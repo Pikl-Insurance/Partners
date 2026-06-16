@@ -9,9 +9,7 @@ import {
   YAxis,
 } from "recharts"
 
-import { buildLeadTimeData } from "@/lib/chart-data"
-
-const data = buildLeadTimeData()
+import { type ActiveFilters, buildLeadTimeData } from "@/lib/chart-data"
 
 const SERIES = [
   { key: "Lead (total)", color: "#10b981" },
@@ -26,7 +24,9 @@ const SERIES = [
 
 const TICK_STYLE = { fontSize: 11, fill: "var(--color-muted-foreground)" }
 
-export function LeadTimeChart() {
+export function LeadTimeChart({ filters }: { filters: ActiveFilters }) {
+  const data = buildLeadTimeData(filters)
+
   return (
     <section>
       <h2 className="mb-4 text-xs font-semibold tracking-wide uppercase">

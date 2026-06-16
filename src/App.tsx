@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/breadcrumb"
 
 import { cn } from "@/lib/utils"
+import { type ActiveFilters, DEFAULT_FILTERS } from "@/lib/chart-data"
 
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard },
@@ -47,6 +48,7 @@ function App() {
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(true)
   const [rightSidebarOpen, setRightSidebarOpen] = useState(true)
   const [hasRun, setHasRun] = useState(false)
+  const [activeFilters, setActiveFilters] = useState<ActiveFilters>(DEFAULT_FILTERS)
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", isDark)
@@ -134,7 +136,7 @@ function App() {
         </aside>
 
         <div className="flex h-full min-w-0 flex-col overflow-hidden">
-          <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-background px-6">
+          <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-6">
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
@@ -214,39 +216,39 @@ function App() {
               ) : (
                 <>
                   <div id="section-bookings" className="scroll-mt-6 space-y-6 rounded-2xl border border-border/80 bg-muted/30 p-6">
-                    <BookingsSnapshot />
+                    <BookingsSnapshot filters={activeFilters} />
                   </div>
 
                   <div id="section-abv" className="mt-8 scroll-mt-6 space-y-6 rounded-2xl border border-border/80 bg-muted/30 p-6">
-                    <AverageBookingValueSnapshot />
+                    <AverageBookingValueSnapshot filters={activeFilters} />
                   </div>
 
                   <div id="section-cal" className="mt-8 scroll-mt-6 space-y-6 rounded-2xl border border-border/80 bg-muted/30 p-6">
-                    <CalFinancials />
+                    <CalFinancials filters={activeFilters} />
                   </div>
 
                   <div id="section-timing" className="mt-8 scroll-mt-6 space-y-6 rounded-2xl border border-border/80 bg-muted/30 p-6">
-                    <TimingSnapshot />
+                    <TimingSnapshot filters={activeFilters} />
                   </div>
 
                   <div id="section-bookings-vs-stays" className="mt-8 scroll-mt-6 rounded-2xl border border-border/80 bg-muted/30 p-6">
-                    <BookingsVsStaysChart />
+                    <BookingsVsStaysChart filters={activeFilters} />
                   </div>
 
                   <div id="section-abv-per-day" className="mt-8 scroll-mt-6 rounded-2xl border border-border/80 bg-muted/30 p-6">
-                    <AbvPerDayChart />
+                    <AbvPerDayChart filters={activeFilters} />
                   </div>
 
                   <div id="section-lead-time" className="mt-8 scroll-mt-6 rounded-2xl border border-border/80 bg-muted/30 p-6">
-                    <LeadTimeChart />
+                    <LeadTimeChart filters={activeFilters} />
                   </div>
 
                   <div id="section-bookings-per-day" className="mt-8 scroll-mt-6 rounded-2xl border border-border/80 bg-muted/30 p-6">
-                    <BookingsMadePerDayChart />
+                    <BookingsMadePerDayChart filters={activeFilters} />
                   </div>
 
                   <div id="section-cal-ddl-takeup" className="mt-8 scroll-mt-6 rounded-2xl border border-border/80 bg-muted/30 p-6">
-                    <CalDdlTakeupChart />
+                    <CalDdlTakeupChart filters={activeFilters} />
                   </div>
                 </>
               )}
@@ -256,7 +258,10 @@ function App() {
             <FilterSidebar
               open={rightSidebarOpen}
               onToggle={() => setRightSidebarOpen((prev) => !prev)}
-              onRun={() => setHasRun(true)}
+              onRun={(filters) => {
+                setActiveFilters(filters)
+                setHasRun(true)
+              }}
             />
           </div>
         </div>

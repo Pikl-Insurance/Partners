@@ -9,9 +9,7 @@ import {
   YAxis,
 } from "recharts"
 
-import { buildAbvPerDayData } from "@/lib/chart-data"
-
-const data = buildAbvPerDayData()
+import { type ActiveFilters, buildAbvPerDayData } from "@/lib/chart-data"
 
 const SERIES = [
   { key: "ABV (total)", color: "#3b82f6" },
@@ -26,7 +24,9 @@ const SERIES = [
 
 const TICK_STYLE = { fontSize: 11, fill: "var(--color-muted-foreground)" }
 
-export function AbvPerDayChart() {
+export function AbvPerDayChart({ filters }: { filters: ActiveFilters }) {
+  const data = buildAbvPerDayData(filters)
+
   return (
     <section>
       <h2 className="mb-4 text-xs font-semibold tracking-wide uppercase">

@@ -25,6 +25,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { type ActiveFilters, getBookingProfile } from "@/lib/chart-data"
 
 
 type BookingMetric = {
@@ -34,51 +35,102 @@ type BookingMetric = {
   description: string
 }
 
-const bookingMetrics: BookingMetric[] = [
-  {
-    label: "Total bookings",
-    value: "124,500",
-    icon: CalendarCheck,
-    description: "Total number of bookings across all selected partners and brands.",
-  },
-  {
-    label: "CAL sales",
-    value: "3,210",
-    icon: TrendingUp,
-    description: "Sales completed through the CAL payment method for the selected period.",
-  },
-  {
-    label: "CAL take-up %",
-    value: "3.8%",
-    icon: Percent,
-    description: "Percentage of eligible bookings that converted to CAL sales.",
-  },
-  {
-    label: "DDL sales",
-    value: "48",
-    icon: CreditCard,
-    description: "Sales completed through direct debit (DDL) for the selected period.",
-  },
-  {
-    label: "DDL take-up %",
-    value: "1.5%",
-    icon: Gauge,
-    description: "Percentage of eligible bookings that converted to DDL sales.",
-  },
+const BASE_PARTNER_ROWS = [
+  { brand: "Partner Alpha", ccy: "GBP", color: "bg-blue-500" },
+  { brand: "Partner Beta", ccy: "GBP", color: "bg-cyan-500" },
+  { brand: "Partner Gamma (DK)", ccy: "EUR", color: "bg-amber-500" },
+  { brand: "Partner Gamma (EUR)", ccy: "EUR", color: "bg-violet-500" },
+  { brand: "Partner Delta (EUR)", ccy: "EUR", color: "bg-rose-500" },
+  { brand: "Partner Epsilon", ccy: "GBP", color: "bg-lime-500" },
+  { brand: "Partner Zeta (DK)", ccy: "EUR", color: "bg-pink-500" },
+  { brand: "Partner Zeta (EUR)", ccy: "EUR", color: "bg-orange-500" },
 ]
 
-const partnerRows = [
-  { brand: "Partner Alpha", ccy: "GBP", bookings: "42,310", cal: "1,104 2.6%", ddl: "12 0.0%", color: "bg-blue-500" },
-  { brand: "Partner Beta", ccy: "GBP", bookings: "38,750", cal: "892 2.3%", ddl: "8 0.0%", color: "bg-cyan-500" },
-  { brand: "Partner Gamma (DK)", ccy: "EUR", bookings: "9,420", cal: "310 3.3%", ddl: "0 0.0%", color: "bg-amber-500" },
-  { brand: "Partner Gamma (EUR)", ccy: "EUR", bookings: "7,880", cal: "0 0.0%", ddl: "0 0.0%", color: "bg-violet-500" },
-  { brand: "Partner Delta (EUR)", ccy: "EUR", bookings: "5,640", cal: "0 0.0%", ddl: "0 0.0%", color: "bg-rose-500" },
-  { brand: "Partner Epsilon", ccy: "GBP", bookings: "4,200", cal: "0 0.0%", ddl: "0 0.0%", color: "bg-lime-500" },
-  { brand: "Partner Zeta (DK)", ccy: "EUR", bookings: "11,800", cal: "620 5.3%", ddl: "18 0.2%", color: "bg-pink-500" },
-  { brand: "Partner Zeta (EUR)", ccy: "EUR", bookings: "4,500", cal: "284 6.3%", ddl: "10 0.2%", color: "bg-orange-500" },
-]
+// Per-row data keyed by partner:brand profile
+const ROW_DATA: Record<string, Array<{ bookings: string; cal: string; ddl: string }>> = {
+  "all-partners:all-brands": [
+    { bookings: "42,310", cal: "1,104 2.6%", ddl: "12 0.0%" },
+    { bookings: "38,750", cal: "892 2.3%", ddl: "8 0.0%" },
+    { bookings: "9,420",  cal: "310 3.3%", ddl: "0 0.0%" },
+    { bookings: "7,880",  cal: "0 0.0%",   ddl: "0 0.0%" },
+    { bookings: "5,640",  cal: "0 0.0%",   ddl: "0 0.0%" },
+    { bookings: "4,200",  cal: "0 0.0%",   ddl: "0 0.0%" },
+    { bookings: "11,800", cal: "620 5.3%", ddl: "18 0.2%" },
+    { bookings: "4,500",  cal: "284 6.3%", ddl: "10 0.2%" },
+  ],
+  "partner-a:all-brands": [
+    { bookings: "18,100", cal: "480 2.7%", ddl: "5 0.0%" },
+    { bookings: "11,200", cal: "220 1.8%", ddl: "3 0.0%" },
+    { bookings: "4,100",  cal: "0 0.0%",   ddl: "0 0.0%" },
+    { bookings: "2,900",  cal: "0 0.0%",   ddl: "0 0.0%" },
+    { bookings: "2,010",  cal: "0 0.0%",   ddl: "0 0.0%" },
+    { bookings: "1,400",  cal: "0 0.0%",   ddl: "0 0.0%" },
+    { bookings: "1,900",  cal: "220 2.4%", ddl: "4 0.0%" },
+    { bookings: "700",    cal: "184 4.2%", ddl: "0 0.0%" },
+  ],
+  "partner-b:all-brands": [
+    { bookings: "14,200", cal: "390 2.7%", ddl: "3 0.0%" },
+    { bookings: "10,800", cal: "240 1.7%", ddl: "2 0.0%" },
+    { bookings: "3,600",  cal: "120 2.9%", ddl: "0 0.0%" },
+    { bookings: "3,200",  cal: "0 0.0%",   ddl: "0 0.0%" },
+    { bookings: "2,100",  cal: "0 0.0%",   ddl: "0 0.0%" },
+    { bookings: "1,850",  cal: "0 0.0%",   ddl: "0 0.0%" },
+    { bookings: "2,000",  cal: "0 0.0%",   ddl: "0 0.0%" },
+    { bookings: "1,000",  cal: "142 3.8%", ddl: "3 0.0%" },
+  ],
+  "partner-c:all-brands": [
+    { bookings: "10,010", cal: "234 2.3%", ddl: "4 0.0%" },
+    { bookings: "16,750", cal: "432 2.6%", ddl: "5 0.0%" },
+    { bookings: "1,720",  cal: "190 3.9%", ddl: "0 0.0%" },
+    { bookings: "1,780",  cal: "0 0.0%",   ddl: "0 0.0%" },
+    { bookings: "1,530",  cal: "0 0.0%",   ddl: "0 0.0%" },
+    { bookings: "950",    cal: "0 0.0%",   ddl: "0 0.0%" },
+    { bookings: "7,900",  cal: "400 5.1%", ddl: "14 0.2%" },
+    { bookings: "2,800",  cal: "158 5.6%", ddl: "5 0.2%" },
+  ],
+}
 
-export function BookingsSnapshot() {
+function getPartnerRows(filters: ActiveFilters) {
+  const key = `${filters.partner}:${filters.brand}`
+  const rowData = ROW_DATA[key] ?? ROW_DATA["all-partners:all-brands"]
+  return BASE_PARTNER_ROWS.map((base, i) => ({ ...base, ...rowData[i] }))
+}
+
+export function BookingsSnapshot({ filters }: { filters: ActiveFilters }) {
+  const profile = getBookingProfile(filters)
+  const bookingMetrics: BookingMetric[] = [
+    {
+      label: "Total bookings",
+      value: profile.total,
+      icon: CalendarCheck,
+      description: "Total number of bookings across all selected partners and brands.",
+    },
+    {
+      label: "CAL sales",
+      value: profile.calSales,
+      icon: TrendingUp,
+      description: "Sales completed through the CAL payment method for the selected period.",
+    },
+    {
+      label: "CAL take-up %",
+      value: profile.calPct,
+      icon: Percent,
+      description: "Percentage of eligible bookings that converted to CAL sales.",
+    },
+    {
+      label: "DDL sales",
+      value: profile.ddlSales,
+      icon: CreditCard,
+      description: "Sales completed through direct debit (DDL) for the selected period.",
+    },
+    {
+      label: "DDL take-up %",
+      value: profile.ddlPct,
+      icon: Gauge,
+      description: "Percentage of eligible bookings that converted to DDL sales.",
+    },
+  ]
+  const partnerRows = getPartnerRows(filters)
   const [showBreakdown, setShowBreakdown] = useState(false)
 
   return (

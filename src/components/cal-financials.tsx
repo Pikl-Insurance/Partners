@@ -7,6 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { type ActiveFilters, getCalFinProfile } from "@/lib/chart-data"
 
 type FinancialMetric = {
   label: string
@@ -16,53 +17,54 @@ type FinancialMetric = {
   note?: string
 }
 
-const financialMetrics: FinancialMetric[] = [
-  {
-    label: "Total payable (GBP)",
-    value: "£214,500",
-    icon: DollarSign,
-    description: "Total amount payable to partners in GBP for the selected period.",
-  },
-  {
-    label: "IPT (GBP)",
-    value: "£22,400",
-    icon: DollarSign,
-    description: "Insurance premium tax amount in GBP for the selected period.",
-  },
-  {
-    label: "PISL comm (GBP)",
-    value: "£61,800",
-    icon: DollarSign,
-    description: "PISL commission amount in GBP for the selected period.",
-  },
-  {
-    label: "Capacity net (GBP)",
-    value: "£130,200",
-    icon: DollarSign,
-    description: "Net capacity value in GBP after deductions for the selected period.",
-  },
-  {
-    label: "PISL amount payable (GBP)",
-    value: "£154,600",
-    icon: DollarSign,
-    description: "Total PISL amount payable in GBP for the selected period.",
-  },
-  {
-    label: "Premium inc. IPT (GBP)",
-    value: "£328,400",
-    icon: DollarSign,
-    description: "Total premium including insurance premium tax in GBP.",
-  },
-  {
-    label: "GWP (GBP)",
-    value: "£306,000",
-    icon: DollarSign,
-    description: "Gross written premium in GBP for the selected period.",
-    note: "Gross written premium",
-  },
-]
+export function CalFinancials({ filters }: { filters: ActiveFilters }) {
+  const profile = getCalFinProfile(filters)
+  const financialMetrics: FinancialMetric[] = [
+    {
+      label: "Total payable (GBP)",
+      value: profile.totalPayable,
+      icon: DollarSign,
+      description: "Total amount payable to partners in GBP for the selected period.",
+    },
+    {
+      label: "IPT (GBP)",
+      value: profile.ipt,
+      icon: DollarSign,
+      description: "Insurance premium tax amount in GBP for the selected period.",
+    },
+    {
+      label: "PISL comm (GBP)",
+      value: profile.pislComm,
+      icon: DollarSign,
+      description: "PISL commission amount in GBP for the selected period.",
+    },
+    {
+      label: "Capacity net (GBP)",
+      value: profile.capacityNet,
+      icon: DollarSign,
+      description: "Net capacity value in GBP after deductions for the selected period.",
+    },
+    {
+      label: "PISL amount payable (GBP)",
+      value: profile.pislPayable,
+      icon: DollarSign,
+      description: "Total PISL amount payable in GBP for the selected period.",
+    },
+    {
+      label: "Premium inc. IPT (GBP)",
+      value: profile.premiumInc,
+      icon: DollarSign,
+      description: "Total premium including insurance premium tax in GBP.",
+    },
+    {
+      label: "GWP (GBP)",
+      value: profile.gwp,
+      icon: DollarSign,
+      description: "Gross written premium in GBP for the selected period.",
+      note: "Gross written premium",
+    },
+  ]
 
-export function CalFinancials() {
   return (
     <TooltipProvider>
       <section>

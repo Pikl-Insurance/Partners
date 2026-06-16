@@ -9,14 +9,14 @@ import {
   YAxis,
 } from "recharts"
 
-import { buildDailyBookingsData } from "@/lib/chart-data"
-
-const data = buildDailyBookingsData()
+import { type ActiveFilters, buildDailyBookingsData } from "@/lib/chart-data"
 
 const TICK_STYLE = { fontSize: 11, fill: "var(--color-muted-foreground)" }
 const EVERY_NTH = 13
 
-export function BookingsVsStaysChart() {
+export function BookingsVsStaysChart({ filters }: { filters: ActiveFilters }) {
+  const data = buildDailyBookingsData(filters)
+
   return (
     <section>
       <h2 className="mb-4 text-xs font-semibold tracking-wide uppercase">

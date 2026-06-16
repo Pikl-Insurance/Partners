@@ -9,9 +9,7 @@ import {
   YAxis,
 } from "recharts"
 
-import { buildCalDdlTakeupData } from "@/lib/chart-data"
-
-const data = buildCalDdlTakeupData()
+import { type ActiveFilters, buildCalDdlTakeupData } from "@/lib/chart-data"
 
 const SERIES = [
   { key: "CAL % (total)", color: "#10b981" },
@@ -23,7 +21,9 @@ const SERIES = [
 
 const TICK_STYLE = { fontSize: 11, fill: "var(--color-muted-foreground)" }
 
-export function CalDdlTakeupChart() {
+export function CalDdlTakeupChart({ filters }: { filters: ActiveFilters }) {
+  const data = buildCalDdlTakeupData(filters)
+
   return (
     <section>
       <h2 className="mb-4 text-xs font-semibold tracking-wide uppercase">

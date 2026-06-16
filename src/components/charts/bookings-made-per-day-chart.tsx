@@ -8,13 +8,13 @@ import {
   YAxis,
 } from "recharts"
 
-import { buildBookingsMadePerDayData } from "@/lib/chart-data"
-
-const data = buildBookingsMadePerDayData()
+import { type ActiveFilters, buildBookingsMadePerDayData } from "@/lib/chart-data"
 
 const TICK_STYLE = { fontSize: 11, fill: "var(--color-muted-foreground)" }
 
-export function BookingsMadePerDayChart() {
+export function BookingsMadePerDayChart({ filters }: { filters: ActiveFilters }) {
+  const data = buildBookingsMadePerDayData(filters)
+
   return (
     <section>
       <h2 className="mb-4 text-xs font-semibold tracking-wide uppercase">

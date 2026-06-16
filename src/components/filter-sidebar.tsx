@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import type { ActiveFilters } from "@/lib/chart-data"
 
 const months = [
   "January",
@@ -36,7 +37,7 @@ const metricOptions = [
 type FilterSidebarProps = {
   open: boolean
   onToggle: () => void
-  onRun: () => void
+  onRun: (filters: ActiveFilters) => void
 }
 
 export function FilterSidebar({ open, onToggle, onRun }: FilterSidebarProps) {
@@ -47,6 +48,10 @@ export function FilterSidebar({ open, onToggle, onRun }: FilterSidebarProps) {
   const [month, setMonth] = useState("June")
   const [metric, setMetric] = useState<(typeof metricOptions)[number]["value"]>("sales")
   const [sortBy, setSortBy] = useState("revenue-desc")
+
+  function handleRun() {
+    onRun({ partner, brand, dateRange, year, month, metric, sortBy })
+  }
 
   return (
     <aside className="relative flex min-h-0 flex-col border-l border-border bg-card">
@@ -70,7 +75,7 @@ export function FilterSidebar({ open, onToggle, onRun }: FilterSidebarProps) {
           <Separator className="w-6" />
           <button
             type="button"
-            onClick={onRun}
+            onClick={handleRun}
             title="Run report"
             className="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground transition-colors hover:bg-primary/90"
           >
@@ -202,7 +207,7 @@ export function FilterSidebar({ open, onToggle, onRun }: FilterSidebarProps) {
       </div>
 
       <div className="border-t border-border p-6 data-[hidden=true]:hidden" data-hidden={!open}>
-        <Button className="w-full" onClick={onRun}>Run</Button>
+        <Button className="w-full" onClick={handleRun}>Run</Button>
       </div>
     </aside>
   )

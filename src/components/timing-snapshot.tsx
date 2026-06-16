@@ -16,6 +16,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { type ActiveFilters, getTimingProfile } from "@/lib/chart-data"
 
 type CurrencyTiming = {
   currency: "GBP" | "EUR"
@@ -32,34 +33,65 @@ type TimingCard = {
   emptyNote?: string
 }
 
-const timingCards: TimingCard[] = [
-  {
-    label: "Avg booking to stay",
-    icon: Clock,
-    description: "Average number of days between booking date and stay start date.",
-    columns: [
-      { currency: "GBP", flag: "uk", value: "94.2 days", cal: "CAL 118.7 days" },
-      { currency: "EUR", flag: "eu", value: "108.5 days", cal: "CAL 134.1 days" },
-    ],
-  },
-  {
-    label: "Avg cancellation to stay",
-    icon: Timer,
-    description: "Average number of days between cancellation date and stay start date.",
-    emptyNote: "Days from cancellation to stay start",
-  },
+const BASE_TIMING_ROWS = [
+  { brand: "Partner Alpha",       ccy: "GBP", color: "bg-blue-500"   },
+  { brand: "Partner Beta",        ccy: "GBP", color: "bg-cyan-500"   },
+  { brand: "Partner Gamma (DK)",  ccy: "EUR", color: "bg-amber-500"  },
+  { brand: "Partner Gamma (EUR)", ccy: "EUR", color: "bg-violet-500" },
+  { brand: "Partner Delta (EUR)", ccy: "EUR", color: "bg-rose-500"   },
+  { brand: "Partner Epsilon",     ccy: "GBP", color: "bg-lime-500"   },
+  { brand: "Partner Zeta (DK)",   ccy: "EUR", color: "bg-pink-500"   },
+  { brand: "Partner Zeta (EUR)",  ccy: "EUR", color: "bg-orange-500" },
 ]
 
-const timingRows = [
-  { brand: "Partner Alpha", ccy: "GBP", avgLead: "92.4 days", calAvgLead: "118.7 days", color: "bg-blue-500" },
-  { brand: "Partner Beta", ccy: "GBP", avgLead: "86.1 days", calAvgLead: "—", color: "bg-cyan-500" },
-  { brand: "Partner Gamma (DK)", ccy: "EUR", avgLead: "101.3 days", calAvgLead: "142.0 days", color: "bg-amber-500" },
-  { brand: "Partner Gamma (EUR)", ccy: "EUR", avgLead: "115.6 days", calAvgLead: "—", color: "bg-violet-500" },
-  { brand: "Partner Delta (EUR)", ccy: "EUR", avgLead: "128.4 days", calAvgLead: "—", color: "bg-rose-500" },
-  { brand: "Partner Epsilon", ccy: "GBP", avgLead: "134.2 days", calAvgLead: "—", color: "bg-lime-500" },
-  { brand: "Partner Zeta (DK)", ccy: "EUR", avgLead: "109.8 days", calAvgLead: "138.5 days", color: "bg-pink-500" },
-  { brand: "Partner Zeta (EUR)", ccy: "EUR", avgLead: "97.3 days", calAvgLead: "124.9 days", color: "bg-orange-500" },
-]
+const TIMING_ROW_DATA: Record<string, Array<{ avgLead: string; calAvgLead: string }>> = {
+  "all-partners:all-brands": [
+    { avgLead: "92.4 days",  calAvgLead: "118.7 days" },
+    { avgLead: "86.1 days",  calAvgLead: "—"          },
+    { avgLead: "101.3 days", calAvgLead: "142.0 days" },
+    { avgLead: "115.6 days", calAvgLead: "—"          },
+    { avgLead: "128.4 days", calAvgLead: "—"          },
+    { avgLead: "134.2 days", calAvgLead: "—"          },
+    { avgLead: "109.8 days", calAvgLead: "138.5 days" },
+    { avgLead: "97.3 days",  calAvgLead: "124.9 days" },
+  ],
+  "partner-a:all-brands": [
+    { avgLead: "85.2 days",  calAvgLead: "108.4 days" },
+    { avgLead: "79.8 days",  calAvgLead: "—"          },
+    { avgLead: "94.6 days",  calAvgLead: "132.1 days" },
+    { avgLead: "108.3 days", calAvgLead: "—"          },
+    { avgLead: "121.0 days", calAvgLead: "—"          },
+    { avgLead: "127.5 days", calAvgLead: "—"          },
+    { avgLead: "102.4 days", calAvgLead: "129.3 days" },
+    { avgLead: "90.1 days",  calAvgLead: "116.7 days" },
+  ],
+  "partner-b:all-brands": [
+    { avgLead: "98.7 days",  calAvgLead: "126.2 days" },
+    { avgLead: "92.4 days",  calAvgLead: "—"          },
+    { avgLead: "108.5 days", calAvgLead: "151.4 days" },
+    { avgLead: "122.9 days", calAvgLead: "—"          },
+    { avgLead: "136.1 days", calAvgLead: "—"          },
+    { avgLead: "142.0 days", calAvgLead: "—"          },
+    { avgLead: "117.3 days", calAvgLead: "147.8 days" },
+    { avgLead: "103.8 days", calAvgLead: "133.1 days" },
+  ],
+  "partner-c:all-brands": [
+    { avgLead: "89.0 days",  calAvgLead: "113.5 days" },
+    { avgLead: "83.6 days",  calAvgLead: "—"          },
+    { avgLead: "97.8 days",  calAvgLead: "137.2 days" },
+    { avgLead: "111.4 days", calAvgLead: "—"          },
+    { avgLead: "124.6 days", calAvgLead: "—"          },
+    { avgLead: "130.9 days", calAvgLead: "—"          },
+    { avgLead: "106.1 days", calAvgLead: "133.8 days" },
+    { avgLead: "93.7 days",  calAvgLead: "120.4 days" },
+  ],
+}
+
+function getTimingRows(filters: ActiveFilters) {
+  const key = `${filters.partner}:${filters.brand}`
+  const rowData = TIMING_ROW_DATA[key] ?? TIMING_ROW_DATA["all-partners:all-brands"]
+  return BASE_TIMING_ROWS.map((base, i) => ({ ...base, ...rowData[i] }))
+}
 
 function FlagBadge({ type }: { type: "uk" | "eu" }) {
   const src = type === "uk" ? "https://flagcdn.com/w40/gb.png" : "https://flagcdn.com/w40/eu.png"
@@ -71,8 +103,27 @@ function FlagBadge({ type }: { type: "uk" | "eu" }) {
   )
 }
 
-export function TimingSnapshot() {
+export function TimingSnapshot({ filters }: { filters: ActiveFilters }) {
   const [showBreakdown, setShowBreakdown] = useState(false)
+  const profile = getTimingProfile(filters)
+  const timingRows = getTimingRows(filters)
+  const timingCards: TimingCard[] = [
+    {
+      label: "Avg booking to stay",
+      icon: Clock,
+      description: "Average number of days between booking date and stay start date.",
+      columns: [
+        { currency: "GBP", flag: "uk", value: profile.gbpDays, cal: profile.gbpCal },
+        { currency: "EUR", flag: "eu", value: profile.eurDays, cal: profile.eurCal },
+      ],
+    },
+    {
+      label: "Avg cancellation to stay",
+      icon: Timer,
+      description: "Average number of days between cancellation date and stay start date.",
+      emptyNote: "Days from cancellation to stay start",
+    },
+  ]
 
   return (
     <TooltipProvider>
