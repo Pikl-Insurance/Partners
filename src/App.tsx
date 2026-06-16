@@ -6,14 +6,15 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Download,
+  KeyRound,
   LayoutDashboard,
   MoonStar,
-  Mountain,
   ShieldCheck,
   Sun,
 } from "lucide-react"
 
 import { FilterSidebar } from "@/components/filter-sidebar"
+import { SectionNav } from "@/components/section-nav"
 import { AverageBookingValueSnapshot } from "@/components/average-booking-value-snapshot"
 import { BookingsSnapshot } from "@/components/bookings-snapshot"
 import { CalFinancials } from "@/components/cal-financials"
@@ -89,9 +90,7 @@ function App() {
                 {/* Logo row */}
                 <div className="flex h-16 shrink-0 items-center justify-between gap-2">
                   <div className="flex min-w-0 items-center gap-2.5">
-                    <div className="grid size-7 shrink-0 place-items-center rounded-md bg-[var(--brand-dark-blue)] text-[var(--brand-light-blue)]">
-                      <Mountain className="size-3.5" />
-                    </div>
+                    <KeyRound className="size-5 shrink-0 text-foreground" />
                     <span className="truncate text-base font-semibold tracking-tight">Keystone</span>
                   </div>
                   <Button
@@ -125,6 +124,12 @@ function App() {
                   ))}
                 </nav>
               </div>
+
+              {hasRun && (
+                <div className="mt-auto px-5 pb-6">
+                  <SectionNav />
+                </div>
+              )}
             </div>
           ) : (
             <div className="flex min-h-0 flex-1 flex-col items-center overflow-hidden px-2">
@@ -141,9 +146,9 @@ function App() {
                 </Button>
               </div>
 
-              <div className="mt-4 flex size-7 items-center justify-center rounded-md bg-[var(--brand-dark-blue)] text-[var(--brand-light-blue)]">
-                <Mountain className="size-3.5" />
-              </div>
+              <span className="mt-4" title="Keystone">
+                <KeyRound className="size-5 text-foreground" />
+              </span>
 
               <nav className="mt-4 flex w-full flex-col items-center gap-1">
                 {navItems.map(({ label, icon: Icon, active }) => (
@@ -246,6 +251,12 @@ function App() {
               <section className="h-full overflow-y-auto px-20 py-12 xl:px-24 xl:py-14">
               <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
                 <div>
+                  <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/60 px-2.5 py-1">
+                    <BarChart3 className="size-3.5 text-muted-foreground" />
+                    <span className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
+                      Analytics
+                    </span>
+                  </div>
                   <h1 className="text-[22px] font-semibold tracking-tight">
                     Sales, cancellation &amp; re-let metrics
                   </h1>
@@ -334,7 +345,6 @@ function App() {
 
             {/* Filter sidebar */}
             <FilterSidebar
-              hasRun={hasRun}
               onRun={(filters) => {
                 setActiveFilters(filters)
                 setHasRun(true)

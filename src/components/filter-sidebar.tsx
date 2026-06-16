@@ -12,7 +12,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import type { ActiveFilters } from "@/lib/chart-data"
-import { SectionNav } from "@/components/section-nav"
 
 const months = [
   "January",
@@ -37,10 +36,9 @@ const metricOptions = [
 
 type FilterSidebarProps = {
   onRun: (filters: ActiveFilters) => void
-  hasRun: boolean
 }
 
-export function FilterSidebar({ onRun, hasRun }: FilterSidebarProps) {
+export function FilterSidebar({ onRun }: FilterSidebarProps) {
   const [partner, setPartner] = useState("all-partners")
   const [brand, setBrand] = useState("all-brands")
   const [dateRange, setDateRange] = useState("year-to-month-end")
@@ -181,7 +179,6 @@ export function FilterSidebar({ onRun, hasRun }: FilterSidebarProps) {
       </div>
 
       <div className="shrink-0">
-        {hasRun && <SectionNav />}
         <div className="relative px-6 pb-6">
           <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-border" />
           <div className="pt-4">

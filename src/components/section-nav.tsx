@@ -22,7 +22,7 @@ export function SectionNav() {
   }
 
   return (
-    <div className="px-4 pb-2">
+    <div className="w-full">
       {open && (
         <div className="mb-2 overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-xs">
           <div className="flex items-center gap-2.5 px-4 py-3.5">
