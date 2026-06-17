@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Ban, RefreshCw, TrendingUp } from "lucide-react"
+import { Ban, ListFilter, RefreshCw, TrendingUp } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -58,7 +58,10 @@ export function DashboardFilterBar({ filters, onRun }: DashboardFilterBarProps) 
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xs">
       <div className="shrink-0 border-b border-border px-4 py-3">
-        <h2 className="text-sm font-semibold">Filters</h2>
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-sm font-semibold">Filters</h2>
+          <ListFilter className="size-4 shrink-0 text-muted-foreground" />
+        </div>
         <p className="mt-0.5 text-xs text-muted-foreground">
           Refine metrics by partner, brand, and period.
         </p>
