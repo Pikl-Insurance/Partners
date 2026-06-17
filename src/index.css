@@ -11,7 +11,7 @@
   --brand-grey-blue: #f1f6fb;
 
   /* Surfaces */
-  --background: var(--brand-grey-blue);
+  --background: #ffffff;
   --foreground: var(--brand-dark-blue);
   --card: #ffffff;
   --card-foreground: var(--brand-dark-blue);
@@ -34,18 +34,18 @@
   --destructive: #dc2626;
 
   /* Ambient gradients */
-  --gradient-from: #f1f6fb;
-  --gradient-mid: #f1fdfe;
-  --gradient-to: #eef8f6;
+  --gradient-from: #ffffff;
+  --gradient-mid: #fafcfe;
+  --gradient-to: #ffffff;
   --glow-pink: rgb(238 42 123 / 0.07);
   --glow-green: rgb(162 255 227 / 0.12);
   --glow-blue: rgb(241 253 254 / 0.9);
-  --panel-bg: rgb(255 255 255 / 0.55);
+  --panel-bg: var(--brand-grey-blue);
   --panel-border: rgb(36 55 72 / 0.08);
 }
 
 .dark {
-  --background: #1a2835;
+  --background: rgb(36 55 72 / 0.45);
   --foreground: var(--brand-light-blue);
   --card: #243748;
   --card-foreground: var(--brand-light-blue);
@@ -65,13 +65,13 @@
   --popover-foreground: var(--brand-light-blue);
   --destructive: #f87171;
 
-  --gradient-from: #141f29;
-  --gradient-mid: #243748;
-  --gradient-to: #1a2835;
+  --gradient-from: #243748;
+  --gradient-mid: #2a4050;
+  --gradient-to: #243748;
   --glow-pink: rgb(238 42 123 / 0.14);
   --glow-green: rgb(162 255 227 / 0.08);
   --glow-blue: rgb(36 55 72 / 0.6);
-  --panel-bg: rgb(36 55 72 / 0.45);
+  --panel-bg: #1a2835;
   --panel-border: rgb(241 253 254 / 0.08);
 }
 

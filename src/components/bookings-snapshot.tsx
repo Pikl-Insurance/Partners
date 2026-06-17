@@ -90,7 +90,7 @@ const ROW_DATA: Record<string, Array<{ bookings: string; cal: string; ddl: strin
   ],
 }
 
-function getPartnerRows(filters: ActiveFilters) {
+export function getPartnerRows(filters: ActiveFilters) {
   const key = `${filters.partner}:${filters.brand}`
   const rowData = ROW_DATA[key] ?? ROW_DATA["all-partners:all-brands"]
   return BASE_PARTNER_ROWS.map((base, i) => ({ ...base, ...rowData[i] }))

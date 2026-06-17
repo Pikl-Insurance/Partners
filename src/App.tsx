@@ -8,6 +8,7 @@ import {
   Download,
   SquareChartGantt,
   ArrowLeftRight,
+  LayoutDashboard,
   Zap,
   LogOut,
   MoonStar,
@@ -18,6 +19,7 @@ import {
 import { BookingEnginePage } from "@/components/booking-engine-page"
 import { ComparePage } from "@/components/compare-page"
 import { FilterSidebar } from "@/components/filter-sidebar"
+import { InsightsDashboardPage } from "@/components/insights-dashboard-page"
 import { LoginPage } from "@/components/login-page"
 import { SectionNav } from "@/components/section-nav"
 import { AverageBookingValueSnapshot } from "@/components/average-booking-value-snapshot"
@@ -57,7 +59,7 @@ const navItems = [
 ]
 
 type ActiveSection = (typeof navItems)[number]["id"]
-type InsightsView = "insights" | "compare"
+type InsightsView = "insights" | "compare" | "dashboard"
 
 function SectionDivider() {
   return <div aria-hidden className="h-px w-full bg-border" />
@@ -146,7 +148,7 @@ function App() {
               </div>
 
               <div className="relative z-30 mt-auto shrink-0 overflow-visible px-5 pb-6 pt-4">
-                {activeSection === "insights" && hasRun && <SectionNav />}
+                {activeSection === "insights" && insightsView === "insights" && hasRun && <SectionNav />}
                 <Button
                   variant="outline"
                   className={cn("w-full justify-center gap-2 bg-card", hasRun && "mt-4")}
@@ -193,7 +195,7 @@ function App() {
               </nav>
 
               <div className="relative z-30 mt-auto flex w-full shrink-0 flex-col items-center gap-1 overflow-visible px-2 pb-4 pt-4">
-                {activeSection === "insights" && hasRun && <SectionNav collapsed />}
+                {activeSection === "insights" && insightsView === "insights" && hasRun && <SectionNav collapsed />}
                 <button
                   type="button"
                   title="Log out"
@@ -228,7 +230,9 @@ function App() {
                         ? "Admin"
                         : insightsView === "compare"
                           ? "Compare"
-                          : "Insights"}
+                          : insightsView === "dashboard"
+                            ? "Dashboard"
+                            : "Insights"}
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
@@ -293,7 +297,12 @@ function App() {
           >
             {/* Center stage */}
             <div className="min-h-0 min-w-0 overflow-hidden">
-              <section className="h-full overflow-y-auto px-20 py-12 xl:px-24 xl:py-14">
+              <section
+                className={cn(
+                  "h-full overflow-y-auto",
+                  insightsView === "dashboard" ? "px-8 py-10 xl:px-10 xl:py-12" : "px-20 py-12 xl:px-24 xl:py-14"
+                )}
+              >
               {activeSection === "booking-engine" ? (
                 <BookingEnginePage />
               ) : activeSection === "admin" ? (
@@ -314,25 +323,54 @@ function App() {
                 <div>
                   {insightsView !== "compare" && (
                     <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/60 px-2.5 py-1">
-                      <BarChart3 className="size-3.5 text-muted-foreground" />
+                      {insightsView === "dashboard" ? (
+                        <LayoutDashboard className="size-3.5 text-muted-foreground" />
+                      ) : (
+                        <BarChart3 className="size-3.5 text-muted-foreground" />
+                      )}
                       <span className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
-                        Analytics
+                        {insightsView === "dashboard" ? "Dashboard" : "Analytics"}
                       </span>
                     </div>
                   )}
                   <h1 className="text-[22px] font-semibold tracking-tight">
                     {insightsView === "compare"
                       ? "Compare partners"
-                      : "Sales, cancellation & re-let metrics"}
+                      : insightsView === "dashboard"
+                        ? "Insights dashboard"
+                        : "Sales, cancellation & re-let metrics"}
                   </h1>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {insightsView === "compare"
                       ? "Set filters for a primary and comparison side, then run to review metrics side by side."
-                      : "Real-time across 3 partners"}
+                      : insightsView === "dashboard"
+                        ? "At-a-glance KPIs, charts and partner performance for your selected filters."
+                        : "Real-time across 3 partners"}
                   </p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
+                  {insightsView !== "compare" && (
+                    <Button
+                      variant="outline"
+                      className="text-xs"
+                      onClick={() =>
+                        setInsightsView((view) => (view === "dashboard" ? "insights" : "dashboard"))
+                      }
+                    >
+                      {insightsView === "dashboard" ? (
+                        <>
+                          <BarChart3 className="size-3.5" />
+                          Report view
+                        </>
+                      ) : (
+                        <>
+                          <LayoutDashboard className="size-3.5" />
+                          Dashboard
+                        </>
+                      )}
+                    </Button>
+                  )}
                   <Button variant="outline" className="text-xs">
                     <Calendar className="size-3.5" />
                     Schedule report
@@ -341,7 +379,9 @@ function App() {
                     variant="outline"
                     className="text-xs"
                     onClick={() =>
-                      setInsightsView((view) => (view === "compare" ? "insights" : "compare"))
+                      setInsightsView((view) =>
+                        view === "compare" ? "insights" : "compare"
+                      )
                     }
                   >
                     {insightsView === "compare" ? (
@@ -377,6 +417,8 @@ function App() {
                     </p>
                   </div>
                 </div>
+              ) : insightsView === "dashboard" ? (
+                <InsightsDashboardPage filters={activeFilters} />
               ) : (
                 <div>
                   <div id="section-bookings" className="scroll-mt-6 py-8">
