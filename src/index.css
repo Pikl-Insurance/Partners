@@ -15,19 +15,20 @@
   --foreground: var(--brand-dark-blue);
   --card: #ffffff;
   --card-foreground: var(--brand-dark-blue);
-  --canvas: var(--brand-light-blue);
+  --canvas: #f4f7fa;
+  --field: #ffffff;
 
   /* Actions */
-  --primary: var(--brand-green);
-  --primary-foreground: var(--brand-dark-blue);
+  --primary: var(--brand-dark-blue);
+  --primary-foreground: #ffffff;
 
   /* UI chrome */
-  --muted: var(--brand-light-blue);
+  --muted: #eef2f6;
   --muted-foreground: #5a6d7d;
-  --accent: var(--brand-light-blue);
+  --accent: #e4ebf2;
   --accent-foreground: var(--brand-dark-blue);
-  --border: #d9e8ef;
-  --input: #d9e8ef;
+  --border: #d5e0ea;
+  --input: #d5e0ea;
   --ring: var(--brand-pink);
   --popover: #ffffff;
   --popover-foreground: var(--brand-dark-blue);
@@ -35,11 +36,11 @@
 
   /* Ambient gradients */
   --gradient-from: #ffffff;
-  --gradient-mid: #fafcfe;
+  --gradient-mid: #fafbfc;
   --gradient-to: #ffffff;
-  --glow-pink: rgb(238 42 123 / 0.07);
-  --glow-green: rgb(162 255 227 / 0.12);
-  --glow-blue: rgb(241 253 254 / 0.9);
+  --glow-pink: rgb(238 42 123 / 0.05);
+  --glow-green: rgb(162 255 227 / 0.04);
+  --glow-blue: rgb(241 246 251 / 0.6);
   --panel-bg: var(--brand-grey-blue);
   --panel-border: rgb(36 55 72 / 0.08);
 }
@@ -95,6 +96,7 @@
   --color-destructive: var(--destructive);
   --color-canvas: var(--canvas);
   --color-brand: var(--brand-pink);
+  --color-field: var(--field);
 }
 
 * {

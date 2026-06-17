@@ -60,7 +60,7 @@ export function PartnerCard({ partner, expanded, onToggle, onViewProperty }: Par
           <Button
             variant="outline"
             size="sm"
-            className="h-8 gap-1.5 border-emerald-200 bg-emerald-50 text-xs text-emerald-900 hover:bg-emerald-100 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-100"
+            className="h-8 gap-1.5 text-xs"
             onClick={onViewProperty}
           >
             View properties
