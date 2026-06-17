@@ -8,6 +8,7 @@ import {
   YAxis,
 } from "recharts"
 
+import { SortedChartTooltip } from "@/components/charts/sorted-chart-tooltip"
 import { type ActiveFilters, buildBookingsMadePerDayData } from "@/lib/chart-data"
 
 const TICK_STYLE = { fontSize: 11, fill: "var(--color-muted-foreground)" }
@@ -38,15 +39,7 @@ export function BookingsMadePerDayChart({ filters }: { filters: ActiveFilters })
               width={52}
               tickFormatter={(v) => (v as number).toLocaleString()}
             />
-            <Tooltip
-              contentStyle={{
-                fontSize: 12,
-                background: "var(--color-card)",
-                border: "1px solid var(--color-border)",
-                borderRadius: 8,
-              }}
-              formatter={(v) => [(v as number).toLocaleString(), "Bookings"]}
-            />
+            <Tooltip content={<SortedChartTooltip />} />
             <Bar dataKey="bookings" fill="#3b82f6" radius={[2, 2, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>

@@ -9,6 +9,7 @@ import {
   YAxis,
 } from "recharts"
 
+import { SortedChartTooltip } from "@/components/charts/sorted-chart-tooltip"
 import { type ActiveFilters, buildCalDdlTakeupData } from "@/lib/chart-data"
 
 const SERIES = [
@@ -48,13 +49,7 @@ export function CalDdlTakeupChart({ filters }: { filters: ActiveFilters }) {
               tickFormatter={(v) => `${v as number}%`}
             />
             <Tooltip
-              contentStyle={{
-                fontSize: 12,
-                background: "var(--color-card)",
-                border: "1px solid var(--color-border)",
-                borderRadius: 8,
-              }}
-              formatter={(v) => [`${v as number}%`]}
+              content={<SortedChartTooltip valueFormatter={(v) => `${v}%`} />}
             />
             <Legend
               iconType="plainline"

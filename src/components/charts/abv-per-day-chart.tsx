@@ -9,6 +9,7 @@ import {
   YAxis,
 } from "recharts"
 
+import { SortedChartTooltip } from "@/components/charts/sorted-chart-tooltip"
 import { type ActiveFilters, buildAbvPerDayData } from "@/lib/chart-data"
 
 const SERIES = [
@@ -51,13 +52,11 @@ export function AbvPerDayChart({ filters }: { filters: ActiveFilters }) {
               tickFormatter={(v) => `£${(v as number).toLocaleString()}`}
             />
             <Tooltip
-              contentStyle={{
-                fontSize: 12,
-                background: "var(--color-card)",
-                border: "1px solid var(--color-border)",
-                borderRadius: 8,
-              }}
-              formatter={(v) => [`£${(v as number).toLocaleString()}`]}
+              content={
+                <SortedChartTooltip
+                  valueFormatter={(v) => `£${v.toLocaleString()}`}
+                />
+              }
             />
             <Legend
               iconType="plainline"
