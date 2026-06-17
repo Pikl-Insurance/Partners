@@ -64,19 +64,19 @@ type DashboardSlide = {
 function DashboardKpiCard({ label, value, subtext, icon: Icon }: KpiCard) {
   return (
     <Card className="shadow-none">
-      <CardHeader className="items-center p-2.5 pb-1.5">
-        <div className="flex items-center gap-1.5">
-          <div className="grid size-6 shrink-0 place-items-center rounded-md bg-muted text-muted-foreground">
-            <Icon className="size-3" />
+      <CardHeader className="items-center p-3 pb-2">
+        <div className="flex items-center gap-2">
+          <div className="grid size-7 shrink-0 place-items-center rounded-md bg-muted text-muted-foreground">
+            <Icon className="size-3.5" />
           </div>
-          <p className="text-[9px] font-medium tracking-wide text-muted-foreground uppercase">
+          <p className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
             {label}
           </p>
         </div>
       </CardHeader>
-      <CardContent className="p-2.5 pt-0">
-        <p className="text-lg font-medium tracking-tight tabular-nums">{value}</p>
-        <p className="mt-0.5 min-h-3.5 text-[10px] text-muted-foreground">{subtext ?? "\u00a0"}</p>
+      <CardContent className="p-3 pt-0">
+        <p className="text-xl font-medium tracking-tight tabular-nums">{value}</p>
+        <p className="mt-1 min-h-4 text-[11px] text-muted-foreground">{subtext ?? "\u00a0"}</p>
       </CardContent>
     </Card>
   )
@@ -84,7 +84,7 @@ function DashboardKpiCard({ label, value, subtext, icon: Icon }: KpiCard) {
 
 function KpiGrid({ kpis, columns }: { kpis: KpiCard[]; columns: string }) {
   return (
-    <div className={cn("grid gap-2", columns)}>
+    <div className={cn("grid gap-3", columns)}>
       {kpis.map((kpi) => (
         <DashboardKpiCard key={kpi.label} {...kpi} />
       ))}
@@ -119,8 +119,8 @@ function DashboardCarousel({ slides }: { slides: DashboardSlide[] }) {
         </Button>
 
         <div className="min-w-0 flex-1 text-center">
-          <h2 className="truncate text-sm font-semibold">{current.title}</h2>
-          <p className="text-[11px] text-muted-foreground">
+          <h2 className="truncate text-base font-semibold">{current.title}</h2>
+          <p className="text-xs text-muted-foreground">
             {index + 1} of {slides.length}
           </p>
         </div>
@@ -144,7 +144,7 @@ function DashboardCarousel({ slides }: { slides: DashboardSlide[] }) {
             type="button"
             onClick={() => setIndex(slideIndex)}
             className={cn(
-              "shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium transition-colors",
+              "shrink-0 rounded-full px-3 py-1.5 text-[11px] font-medium transition-colors",
               slideIndex === index
                 ? "bg-primary text-primary-foreground"
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
@@ -155,7 +155,7 @@ function DashboardCarousel({ slides }: { slides: DashboardSlide[] }) {
         ))}
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto p-4">{current.content}</div>
+      <div className="min-h-0 flex-1 overflow-y-auto p-5">{current.content}</div>
     </div>
   )
 }
@@ -301,30 +301,30 @@ export function InsightsDashboardPage({ filters, hasRun, onRun }: InsightsDashbo
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="h-9 px-4">Brand</TableHead>
-              <TableHead className="px-4">CCY</TableHead>
-              <TableHead className="px-4 text-right">Bookings</TableHead>
-              <TableHead className="px-4 text-right">CAL</TableHead>
-              <TableHead className="px-4 text-right">DDL</TableHead>
+              <TableHead className="h-11 px-5">Brand</TableHead>
+              <TableHead className="px-5">CCY</TableHead>
+              <TableHead className="px-5 text-right">Bookings</TableHead>
+              <TableHead className="px-5 text-right">CAL</TableHead>
+              <TableHead className="px-5 text-right">DDL</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {partnerRows.map((row) => (
               <TableRow key={row.brand}>
-                <TableCell className="px-4 py-2">
+                <TableCell className="px-5 py-3">
                   <div className="flex items-center gap-2">
                     <span className={`size-2 rounded-full ${row.color}`} />
                     <span className="text-sm">{row.brand}</span>
                   </div>
                 </TableCell>
-                <TableCell className="px-4 py-2 text-sm text-muted-foreground">{row.ccy}</TableCell>
-                <TableCell className="px-4 py-2 text-right text-sm tabular-nums">
+                <TableCell className="px-5 py-3 text-sm text-muted-foreground">{row.ccy}</TableCell>
+                <TableCell className="px-5 py-3 text-right text-sm tabular-nums">
                   {row.bookings}
                 </TableCell>
-                <TableCell className="px-4 py-2 text-right text-sm tabular-nums text-primary dark:text-blue-400">
+                <TableCell className="px-5 py-3 text-right text-sm tabular-nums text-primary dark:text-blue-400">
                   {row.cal}
                 </TableCell>
-                <TableCell className="px-4 py-2 text-right text-sm tabular-nums text-amber-600 dark:text-amber-400">
+                <TableCell className="px-5 py-3 text-right text-sm tabular-nums text-amber-600 dark:text-amber-400">
                   {row.ddl}
                 </TableCell>
               </TableRow>
@@ -353,20 +353,24 @@ export function InsightsDashboardPage({ filters, hasRun, onRun }: InsightsDashbo
         ))}
       </div>
 
-      <div className="shrink-0">
-        <DashboardFilterBar filters={filters} onRun={onRun} />
-      </div>
-
-      {!hasRun ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-muted/10 py-10 text-center">
-          <p className="text-sm font-medium">No data to display</p>
-          <p className="max-w-sm text-sm text-muted-foreground">
-            Adjust filters above, then press <strong>Run</strong> to load the dashboard.
-          </p>
+      <div className="grid min-h-0 flex-1 grid-cols-4 gap-3">
+        <div className="col-span-3 flex min-h-0 min-w-0 flex-col">
+          {!hasRun ? (
+            <div className="flex flex-1 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-muted/10 py-10 text-center">
+              <p className="text-sm font-medium">No data to display</p>
+              <p className="max-w-sm text-sm text-muted-foreground">
+                Adjust filters on the right, then press <strong>Run</strong> to load the dashboard.
+              </p>
+            </div>
+          ) : (
+            <DashboardCarousel slides={slides} />
+          )}
         </div>
-      ) : (
-        <DashboardCarousel slides={slides} />
-      )}
+
+        <div className="col-span-1 min-h-0 min-w-0">
+          <DashboardFilterBar filters={filters} onRun={onRun} />
+        </div>
+      </div>
     </div>
   )
 }

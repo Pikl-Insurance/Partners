@@ -56,8 +56,15 @@ export function DashboardFilterBar({ filters, onRun }: DashboardFilterBarProps) 
   }
 
   return (
-    <div className="rounded-xl border border-border bg-card p-3 shadow-xs">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8 lg:items-end">
+    <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xs">
+      <div className="shrink-0 border-b border-border px-4 py-3">
+        <h2 className="text-sm font-semibold">Filters</h2>
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          Refine metrics by partner, brand, and period.
+        </p>
+      </div>
+
+      <div className="flex-1 space-y-4 overflow-y-auto px-4 py-4">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="dash-partner" className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
             Partner
@@ -108,38 +115,40 @@ export function DashboardFilterBar({ filters, onRun }: DashboardFilterBarProps) 
           </Select>
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="dash-year" className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-            Year
-          </Label>
-          <Select value={year} onValueChange={setYear}>
-            <SelectTrigger id="dash-year" className="h-9 w-full">
-              <SelectValue placeholder="Year" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="2024">2024</SelectItem>
-              <SelectItem value="2025">2025</SelectItem>
-              <SelectItem value="2026">2026</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="dash-year" className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+              Year
+            </Label>
+            <Select value={year} onValueChange={setYear}>
+              <SelectTrigger id="dash-year" className="h-9 w-full">
+                <SelectValue placeholder="Year" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="2024">2024</SelectItem>
+                <SelectItem value="2025">2025</SelectItem>
+                <SelectItem value="2026">2026</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="dash-month" className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-            Month
-          </Label>
-          <Select value={month} onValueChange={setMonth}>
-            <SelectTrigger id="dash-month" className="h-9 w-full">
-              <SelectValue placeholder="Month" />
-            </SelectTrigger>
-            <SelectContent>
-              {months.map((monthName) => (
-                <SelectItem key={monthName} value={monthName}>
-                  {monthName}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="dash-month" className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+              Month
+            </Label>
+            <Select value={month} onValueChange={setMonth}>
+              <SelectTrigger id="dash-month" className="h-9 w-full">
+                <SelectValue placeholder="Month" />
+              </SelectTrigger>
+              <SelectContent>
+                {months.map((monthName) => (
+                  <SelectItem key={monthName} value={monthName}>
+                    {monthName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <div className="flex flex-col gap-1.5">
@@ -190,12 +199,12 @@ export function DashboardFilterBar({ filters, onRun }: DashboardFilterBarProps) 
             </SelectContent>
           </Select>
         </div>
+      </div>
 
-        <div className="col-span-2 sm:col-span-4 lg:col-span-1">
-          <Button className="h-9 w-full" onClick={handleRun}>
-            Run
-          </Button>
-        </div>
+      <div className="shrink-0 border-t border-border px-4 py-4">
+        <Button className="h-9 w-full" onClick={handleRun}>
+          Run
+        </Button>
       </div>
     </div>
   )

@@ -41,7 +41,7 @@ export function AbvPerDayChart({ filters, compact }: AbvPerDayChartProps) {
         </h2>
       )}
       <div className={compact ? "p-0" : "rounded-xl border border-border bg-card p-4 shadow-xs"}>
-        <ResponsiveContainer width="100%" height={compact ? 200 : 280}>
+        <ResponsiveContainer width="100%" height={compact ? 300 : 280}>
           <LineChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
             <XAxis
