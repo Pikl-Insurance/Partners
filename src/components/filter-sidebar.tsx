@@ -63,85 +63,95 @@ export function FilterSidebar({ onRun }: FilterSidebarProps) {
           </p>
         </div>
 
-        <div className="space-y-3">
+        <div className="flex flex-col gap-2">
           <Label htmlFor="partner-filter">Partner</Label>
-          <Select value={partner} onValueChange={setPartner}>
-            <SelectTrigger id="partner-filter">
-              <SelectValue placeholder="Select partner" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all-partners">All partners</SelectItem>
-              <SelectItem value="partner-a">Partner A</SelectItem>
-              <SelectItem value="partner-b">Partner B</SelectItem>
-              <SelectItem value="partner-c">Partner C</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-3">
-          <Label htmlFor="brand-filter">Brand</Label>
-          <Select value={brand} onValueChange={setBrand}>
-            <SelectTrigger id="brand-filter">
-              <SelectValue placeholder="Select brand" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all-brands">All brands</SelectItem>
-              <SelectItem value="brand-a">Brand A</SelectItem>
-              <SelectItem value="brand-b">Brand B</SelectItem>
-              <SelectItem value="brand-c">Brand C</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-3">
-          <Label htmlFor="date-range-filter">Date range</Label>
-          <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger id="date-range-filter">
-              <SelectValue placeholder="Select date range" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="calendar-month">Calendar month</SelectItem>
-              <SelectItem value="year-to-month-end">Year to month-end</SelectItem>
-              <SelectItem value="custom-range">Custom range</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-3">
-            <Label htmlFor="year-filter">Year</Label>
-            <Select value={year} onValueChange={setYear}>
-              <SelectTrigger id="year-filter">
-                <SelectValue placeholder="Year" />
+          <div>
+            <Select value={partner} onValueChange={setPartner}>
+              <SelectTrigger id="partner-filter">
+                <SelectValue placeholder="Select partner" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="2024">2024</SelectItem>
-                <SelectItem value="2025">2025</SelectItem>
-                <SelectItem value="2026">2026</SelectItem>
+                <SelectItem value="all-partners">All partners</SelectItem>
+                <SelectItem value="partner-a">Partner A</SelectItem>
+                <SelectItem value="partner-b">Partner B</SelectItem>
+                <SelectItem value="partner-c">Partner C</SelectItem>
               </SelectContent>
             </Select>
           </div>
+        </div>
 
-          <div className="space-y-3">
-            <Label htmlFor="month-filter">Month</Label>
-            <Select value={month} onValueChange={setMonth}>
-              <SelectTrigger id="month-filter">
-                <SelectValue placeholder="Month" />
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="brand-filter">Brand</Label>
+          <div>
+            <Select value={brand} onValueChange={setBrand}>
+              <SelectTrigger id="brand-filter">
+                <SelectValue placeholder="Select brand" />
               </SelectTrigger>
               <SelectContent>
-                {months.map((monthName) => (
-                  <SelectItem key={monthName} value={monthName}>
-                    {monthName}
-                  </SelectItem>
-                ))}
+                <SelectItem value="all-brands">All brands</SelectItem>
+                <SelectItem value="brand-a">Brand A</SelectItem>
+                <SelectItem value="brand-b">Brand B</SelectItem>
+                <SelectItem value="brand-c">Brand C</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="date-range-filter">Date range</Label>
+          <div>
+            <Select value={dateRange} onValueChange={setDateRange}>
+              <SelectTrigger id="date-range-filter">
+                <SelectValue placeholder="Select date range" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="calendar-month">Calendar month</SelectItem>
+                <SelectItem value="year-to-month-end">Year to month-end</SelectItem>
+                <SelectItem value="custom-range">Custom range</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="year-filter">Year</Label>
+            <div>
+              <Select value={year} onValueChange={setYear}>
+                <SelectTrigger id="year-filter">
+                  <SelectValue placeholder="Year" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="2024">2024</SelectItem>
+                  <SelectItem value="2025">2025</SelectItem>
+                  <SelectItem value="2026">2026</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="month-filter">Month</Label>
+            <div>
+              <Select value={month} onValueChange={setMonth}>
+                <SelectTrigger id="month-filter">
+                  <SelectValue placeholder="Month" />
+                </SelectTrigger>
+                <SelectContent>
+                  {months.map((monthName) => (
+                    <SelectItem key={monthName} value={monthName}>
+                      {monthName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 
         <Separator />
 
-        <div className="space-y-3">
+        <div className="flex flex-col gap-2">
           <h2 className="text-sm font-semibold">Metrics</h2>
           <div className="flex flex-col gap-2">
             {metricOptions.map(({ label, value, icon: Icon }) => (
@@ -159,22 +169,24 @@ export function FilterSidebar({ onRun }: FilterSidebarProps) {
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="flex flex-col gap-2">
           <h2 id="sort-filter-heading" className="text-sm font-semibold">
             Sort by
           </h2>
-          <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger id="sort-filter" aria-labelledby="sort-filter-heading">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="revenue-desc">Revenue (high to low)</SelectItem>
-              <SelectItem value="revenue-asc">Revenue (low to high)</SelectItem>
-              <SelectItem value="partner-name">Partner name</SelectItem>
-              <SelectItem value="date-desc">Date (newest first)</SelectItem>
-              <SelectItem value="date-asc">Date (oldest first)</SelectItem>
-            </SelectContent>
-          </Select>
+          <div>
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger id="sort-filter" aria-labelledby="sort-filter-heading">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="revenue-desc">Revenue (high to low)</SelectItem>
+                <SelectItem value="revenue-asc">Revenue (low to high)</SelectItem>
+                <SelectItem value="partner-name">Partner name</SelectItem>
+                <SelectItem value="date-desc">Date (newest first)</SelectItem>
+                <SelectItem value="date-asc">Date (oldest first)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 

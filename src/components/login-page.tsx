@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react"
-import { KeyRound, LogIn, Mail } from "lucide-react"
+import { LogIn, Mail, SquareChartGantt } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -89,7 +89,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
       <div className="relative z-10 w-full max-w-md">
         <div className="mb-8 flex flex-col items-center text-center">
-          <KeyRound className="size-8 text-foreground" />
+          <SquareChartGantt className="size-8 text-foreground" />
           <h1 className="mt-4 text-2xl font-semibold tracking-tight">Keystone</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Sign in to access partner booking analytics
@@ -98,7 +98,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
         <div className="rounded-2xl border border-[var(--panel-border)] bg-[var(--panel-bg)] p-8 shadow-[0_1px_0_rgb(255_255_255_/_0.4)_inset] backdrop-blur-md dark:shadow-none">
           <form className="space-y-5" onSubmit={handleSubmit} noValidate>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
@@ -118,7 +118,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
               )}
             </div>
 
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"

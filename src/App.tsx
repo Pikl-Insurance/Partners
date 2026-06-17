@@ -6,7 +6,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Download,
-  KeyRound,
+  SquareChartGantt,
   LayoutDashboard,
   LogOut,
   MoonStar,
@@ -58,7 +58,7 @@ function SectionDivider() {
 }
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(true)
   const [isDark, setIsDark] = useState(false)
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(true)
   const [hasRun, setHasRun] = useState(false)
@@ -90,19 +90,18 @@ function App() {
       {/* ── Main grid ── */}
       <div
         className={cn(
-          "relative z-10 grid h-full transition-[grid-template-columns] duration-200",
+          "relative z-10 grid h-full",
           leftSidebarOpen ? "grid-cols-[230px_1fr]" : "grid-cols-[52px_1fr]"
         )}
       >
         {/* ════ Left sidebar ════ */}
-        <aside className="relative flex h-full min-h-0 flex-col overflow-hidden">
+        <aside className="relative flex h-full min-h-0 flex-col overflow-visible">
           {leftSidebarOpen ? (
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <div className="flex min-h-0 flex-1 flex-col overflow-visible">
               <div className="px-5">
-                {/* Logo row */}
                 <div className="flex h-16 shrink-0 items-center justify-between gap-2">
                   <div className="flex min-w-0 items-center gap-2.5">
-                    <KeyRound className="size-5 shrink-0 text-foreground" />
+                    <SquareChartGantt className="size-5 shrink-0 text-foreground" />
                     <span className="truncate text-base font-semibold tracking-tight">Keystone</span>
                   </div>
                   <Button
@@ -137,11 +136,11 @@ function App() {
                 </nav>
               </div>
 
-              <div className="mt-auto shrink-0 px-5 pb-6 pt-4">
+              <div className="relative z-30 mt-auto shrink-0 overflow-visible px-5 pb-6 pt-4">
                 {hasRun && <SectionNav />}
                 <Button
                   variant="outline"
-                  className={cn("w-full justify-start gap-2 bg-card", hasRun && "mt-4")}
+                  className={cn("w-full justify-center gap-2 bg-card", hasRun && "mt-4")}
                   onClick={handleLogout}
                 >
                   <LogOut className="size-4 shrink-0" />
@@ -150,7 +149,7 @@ function App() {
               </div>
             </div>
           ) : (
-            <div className="flex min-h-0 flex-1 flex-col items-center overflow-hidden px-2">
+            <div className="flex min-h-0 flex-1 flex-col items-center overflow-visible px-2">
               <div className="flex h-16 w-full shrink-0 items-center justify-center border-b border-border/50">
                 <Button
                   variant="outline"
@@ -163,10 +162,6 @@ function App() {
                   <ChevronsRight className="size-4" />
                 </Button>
               </div>
-
-              <span className="mt-4" title="Keystone">
-                <KeyRound className="size-5 text-foreground" />
-              </span>
 
               <nav className="mt-4 flex w-full flex-col items-center gap-1">
                 {navItems.map(({ label, icon: Icon, active }) => (
@@ -187,22 +182,20 @@ function App() {
                 ))}
               </nav>
 
-              <div className="mt-auto w-full shrink-0 px-2 pb-4 pt-4">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="size-9 w-full bg-card"
+              <div className="relative z-30 mt-auto flex w-full shrink-0 flex-col items-center gap-1 overflow-visible px-2 pb-4 pt-4">
+                {hasRun && <SectionNav collapsed />}
+                <button
+                  type="button"
                   title="Log out"
                   aria-label="Log out"
                   onClick={handleLogout}
+                  className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground"
                 >
                   <LogOut className="size-4" />
-                </Button>
+                </button>
               </div>
-
             </div>
           )}
-
         </aside>
 
         {/* ════ Main column — wrapped panel ════ */}
