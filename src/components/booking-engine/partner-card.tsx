@@ -82,7 +82,7 @@ export function PartnerCard({ partner, expanded, onToggle, onViewProperty }: Par
       {expanded && (
         <div className="border-t border-border">
           <div className="grid lg:grid-cols-[260px_minmax(0,1fr)]">
-            <aside className="space-y-8 border-border px-7 py-7 lg:border-r">
+            <aside className="space-y-8 border-border px-7 py-7 dark:bg-canvas lg:border-r">
               <div>
                 <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
                   Activity
