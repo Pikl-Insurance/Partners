@@ -42,6 +42,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
+import { buildSnapshotFilename, exportElementSnapshot } from "@/lib/export-snapshot"
 import {
   type ActiveFilters,
   getAbvProfile,
@@ -113,21 +114,16 @@ function KpiGrid({ kpis, columns }: { kpis: KpiCard[]; columns: string }) {
   )
 }
 
-function buildSnapshotFilename(slideId: string, filters: ActiveFilters) {
-  const period = `${filters.month}-${filters.year}`.toLowerCase().replace(/\s+/g, "-")
-  return `keystone-${slideId}-${period}.png`
-}
-
 function DashboardCarousel({
   slides,
-  filters,
+  onExport,
+  isExporting,
 }: {
   slides: DashboardSlide[]
-  filters: ActiveFilters
+  onExport: (slideId: string) => void
+  isExporting: boolean
 }) {
   const [index, setIndex] = useState(0)
-  const [isExporting, setIsExporting] = useState(false)
-  const snapshotRef = useRef<HTMLDivElement>(null)
   const current = slides[index]
 
   function goPrev() {
@@ -136,45 +132,6 @@ function DashboardCarousel({
 
   function goNext() {
     setIndex((currentIndex) => (currentIndex === slides.length - 1 ? 0 : currentIndex + 1))
-  }
-
-  async function handleExportSnapshot() {
-    if (!snapshotRef.current || isExporting) return
-
-    setIsExporting(true)
-    try {
-      const { default: html2canvas } = await import("html2canvas")
-      const cardBg =
-        getComputedStyle(document.documentElement).getPropertyValue("--card").trim() || "#ffffff"
-      const scrollArea = snapshotRef.current.querySelector<HTMLElement>("[data-snapshot-scroll]")
-      const previousOverflow = scrollArea?.style.overflow
-      const previousHeight = scrollArea?.style.height
-
-      if (scrollArea) {
-        scrollArea.style.overflow = "visible"
-        scrollArea.style.height = "auto"
-      }
-
-      const canvas = await html2canvas(snapshotRef.current, {
-        backgroundColor: cardBg,
-        scale: 2,
-        useCORS: true,
-        height: snapshotRef.current.scrollHeight,
-        windowHeight: snapshotRef.current.scrollHeight,
-      })
-
-      if (scrollArea) {
-        scrollArea.style.overflow = previousOverflow ?? ""
-        scrollArea.style.height = previousHeight ?? ""
-      }
-
-      const link = document.createElement("a")
-      link.download = buildSnapshotFilename(current.id, filters)
-      link.href = canvas.toDataURL("image/png")
-      link.click()
-    } finally {
-      setIsExporting(false)
-    }
   }
 
   return (
@@ -210,7 +167,7 @@ function DashboardCarousel({
         </Button>
       </div>
 
-      <div ref={snapshotRef} className="flex min-h-0 flex-1 flex-col bg-card">
+      <div className="flex min-h-0 flex-1 flex-col bg-card">
         <div className="flex shrink-0 gap-1.5 overflow-x-auto border-b border-border px-4 py-3">
           {slides.map((slide, slideIndex) => (
             <button
@@ -218,13 +175,14 @@ function DashboardCarousel({
               type="button"
               onClick={() => setIndex(slideIndex)}
               className={cn(
-                "shrink-0 rounded-full px-4 py-2 text-[11px] font-medium transition-colors",
+                "inline-block h-8 shrink-0 rounded-full border-0 px-4 py-0 text-center text-[11px] font-medium leading-8 transition-colors",
                 slideIndex === index
                   ? "bg-primary text-primary-foreground"
                   : "bg-muted text-muted-foreground hover:bg-muted/80"
               )}
+              data-snapshot-pill
             >
-              {slide.title}
+              <span className="block h-8 leading-8">{slide.title}</span>
             </button>
           ))}
         </div>
@@ -242,13 +200,13 @@ function DashboardCarousel({
         </div>
       </div>
 
-      <div className="flex shrink-0 items-center justify-end border-t border-border px-4 py-3">
+      <div className="flex shrink-0 items-center justify-end border-t border-border px-4 py-3" data-snapshot-exclude>
         <Button
           type="button"
           variant="outline"
           size="sm"
           className="gap-1.5 text-xs"
-          onClick={handleExportSnapshot}
+          onClick={() => onExport(current.id)}
           disabled={isExporting}
         >
           <Camera className="size-3.5" />
@@ -267,6 +225,8 @@ function formatFilterLabel(value: string) {
 }
 
 export function InsightsDashboardPage({ filters, hasRun, onRun }: InsightsDashboardPageProps) {
+  const snapshotRef = useRef<HTMLDivElement>(null)
+  const [isExporting, setIsExporting] = useState(false)
   const booking = getBookingProfile(filters)
   const abv = getAbvProfile(filters)
   const calFin = getCalFinProfile(filters)
@@ -533,24 +493,29 @@ export function InsightsDashboardPage({ filters, hasRun, onRun }: InsightsDashbo
     },
   ]
 
+  async function handleExportSnapshot(slideId: string) {
+    if (!snapshotRef.current || isExporting) return
+
+    setIsExporting(true)
+    try {
+      await exportElementSnapshot(
+        snapshotRef.current,
+        buildSnapshotFilename(slideId, filters)
+      )
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  const filterChips = [
+    formatFilterLabel(filters.partner),
+    formatFilterLabel(filters.brand),
+    filters.dateRange.replace(/-/g, " "),
+    `${filters.month} ${filters.year}`,
+  ]
+
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
-      <div className="flex shrink-0 flex-wrap gap-2">
-        {[
-          formatFilterLabel(filters.partner),
-          formatFilterLabel(filters.brand),
-          filters.dateRange.replace(/-/g, " "),
-          `${filters.month} ${filters.year}`,
-        ].map((chip) => (
-          <span
-            key={chip}
-            className="rounded-full border border-border bg-card px-4 py-1.5 text-[11px] font-medium text-muted-foreground"
-          >
-            {chip}
-          </span>
-        ))}
-      </div>
-
       <div className="grid min-h-0 flex-1 grid-cols-4 gap-3">
         <div className="col-span-3 flex min-h-0 min-w-0 flex-col">
           {!hasRun ? (
@@ -561,7 +526,25 @@ export function InsightsDashboardPage({ filters, hasRun, onRun }: InsightsDashbo
               </p>
             </div>
           ) : (
-            <DashboardCarousel slides={slides} filters={filters} />
+            <div ref={snapshotRef} data-snapshot-capture className="flex min-h-0 flex-1 flex-col gap-3">
+              <div className="flex shrink-0 flex-wrap gap-2">
+                {filterChips.map((chip) => (
+                  <span
+                    key={chip}
+                    className="inline-block h-8 rounded-full border border-border bg-card px-4 py-0 text-center text-[11px] font-medium leading-8 text-muted-foreground"
+                    data-snapshot-pill
+                  >
+                    <span className="block h-8 leading-8">{chip}</span>
+                  </span>
+                ))}
+              </div>
+
+              <DashboardCarousel
+                slides={slides}
+                onExport={handleExportSnapshot}
+                isExporting={isExporting}
+              />
+            </div>
           )}
         </div>
 

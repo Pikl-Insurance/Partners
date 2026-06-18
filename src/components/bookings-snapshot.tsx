@@ -11,6 +11,7 @@ import {
 } from "lucide-react"
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { ReportSection } from "@/components/report-section"
 import {
   Table,
   TableBody,
@@ -135,9 +136,11 @@ export function BookingsSnapshot({ filters }: { filters: ActiveFilters }) {
 
   return (
     <TooltipProvider>
-      <section>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-xs font-semibold tracking-wide uppercase">Bookings</h2>
+      <ReportSection
+        title="Bookings"
+        exportSlug="bookings"
+        filters={filters}
+        headerActions={
           <Tooltip>
             <TooltipTrigger asChild>
               <button
@@ -155,8 +158,8 @@ export function BookingsSnapshot({ filters }: { filters: ActiveFilters }) {
                 : "View bookings broken down by partner — includes CAL and DDL figures per brand"}
             </TooltipContent>
           </Tooltip>
-        </div>
-
+        }
+      >
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
           {bookingMetrics.map(({ label, value, icon: Icon, description }) => (
             <Card key={label}>
@@ -224,7 +227,7 @@ export function BookingsSnapshot({ filters }: { filters: ActiveFilters }) {
             </Table>
           </div>
         )}
-      </section>
+      </ReportSection>
     </TooltipProvider>
   )
 }

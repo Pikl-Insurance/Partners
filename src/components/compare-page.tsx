@@ -10,8 +10,13 @@ import {
   formatCompareDateRange,
   getBrandLabel,
   getPartnerLabel,
+  toActiveFilters,
   type CompareSideFilters,
 } from "@/lib/compare-data"
+
+function compareSectionSlug(title: string) {
+  return `compare-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`
+}
 
 export function ComparePage() {
   const [primaryDraft, setPrimaryDraft] = useState<CompareSideFilters>({
@@ -97,7 +102,12 @@ export function ComparePage() {
 
       <div className="space-y-6">
         {sections.map((section) => (
-          <CompareMetricSection key={section.title} section={section} />
+          <CompareMetricSection
+            key={section.title}
+            section={section}
+            exportSlug={compareSectionSlug(section.title)}
+            filters={toActiveFilters(primaryApplied)}
+          />
         ))}
       </div>
     </div>

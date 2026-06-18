@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Clock, Info, LayoutList, Timer } from "lucide-react"
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { ReportSection } from "@/components/report-section"
 import {
   Table,
   TableBody,
@@ -127,9 +128,11 @@ export function TimingSnapshot({ filters }: { filters: ActiveFilters }) {
 
   return (
     <TooltipProvider>
-      <section>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-xs font-semibold tracking-wide uppercase">Timing</h2>
+      <ReportSection
+        title="Timing"
+        exportSlug="timing"
+        filters={filters}
+        headerActions={
           <Tooltip>
             <TooltipTrigger asChild>
               <button
@@ -147,8 +150,8 @@ export function TimingSnapshot({ filters }: { filters: ActiveFilters }) {
                 : "View avg booking lead time per partner — includes CAL avg lead days by brand"}
             </TooltipContent>
           </Tooltip>
-        </div>
-
+        }
+      >
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
           {timingCards.map(({ label, icon: Icon, description, columns, emptyNote }) => (
             <Card key={label}>
@@ -237,7 +240,7 @@ export function TimingSnapshot({ filters }: { filters: ActiveFilters }) {
             </Table>
           </div>
         )}
-      </section>
+      </ReportSection>
     </TooltipProvider>
   )
 }

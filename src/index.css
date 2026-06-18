@@ -127,3 +127,20 @@ body {
     var(--gradient-to) 100%
   );
 }
+
+.recharts-default-legend .recharts-legend-item {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px;
+}
+
+.recharts-legend-item-text {
+  line-height: 14px !important;
+  margin-top: 2px;
+}
+
+[data-snapshot-pill] {
+  padding-top: 0;
+  padding-bottom: 0;
+  line-height: 2rem;
+}

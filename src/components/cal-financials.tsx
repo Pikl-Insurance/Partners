@@ -1,6 +1,7 @@
 import { DollarSign, Info, type LucideIcon } from "lucide-react"
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { ReportSection } from "@/components/report-section"
 import {
   Tooltip,
   TooltipContent,
@@ -67,11 +68,11 @@ export function CalFinancials({ filters }: { filters: ActiveFilters }) {
 
   return (
     <TooltipProvider>
-      <section>
-        <h2 className="mb-3 text-xs font-semibold tracking-wide uppercase">
-          CAL financials (GBP)
-        </h2>
-
+      <ReportSection
+        title="CAL financials (GBP)"
+        exportSlug="cal-financials"
+        filters={filters}
+      >
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
           {financialMetrics.map(({ label, value, icon: Icon, description, note }) => (
             <Card key={label}>
@@ -106,7 +107,7 @@ export function CalFinancials({ filters }: { filters: ActiveFilters }) {
             </Card>
           ))}
         </div>
-      </section>
+      </ReportSection>
     </TooltipProvider>
   )
 }

@@ -34,7 +34,6 @@ type CompareFilterPanelProps = {
   filters: CompareSideFilters
   onChange: (filters: CompareSideFilters) => void
   disablePartnerId?: string
-  embedded?: boolean
 }
 
 export function CompareFilterPanel({
@@ -42,13 +41,12 @@ export function CompareFilterPanel({
   filters,
   onChange,
   disablePartnerId,
-  embedded = false,
 }: CompareFilterPanelProps) {
   const isPrimary = variant === "primary"
 
-  const content = (
-    <>
-      <div className={cn(embedded ? "px-5 pt-5" : "px-5 pt-4")}>
+  return (
+    <div className="flex flex-col overflow-hidden rounded-xl border border-border bg-card">
+      <div className="px-5 pt-4">
         <div className="flex items-center gap-2">
           <span
             className={cn("size-2 rounded-full", isPrimary ? "bg-primary" : "bg-blue-600")}
@@ -59,7 +57,7 @@ export function CompareFilterPanel({
         </div>
       </div>
 
-      <div className={cn("space-y-3 px-5", embedded ? "pb-5 pt-3" : "py-4")}>
+      <div className="space-y-3 px-5 py-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-2">
             <Label>Partner</Label>
@@ -165,16 +163,6 @@ export function CompareFilterPanel({
           </div>
         </div>
       </div>
-    </>
-  )
-
-  if (embedded) {
-    return <div className="flex min-w-0 flex-col">{content}</div>
-  }
-
-  return (
-    <div className="flex flex-col overflow-hidden rounded-xl border border-border bg-card">
-      {content}
     </div>
   )
 }

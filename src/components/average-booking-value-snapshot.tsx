@@ -2,6 +2,7 @@ import { useState } from "react"
 import { FileText, Info, LayoutList, Percent, Wallet, type LucideIcon } from "lucide-react"
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { ReportSection } from "@/components/report-section"
 import {
   Table,
   TableBody,
@@ -130,9 +131,11 @@ export function AverageBookingValueSnapshot({ filters }: { filters: ActiveFilter
 
   return (
     <TooltipProvider>
-      <section>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-xs font-semibold tracking-wide uppercase">Average booking value</h2>
+      <ReportSection
+        title="Average booking value"
+        exportSlug="abv"
+        filters={filters}
+        headerActions={
           <Tooltip>
             <TooltipTrigger asChild>
               <button
@@ -150,8 +153,8 @@ export function AverageBookingValueSnapshot({ filters }: { filters: ActiveFilter
                 : "View ABV per partner — shows ABV, CAL ABV, ABV inc. fee and CAL price % by brand"}
             </TooltipContent>
           </Tooltip>
-        </div>
-
+        }
+      >
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
           {currencyAbvMetrics.map(({ label, icon: Icon, description, columns }) => (
             <Card key={label}>
@@ -269,7 +272,7 @@ export function AverageBookingValueSnapshot({ filters }: { filters: ActiveFilter
             </Table>
           </div>
         )}
-      </section>
+      </ReportSection>
     </TooltipProvider>
   )
 }

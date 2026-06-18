@@ -68,7 +68,7 @@ const MOCK_CANCELLATION_RATES: Record<ComparePartnerId, number> = {
   "partner-c": 7.1,
 }
 
-function toActiveFilters(side: CompareSideFilters): ActiveFilters {
+export function toActiveFilters(side: CompareSideFilters): ActiveFilters {
   return {
     partner: side.partner,
     brand: side.brand,

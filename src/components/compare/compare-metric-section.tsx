@@ -1,4 +1,6 @@
+import { ReportSection } from "@/components/report-section"
 import type { CompareMetric, CompareSection } from "@/lib/compare-data"
+import type { ActiveFilters } from "@/lib/chart-data"
 import { cn } from "@/lib/utils"
 
 function ButterflyRow({ metric }: { metric: CompareMetric }) {
@@ -51,17 +53,24 @@ function ButterflyRow({ metric }: { metric: CompareMetric }) {
   )
 }
 
-export function CompareMetricSection({ section }: { section: CompareSection }) {
+type CompareMetricSectionProps = {
+  section: CompareSection
+  exportSlug: string
+  filters?: ActiveFilters
+}
+
+export function CompareMetricSection({
+  section,
+  exportSlug,
+  filters,
+}: CompareMetricSectionProps) {
   return (
-    <section className="space-y-2">
-      <h3 className="px-1 text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
-        {section.title}
-      </h3>
+    <ReportSection title={section.title} exportSlug={exportSlug} filters={filters}>
       <div className="overflow-hidden rounded-xl border border-border bg-card shadow-xs">
         {section.metrics.map((metric) => (
           <ButterflyRow key={metric.label} metric={metric} />
         ))}
       </div>
-    </section>
+    </ReportSection>
   )
 }
