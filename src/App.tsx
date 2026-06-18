@@ -276,7 +276,7 @@ function App() {
                   >
                     <span className="relative flex size-6 shrink-0 items-center justify-center rounded-full bg-[var(--brand-dark-blue)] text-[10px] font-semibold text-[var(--brand-light-blue)]">
                       CG
-                      <span className="absolute -right-0.5 -bottom-0.5 size-2 rounded-full border-2 border-background bg-primary" />
+                      <span className="absolute -right-0.5 -bottom-0.5 size-2 rounded-full border-0 bg-[var(--brand-green)] dark:border-2 dark:border-background" />
                     </span>
                     <span className="text-sm font-medium">Courtney</span>
                   </Button>

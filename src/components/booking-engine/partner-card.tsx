@@ -40,7 +40,7 @@ export function PartnerCard({ partner, expanded, onToggle, onViewProperty }: Par
 
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-card">
-      <div className="flex flex-wrap items-center gap-4 bg-canvas px-6 py-4 dark:bg-card">
+      <div className="flex flex-wrap items-center gap-4 bg-muted px-6 py-4 dark:bg-card">
         <div className="min-w-0 flex-1">
           <p className="font-semibold">{partner.name}</p>
           <p className="text-xs text-muted-foreground">Data route: {partner.dataRoute}</p>
@@ -82,7 +82,7 @@ export function PartnerCard({ partner, expanded, onToggle, onViewProperty }: Par
       {expanded && (
         <div className="border-t border-border">
           <div className="grid lg:grid-cols-[260px_minmax(0,1fr)]">
-            <aside className="space-y-8 border-border bg-canvas px-7 py-7 dark:bg-card lg:border-r">
+            <aside className="space-y-8 border-border bg-muted px-7 py-7 dark:bg-card lg:border-r">
               <div>
                 <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
                   Activity
