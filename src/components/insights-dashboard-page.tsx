@@ -136,7 +136,7 @@ function DashboardCarousel({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xs">
-      <div className="flex shrink-0 items-center gap-3 border-b border-border px-4 py-2.5">
+      <div className="flex shrink-0 items-center gap-3 border-b border-border px-4 py-3.5">
         <Button
           type="button"
           variant="outline"
@@ -516,40 +516,46 @@ export function InsightsDashboardPage({ filters, hasRun, onRun }: InsightsDashbo
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
-      <div className="grid min-h-0 flex-1 grid-cols-4 gap-3">
-        <div className="col-span-3 flex min-h-0 min-w-0 flex-col">
-          {!hasRun ? (
-            <div className="flex flex-1 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-muted/10 py-10 text-center">
-              <p className="text-sm font-medium">No data to display</p>
-              <p className="max-w-sm text-sm text-muted-foreground">
-                Adjust filters on the right, then press <strong>Run</strong> to load the dashboard.
-              </p>
-            </div>
-          ) : (
-            <div ref={snapshotRef} data-snapshot-capture className="flex min-h-0 flex-1 flex-col gap-3">
-              <div className="flex shrink-0 flex-wrap items-center gap-2">
-                {filterChips.map((chip) => (
-                  <span
-                    key={chip}
-                    className="text-muted-foreground"
-                    data-snapshot-filter-chip
-                  >
-                    {chip}
-                  </span>
-                ))}
-              </div>
+      <div
+        ref={hasRun ? snapshotRef : undefined}
+        data-snapshot-capture={hasRun ? true : undefined}
+        className="flex min-h-0 flex-1 flex-col gap-3"
+      >
+        {hasRun && (
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            {filterChips.map((chip) => (
+              <span
+                key={chip}
+                className="text-muted-foreground"
+                data-snapshot-filter-chip
+              >
+                {chip}
+              </span>
+            ))}
+          </div>
+        )}
 
+        <div className="grid min-h-0 flex-1 grid-cols-4 gap-3">
+          <div className="col-span-3 flex min-h-0 min-w-0 flex-col">
+            {!hasRun ? (
+              <div className="flex flex-1 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-muted/10 py-10 text-center">
+                <p className="text-sm font-medium">No data to display</p>
+                <p className="max-w-sm text-sm text-muted-foreground">
+                  Adjust filters on the right, then press <strong>Run</strong> to load the dashboard.
+                </p>
+              </div>
+            ) : (
               <DashboardCarousel
                 slides={slides}
                 onExport={handleExportSnapshot}
                 isExporting={isExporting}
               />
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        <div className="col-span-1 min-h-0 min-w-0">
-          <DashboardFilterBar filters={filters} onRun={onRun} />
+          <div className="col-span-1 flex min-h-0 min-w-0 flex-col" data-snapshot-exclude>
+            <DashboardFilterBar filters={filters} onRun={onRun} />
+          </div>
         </div>
       </div>
     </div>
