@@ -318,7 +318,7 @@ function App() {
               <section
                 className={cn(
                   isInsightsDashboard
-                    ? "flex min-h-0 flex-1 flex-col px-6 py-5 xl:px-8"
+                    ? "flex min-h-0 flex-1 flex-col px-[68px] py-9 xl:px-[84px] xl:py-11"
                     : "h-full overflow-y-auto px-20 py-12 xl:px-24 xl:py-14"
                 )}
               >
