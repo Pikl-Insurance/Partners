@@ -2,7 +2,7 @@ import { useState } from "react"
 import { ArrowRight, ChevronDown, ChevronUp } from "lucide-react"
 
 import { PolicyRatesTable } from "@/components/booking-engine/policy-rates-table"
-import { DualDataWidget } from "@/components/dual-data-widget"
+import { PartnerVolumeWidget } from "@/components/booking-engine/partner-volume-widget"
 import { Button } from "@/components/ui/button"
 import {
   formatCount,
@@ -15,21 +15,6 @@ type PartnerCardProps = {
   expanded: boolean
   onToggle: () => void
   onViewProperty?: () => void
-}
-
-function ProductBadge({ product }: { product: "CAL" | "DDL" }) {
-  return (
-    <span
-      className={cn(
-        "rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase",
-        product === "CAL"
-          ? "bg-amber-100 text-amber-800 dark:bg-muted dark:text-muted-foreground"
-          : "bg-sky-100 text-sky-800 dark:bg-muted dark:text-foreground"
-      )}
-    >
-      {product}
-    </span>
-  )
 }
 
 export function PartnerCard({ partner, expanded, onToggle, onViewProperty }: PartnerCardProps) {
@@ -53,12 +38,6 @@ export function PartnerCard({ partner, expanded, onToggle, onViewProperty }: Par
         <div className="min-w-0 flex-1">
           <p className="font-semibold">{partner.name}</p>
           <p className="text-xs text-muted-foreground">Data route: {partner.dataRoute}</p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          {partner.products.map((product) => (
-            <ProductBadge key={product} product={product} />
-          ))}
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -90,32 +69,32 @@ export function PartnerCard({ partner, expanded, onToggle, onViewProperty }: Par
 
       {expanded && (
         <div className="border-t border-border">
-          <div className="grid lg:grid-cols-[280px_minmax(0,1fr)]">
-            <aside className="space-y-4 border-border px-5 py-5 dark:bg-card lg:border-r">
-              <DualDataWidget
-                primaryTitle="Volume"
-                datasetA={{
-                  title: "Bookings",
-                  value: formatCount(partner.activity.bookings),
-                  clarification: "Total bookings",
+          <div className="grid lg:grid-cols-[280px_minmax(0,1fr)] lg:items-stretch">
+            <aside className="flex flex-col gap-4 border-border px-5 py-5 dark:bg-card lg:border-r">
+              <PartnerVolumeWidget
+                productSplit={{
+                  datasetA: {
+                    title: "With CAL",
+                    value: formatCount(partner.activity.withCal),
+                    clarification: `${calPct} of bookings`,
+                  },
+                  datasetB: {
+                    title: "With DDL",
+                    value: formatCount(partner.activity.withDdl),
+                    clarification: `${ddlPct} of bookings`,
+                  },
                 }}
-                datasetB={{
-                  title: "Properties",
-                  value: formatCount(partner.activity.properties),
-                  clarification: "On platform",
-                }}
-              />
-              <DualDataWidget
-                primaryTitle="Product uptake"
-                datasetA={{
-                  title: "With CAL",
-                  value: formatCount(partner.activity.withCal),
-                  clarification: `${calPct} of bookings`,
-                }}
-                datasetB={{
-                  title: "With DDL",
-                  value: formatCount(partner.activity.withDdl),
-                  clarification: `${ddlPct} of bookings`,
+                volume={{
+                  datasetA: {
+                    title: "Sales",
+                    value: formatCount(partner.activity.bookings),
+                    clarification: "Total bookings",
+                  },
+                  datasetB: {
+                    title: "Properties",
+                    value: formatCount(partner.activity.properties),
+                    clarification: "On platform",
+                  },
                 }}
               />
 

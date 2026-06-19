@@ -6,8 +6,8 @@ import { PropertiesListPage } from "@/components/booking-engine/properties-list-
 import { PropertyPage } from "@/components/booking-engine/property-page"
 import { Button } from "@/components/ui/button"
 import { TooltipProvider } from "@/components/ui/tooltip"
-import { DataSnapshotWidget } from "@/components/widgets/data-snapshot-widget"
 import { HeadlineDataWidget } from "@/components/widgets/headline-data-widget"
+import { DualDataWidget } from "@/components/dual-data-widget"
 import {
   BOOKING_ENGINE_PARTNERS,
   BOOKING_ENGINE_SUMMARY,
@@ -46,6 +46,15 @@ export function BookingEnginePage() {
     )
   }
 
+  const calPct =
+    BOOKING_ENGINE_SUMMARY.totalBookings > 0
+      ? `${Math.round((BOOKING_ENGINE_SUMMARY.totalWithCal / BOOKING_ENGINE_SUMMARY.totalBookings) * 100)}%`
+      : "0%"
+  const ddlPct =
+    BOOKING_ENGINE_SUMMARY.totalBookings > 0
+      ? `${Math.round((BOOKING_ENGINE_SUMMARY.totalWithDdl / BOOKING_ENGINE_SUMMARY.totalBookings) * 100)}%`
+      : "0%"
+
   return (
     <TooltipProvider>
       <div className="space-y-8">
@@ -64,31 +73,53 @@ export function BookingEnginePage() {
           </Button>
         </div>
 
-        <div className="@container min-w-0">
-          <div className="grid grid-cols-1 gap-4 @md:grid-cols-2 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,260px)]">
-            <HeadlineDataWidget
-              title="Total bookings"
-              value={formatCount(BOOKING_ENGINE_SUMMARY.totalBookings)}
-              label="Across all partners"
-              helpText="Total bookings processed through the booking engine."
+        <div className="@container min-w-0 space-y-4">
+          <div className="grid grid-cols-1 items-stretch gap-4 @md:grid-cols-2">
+            <DualDataWidget
+              datasetA={{
+                title: "Sales",
+                value: formatCount(BOOKING_ENGINE_SUMMARY.totalBookings),
+                clarification: "Total bookings",
+              }}
+              datasetB={{
+                title: "Properties",
+                value: formatCount(BOOKING_ENGINE_SUMMARY.totalProperties),
+                clarification: "On platform",
+              }}
             />
             <HeadlineDataWidget
               title="Revenue"
               value={formatCurrency(BOOKING_ENGINE_SUMMARY.totalRevenue, "GBP")}
               label="GBP · all partners"
               helpText="Combined revenue across all partners and brands."
+              valueClassName="text-[30px] leading-none"
             />
-            <div className="@md:col-span-2 @4xl:col-span-1">
-              <DataSnapshotWidget
-                title="Engine overview"
-                rows={[
-                  { label: "Partners", value: formatCount(BOOKING_ENGINE_SUMMARY.partners) },
-                  { label: "Active brands", value: formatCount(BOOKING_ENGINE_SUMMARY.activeBrands) },
-                  { label: "Total properties", value: formatCount(BOOKING_ENGINE_SUMMARY.totalProperties) },
-                  { label: "Cancellations", value: formatCount(BOOKING_ENGINE_SUMMARY.totalCancellations) },
-                ]}
-              />
-            </div>
+          </div>
+          <div className="grid grid-cols-1 items-stretch gap-4 @md:grid-cols-2">
+            <DualDataWidget
+              datasetA={{
+                title: "Partners",
+                value: formatCount(BOOKING_ENGINE_SUMMARY.partners),
+                clarification: "Connected to engine",
+              }}
+              datasetB={{
+                title: "Active brands",
+                value: formatCount(BOOKING_ENGINE_SUMMARY.activeBrands),
+                clarification: "Across all partners",
+              }}
+            />
+            <DualDataWidget
+              datasetA={{
+                title: "With CAL",
+                value: formatCount(BOOKING_ENGINE_SUMMARY.totalWithCal),
+                clarification: `${calPct} of bookings`,
+              }}
+              datasetB={{
+                title: "With DDL",
+                value: formatCount(BOOKING_ENGINE_SUMMARY.totalWithDdl),
+                clarification: `${ddlPct} of bookings`,
+              }}
+            />
           </div>
         </div>
 

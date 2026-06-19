@@ -201,6 +201,14 @@ export const BOOKING_ENGINE_SUMMARY = {
     (sum, partner) => sum + partner.activity.properties,
     0
   ),
+  totalWithCal: BOOKING_ENGINE_PARTNERS.reduce(
+    (sum, partner) => sum + partner.activity.withCal,
+    0
+  ),
+  totalWithDdl: BOOKING_ENGINE_PARTNERS.reduce(
+    (sum, partner) => sum + partner.activity.withDdl,
+    0
+  ),
   totalCancellations: 73_236,
   totalRevenue: 284_560_000,
 }

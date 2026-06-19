@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
 import { WidgetHelpButton } from "@/components/widgets/widget-help-button"
 
 export type DualDataDataset = {
@@ -8,7 +9,7 @@ export type DualDataDataset = {
 }
 
 export type DualDataWidgetProps = {
-  primaryTitle: string
+  primaryTitle?: string
   datasetA: DualDataDataset
   datasetB: DualDataDataset
   helpText?: string
@@ -36,12 +37,14 @@ export function DualDataWidget({
 }: DualDataWidgetProps) {
   return (
     <Card className="@container flex h-full min-w-0 flex-col bg-card shadow-xs">
-      <CardHeader className="flex-row items-start justify-between space-y-0 pb-3">
-        <h3 className="min-w-0 pr-2 text-sm font-semibold text-muted-foreground">{primaryTitle}</h3>
-        <WidgetHelpButton title={primaryTitle} helpText={helpText} />
-      </CardHeader>
+      {primaryTitle ? (
+        <CardHeader className="flex-row items-start justify-between space-y-0 pb-3">
+          <h3 className="min-w-0 pr-2 text-sm font-semibold text-muted-foreground">{primaryTitle}</h3>
+          <WidgetHelpButton title={primaryTitle} helpText={helpText} />
+        </CardHeader>
+      ) : null}
 
-      <CardContent className="flex flex-1 flex-col justify-center pb-5">
+      <CardContent className={cn("flex flex-1 flex-col justify-center pb-5", !primaryTitle && "pt-5")}>
         <div className="flex min-w-0 items-stretch">
           <div className="min-w-0 flex-1 pr-3 @sm:pr-6">
             <DatasetColumn {...datasetA} />
