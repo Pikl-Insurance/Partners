@@ -111,7 +111,8 @@ export function TimingSnapshot({ filters }: { filters: ActiveFilters }) {
           </Tooltip>
         }
       >
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,240px)]">
+        <div className="@container min-w-0">
+          <div className="grid grid-cols-1 gap-4 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,240px)]">
           <DualDataWidget
             primaryTitle="Avg booking to stay"
             datasetA={{
@@ -132,6 +133,7 @@ export function TimingSnapshot({ filters }: { filters: ActiveFilters }) {
             label="Days from cancellation to stay start"
             helpText="Average number of days between cancellation date and stay start date."
           />
+        </div>
         </div>
 
         {showBreakdown && (

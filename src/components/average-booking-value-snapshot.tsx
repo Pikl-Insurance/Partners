@@ -111,7 +111,8 @@ export function AverageBookingValueSnapshot({ filters }: { filters: ActiveFilter
           </Tooltip>
         }
       >
-        <div className="grid gap-4 lg:grid-cols-3">
+        <div className="@container min-w-0">
+          <div className="grid grid-cols-1 gap-4 @4xl:grid-cols-3">
           <DualDataWidget
             primaryTitle="ABV (excl. booking fee)"
             datasetA={{
@@ -146,6 +147,7 @@ export function AverageBookingValueSnapshot({ filters }: { filters: ActiveFilter
             label="% of ABV inc. booking fee"
             helpText="Share of customer price against ABV including booking fee."
           />
+        </div>
         </div>
 
         {showBreakdown && (

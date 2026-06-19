@@ -13,6 +13,7 @@ import {
   Zap,
   LogOut,
   MoonStar,
+  PanelRightClose,
   Settings2,
   Sun,
 } from "lucide-react"
@@ -21,18 +22,11 @@ import { BookingEnginePage } from "@/components/booking-engine-page"
 import { ComparePage } from "@/components/compare-page"
 import { ComponentsPage } from "@/components/components-page"
 import { FilterSidebar } from "@/components/filter-sidebar"
+import { FiltersReopenTab } from "@/components/filters-reopen-tab"
 import { InsightsDashboardPage } from "@/components/insights-dashboard-page"
+import { InsightsReportPage } from "@/components/insights-report-page"
 import { LoginPage } from "@/components/login-page"
 import { SectionNav } from "@/components/section-nav"
-import { AverageBookingValueSnapshot } from "@/components/average-booking-value-snapshot"
-import { BookingsSnapshot } from "@/components/bookings-snapshot"
-import { CalFinancials } from "@/components/cal-financials"
-import { TimingSnapshot } from "@/components/timing-snapshot"
-import { AbvPerDayChart } from "@/components/charts/abv-per-day-chart"
-import { BookingsMadePerDayChart } from "@/components/charts/bookings-made-per-day-chart"
-import { BookingsVsStaysChart } from "@/components/charts/bookings-vs-stays-chart"
-import { CalDdlTakeupChart } from "@/components/charts/cal-ddl-takeup-chart"
-import { LeadTimeChart } from "@/components/charts/lead-time-chart"
 import { Button } from "@/components/ui/button"
 import {
   Tooltip,
@@ -70,10 +64,6 @@ const navItems = [
 type ActiveSection = (typeof navItems)[number]["id"]
 type InsightsView = "insights" | "compare" | "dashboard"
 
-function SectionDivider() {
-  return <div aria-hidden className="h-px w-full bg-border" />
-}
-
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(true)
   const [isDark, setIsDark] = useState(false)
@@ -81,6 +71,7 @@ function App() {
   const [activeSection, setActiveSection] = useState<ActiveSection>("booking-engine")
   const [insightsView, setInsightsView] = useState<InsightsView>("insights")
   const [hasRun, setHasRun] = useState(false)
+  const [filtersSidebarOpen, setFiltersSidebarOpen] = useState(true)
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>(DEFAULT_FILTERS)
 
   function handleLogout() {
@@ -93,6 +84,13 @@ function App() {
   }, [isDark])
 
   const isInsightsDashboard = activeSection === "insights" && insightsView === "dashboard"
+  const isInsightsReport =
+    activeSection === "insights" && insightsView === "insights" && hasRun
+  const showFiltersSidebar =
+    activeSection === "insights" &&
+    insightsView !== "compare" &&
+    insightsView !== "dashboard" &&
+    (filtersSidebarOpen || !hasRun)
 
   if (!isAuthenticated) {
     return <LoginPage onLogin={() => setIsAuthenticated(true)} />
@@ -305,19 +303,21 @@ function App() {
           {/* ── Center + right sidebar ── */}
           <div
             className={cn(
-              "grid min-h-0 flex-1 overflow-hidden",
-              activeSection === "insights" && insightsView !== "compare" && insightsView !== "dashboard"
-                ? "grid-cols-[1fr_300px]"
-                : "grid-cols-1"
+              "relative grid min-h-0 flex-1 overflow-hidden",
+              showFiltersSidebar ? "grid-cols-[1fr_300px]" : "grid-cols-1"
             )}
           >
+            {!showFiltersSidebar && isInsightsReport ? (
+              <FiltersReopenTab onClick={() => setFiltersSidebarOpen(true)} />
+            ) : null}
             {/* Center stage */}
             <div className={cn("min-h-0 min-w-0 overflow-hidden", isInsightsDashboard && "flex flex-col")}>
               <section
                 className={cn(
                   isInsightsDashboard
                     ? "flex min-h-0 flex-1 flex-col px-20 py-12 xl:px-24 xl:py-14"
-                    : "h-full overflow-y-auto px-20 py-12 xl:px-24 xl:py-14"
+                    : "h-full overflow-y-auto px-20 py-12 xl:px-24 xl:py-14",
+                  isInsightsReport && !showFiltersSidebar && "pr-14"
                 )}
               >
               {activeSection === "booking-engine" ? (
@@ -378,6 +378,16 @@ function App() {
                       )}
                     </Button>
                   )}
+                  {insightsView === "insights" && hasRun && filtersSidebarOpen ? (
+                    <Button
+                      variant="outline"
+                      className="text-xs"
+                      onClick={() => setFiltersSidebarOpen(false)}
+                    >
+                      <PanelRightClose className="size-3.5" />
+                      Hide filters
+                    </Button>
+                  ) : null}
                   <Button variant="outline" className="text-xs">
                     <Calendar className="size-3.5" />
                     Schedule report
@@ -434,65 +444,25 @@ function App() {
                   </div>
                 </div>
               ) : (
-                <div>
-                  <div id="section-bookings" className="scroll-mt-6 py-8">
-                    <BookingsSnapshot filters={activeFilters} />
-                  </div>
-                  <SectionDivider />
-
-                  <div id="section-abv" className="scroll-mt-6 py-8">
-                    <AverageBookingValueSnapshot filters={activeFilters} />
-                  </div>
-                  <SectionDivider />
-
-                  <div id="section-cal" className="scroll-mt-6 py-8">
-                    <CalFinancials filters={activeFilters} />
-                  </div>
-                  <SectionDivider />
-
-                  <div id="section-timing" className="scroll-mt-6 py-8">
-                    <TimingSnapshot filters={activeFilters} />
-                  </div>
-                  <SectionDivider />
-
-                  <div id="section-bookings-vs-stays" className="scroll-mt-6 py-8">
-                    <BookingsVsStaysChart filters={activeFilters} />
-                  </div>
-                  <SectionDivider />
-
-                  <div id="section-abv-per-day" className="scroll-mt-6 py-8">
-                    <AbvPerDayChart filters={activeFilters} />
-                  </div>
-                  <SectionDivider />
-
-                  <div id="section-lead-time" className="scroll-mt-6 py-8">
-                    <LeadTimeChart filters={activeFilters} />
-                  </div>
-                  <SectionDivider />
-
-                  <div id="section-bookings-per-day" className="scroll-mt-6 py-8">
-                    <BookingsMadePerDayChart filters={activeFilters} />
-                  </div>
-                  <SectionDivider />
-
-                  <div id="section-cal-ddl-takeup" className="scroll-mt-6 py-8">
-                    <CalDdlTakeupChart filters={activeFilters} />
-                  </div>
-                </div>
+                <InsightsReportPage
+                  filters={activeFilters}
+                  wideLayout={!filtersSidebarOpen}
+                />
               )}
                 </>
               )}
               </section>
             </div>
 
-            {activeSection === "insights" && insightsView !== "compare" && insightsView !== "dashboard" && (
+            {showFiltersSidebar ? (
               <FilterSidebar
                 onRun={(filters) => {
                   setActiveFilters(filters)
                   setHasRun(true)
                 }}
+                onClose={() => setFiltersSidebarOpen(false)}
               />
-            )}
+            ) : null}
           </div>
 
           </div>{/* end rounded panel */}

@@ -10,17 +10,17 @@ export type HeadlineDataWidgetProps = {
 
 export function HeadlineDataWidget({ title, value, label, helpText }: HeadlineDataWidgetProps) {
   return (
-    <Card className="bg-muted/30 shadow-xs">
-      <CardHeader className="relative items-center justify-center pb-2">
-        <h3 className="text-sm font-semibold text-muted-foreground">{title}</h3>
-        <div className="absolute top-4 right-4">
-          <WidgetHelpButton title={title} helpText={helpText} />
-        </div>
+    <Card className="@container flex h-full min-w-0 flex-col bg-card shadow-xs">
+      <CardHeader className="flex-row items-start justify-between space-y-0 pb-0">
+        <h3 className="min-w-0 pr-2 text-sm font-semibold text-muted-foreground">{title}</h3>
+        <WidgetHelpButton title={title} helpText={helpText} />
       </CardHeader>
 
-      <CardContent className="pb-5 text-center">
-        <p className="text-4xl font-bold tracking-tight tabular-nums text-foreground">{value}</p>
-        <p className="mt-2 text-sm italic text-muted-foreground">{label}</p>
+      <CardContent className="flex flex-1 flex-col justify-between pb-5 pt-4">
+        <p className="text-3xl font-bold tracking-tight tabular-nums text-foreground @sm:text-4xl">
+          {value}
+        </p>
+        <p className="text-xs italic text-muted-foreground @sm:text-sm">{label}</p>
       </CardContent>
     </Card>
   )

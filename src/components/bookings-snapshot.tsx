@@ -111,7 +111,8 @@ export function BookingsSnapshot({ filters }: { filters: ActiveFilters }) {
           </Tooltip>
         }
       >
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,220px)_minmax(0,1fr)]">
+      <div className="@container min-w-0">
+        <div className="grid grid-cols-1 gap-4 @4xl:grid-cols-[minmax(0,220px)_minmax(0,1fr)]">
           <HeadlineDataWidget
             title="Total bookings"
             value={profile.total}
@@ -133,6 +134,7 @@ export function BookingsSnapshot({ filters }: { filters: ActiveFilters }) {
             helpText="Compare CAL and DDL sales volume and conversion rates side by side."
           />
         </div>
+      </div>
 
         {showBreakdown && (
           <div className="mt-4 overflow-hidden rounded-xl border border-border bg-card shadow-xs">

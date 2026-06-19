@@ -23,7 +23,7 @@ export function BookingsMadePerDayChart({ filters, compact }: BookingsMadePerDay
   const data = buildBookingsMadePerDayData(filters)
 
   const chart = (
-    <div className={compact ? "p-0" : "rounded-xl border border-border bg-card p-4 shadow-xs"}>
+    <div className={compact ? "min-w-0 p-0" : "min-w-0 rounded-xl border border-border bg-card p-4 shadow-xs"}>
       <ResponsiveContainer width="100%" height={compact ? 260 : 240}>
         <BarChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }} barSize={4}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />

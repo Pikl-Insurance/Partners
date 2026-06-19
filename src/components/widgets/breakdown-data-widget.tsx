@@ -35,7 +35,7 @@ export function BreakdownDataWidget({
   subdataB,
 }: BreakdownDataWidgetProps) {
   return (
-    <Card className="bg-muted/30 shadow-xs">
+    <Card className="bg-card shadow-xs">
       <CardContent className="grid gap-6 p-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
         <div className="min-w-0 text-center sm:text-left">
           <h3 className="text-sm font-semibold text-muted-foreground">{title}</h3>

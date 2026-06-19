@@ -14,7 +14,7 @@ export type DualDataListWidgetProps = {
 
 export function DualDataListWidget({ title, rows, helpText }: DualDataListWidgetProps) {
   return (
-    <Card className="bg-muted/30 shadow-xs">
+    <Card className="bg-card shadow-xs">
       <CardHeader className="relative items-center justify-center pb-4">
         <h3 className="text-sm font-semibold text-muted-foreground">{title}</h3>
         <div className="absolute top-4 right-4">

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useMemo } from "react"
 import {
   CartesianGrid,
   Line,
@@ -9,6 +9,8 @@ import {
   YAxis,
 } from "recharts"
 
+import { InteractiveChartLegend } from "@/components/charts/interactive-chart-legend"
+import { useHiddenChartSeries } from "@/components/charts/use-hidden-chart-series"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 
@@ -38,27 +40,22 @@ export function GraphWidget({
   xAxisKey,
   className,
 }: GraphWidgetProps) {
-  const [activeLayerIds, setActiveLayerIds] = useState(() => new Set(layers.map((layer) => layer.id)))
+  const layerKeys = useMemo(() => layers.map((layer) => layer.dataKey), [layers])
+  const { hiddenKeys, toggleSeries, isHidden } = useHiddenChartSeries(layerKeys)
 
-  const visibleLayers = useMemo(
-    () => layers.filter((layer) => activeLayerIds.has(layer.id)),
-    [activeLayerIds, layers]
+  const legendPayload = useMemo(
+    () =>
+      layers.map((layer) => ({
+        dataKey: layer.dataKey,
+        value: layer.label,
+        color: layer.color,
+        type: "line" as const,
+      })),
+    [layers]
   )
 
-  function toggleLayer(layerId: string) {
-    setActiveLayerIds((current) => {
-      const next = new Set(current)
-      if (next.has(layerId)) {
-        next.delete(layerId)
-      } else {
-        next.add(layerId)
-      }
-      return next
-    })
-  }
-
   return (
-    <Card className={cn("bg-muted/30 shadow-xs", className)}>
+    <Card className={cn("bg-card shadow-xs", className)}>
       <CardHeader className="flex-col items-start gap-1 pb-3">
         <h3 className="text-sm font-semibold text-foreground">{title}</h3>
         <p className="text-xs text-muted-foreground">{explanation}</p>
@@ -84,12 +81,13 @@ export function GraphWidget({
                   fontSize: 12,
                 }}
               />
-              {visibleLayers.map((layer) => (
+              {layers.map((layer) => (
                 <Line
                   key={layer.id}
                   type="monotone"
                   dataKey={layer.dataKey}
                   name={layer.label}
+                  hide={isHidden(layer.dataKey)}
                   stroke={layer.color}
                   strokeWidth={1.5}
                   dot={false}
@@ -100,26 +98,11 @@ export function GraphWidget({
           </ResponsiveContainer>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-x-4 gap-y-2">
-          {layers.map((layer) => {
-            const isActive = activeLayerIds.has(layer.id)
-
-            return (
-              <button
-                key={layer.id}
-                type="button"
-                onClick={() => toggleLayer(layer.id)}
-                className={cn(
-                  "text-xs font-medium transition-colors",
-                  isActive ? "hover:opacity-80" : "text-muted-foreground hover:text-foreground"
-                )}
-                style={isActive ? { color: layer.color } : undefined}
-              >
-                {isActive ? `Deactivate ${layer.label}` : `Activate ${layer.label}`}
-              </button>
-            )
-          })}
-        </div>
+        <InteractiveChartLegend
+          payload={legendPayload}
+          hiddenKeys={hiddenKeys}
+          onToggleSeries={toggleSeries}
+        />
       </CardContent>
     </Card>
   )

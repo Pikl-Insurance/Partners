@@ -9,7 +9,9 @@ import {
   YAxis,
 } from "recharts"
 
+import { InteractiveChartLegend } from "@/components/charts/interactive-chart-legend"
 import { SortedChartTooltip } from "@/components/charts/sorted-chart-tooltip"
+import { useHiddenChartSeries } from "@/components/charts/use-hidden-chart-series"
 import { ReportSection } from "@/components/report-section"
 import { type ActiveFilters, buildCalDdlTakeupData } from "@/lib/chart-data"
 
@@ -21,6 +23,8 @@ const SERIES = [
   { key: "Partner Alpha DDL %", color: "#f97316" },
 ]
 
+const SERIES_KEYS = SERIES.map(({ key }) => key)
+
 const TICK_STYLE = { fontSize: 11, fill: "var(--color-muted-foreground)" }
 
 type CalDdlTakeupChartProps = {
@@ -30,9 +34,10 @@ type CalDdlTakeupChartProps = {
 
 export function CalDdlTakeupChart({ filters, compact }: CalDdlTakeupChartProps) {
   const data = buildCalDdlTakeupData(filters)
+  const { hiddenKeys, toggleSeries, isHidden } = useHiddenChartSeries(SERIES_KEYS)
 
   const chart = (
-    <div className={compact ? "p-0" : "rounded-xl border border-border bg-card p-4 shadow-xs"}>
+    <div className={compact ? "min-w-0 p-0" : "min-w-0 rounded-xl border border-border bg-card p-4 shadow-xs"}>
       <ResponsiveContainer width="100%" height={compact ? 280 : 260}>
         <LineChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
@@ -51,12 +56,21 @@ export function CalDdlTakeupChart({ filters, compact }: CalDdlTakeupChartProps) 
             tickFormatter={(v) => `${v as number}%`}
           />
           <Tooltip content={<SortedChartTooltip valueFormatter={(v) => `${v}%`} />} />
-          <Legend iconType="plainline" wrapperStyle={{ fontSize: 11, paddingTop: 12 }} />
+          <Legend
+            content={(props) => (
+              <InteractiveChartLegend
+                payload={props.payload}
+                hiddenKeys={hiddenKeys}
+                onToggleSeries={toggleSeries}
+              />
+            )}
+          />
           {SERIES.map(({ key, color }) => (
             <Line
               key={key}
               type="monotone"
               dataKey={key}
+              hide={isHidden(key)}
               stroke={color}
               strokeWidth={1.5}
               dot={false}

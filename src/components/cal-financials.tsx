@@ -23,7 +23,8 @@ export function CalFinancials({ filters }: { filters: ActiveFilters }) {
         exportSlug="cal-financials"
         filters={filters}
       >
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,260px)_minmax(0,1fr)]">
+        <div className="@container min-w-0">
+          <div className="grid grid-cols-1 gap-4 @4xl:grid-cols-[minmax(0,260px)_minmax(0,1fr)]">
           <HeadlineDataWidget
             title="Total payable"
             value={profile.totalPayable}
@@ -34,6 +35,7 @@ export function CalFinancials({ filters }: { filters: ActiveFilters }) {
             title="Financial breakdown"
             rows={breakdownRows}
           />
+        </div>
         </div>
       </ReportSection>
     </TooltipProvider>

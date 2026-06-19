@@ -24,7 +24,7 @@ export function ReportSection({
   const snapshotRef = useRef<HTMLElement>(null)
 
   return (
-    <section ref={snapshotRef}>
+    <section ref={snapshotRef} className="min-w-0">
       <div
         className={cn(
           "flex items-center justify-between gap-3",

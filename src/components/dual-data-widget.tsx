@@ -17,11 +17,13 @@ export type DualDataWidgetProps = {
 function DatasetColumn({ title, value, clarification }: DualDataDataset) {
   return (
     <div className="min-w-0">
-      <p className="text-sm font-semibold text-muted-foreground">{title}</p>
-      <p className="mt-3 text-3xl font-bold tracking-tight tabular-nums text-foreground">
+      <p className="truncate text-sm font-semibold text-muted-foreground">{title}</p>
+      <p className="mt-2 text-2xl font-bold tracking-tight tabular-nums text-foreground @sm:text-3xl">
         {value}
       </p>
-      <p className="mt-2 text-sm italic text-muted-foreground">{clarification}</p>
+      <p className="mt-1.5 truncate text-xs italic text-muted-foreground @sm:text-sm">
+        {clarification}
+      </p>
     </div>
   )
 }
@@ -33,21 +35,19 @@ export function DualDataWidget({
   helpText,
 }: DualDataWidgetProps) {
   return (
-    <Card className="bg-muted/30 shadow-xs">
-      <CardHeader className="relative items-center pb-4">
-        <h3 className="text-sm font-semibold text-muted-foreground">{primaryTitle}</h3>
-        <div className="absolute top-4 right-4">
-          <WidgetHelpButton title={primaryTitle} helpText={helpText} />
-        </div>
+    <Card className="@container flex h-full min-w-0 flex-col bg-card shadow-xs">
+      <CardHeader className="flex-row items-start justify-between space-y-0 pb-3">
+        <h3 className="min-w-0 pr-2 text-sm font-semibold text-muted-foreground">{primaryTitle}</h3>
+        <WidgetHelpButton title={primaryTitle} helpText={helpText} />
       </CardHeader>
 
       <CardContent className="pb-5">
-        <div className="flex items-stretch">
-          <div className="min-w-0 flex-1 pr-8">
+        <div className="flex min-w-0 items-stretch">
+          <div className="min-w-0 flex-1 pr-3 @sm:pr-6">
             <DatasetColumn {...datasetA} />
           </div>
           <div aria-hidden className="w-px shrink-0 self-stretch bg-border" />
-          <div className="min-w-0 flex-1 pl-8">
+          <div className="min-w-0 flex-1 pl-3 @sm:pl-6">
             <DatasetColumn {...datasetB} />
           </div>
         </div>

@@ -24,7 +24,7 @@ export function DataSnapshotWidget({
   className,
 }: DataSnapshotWidgetProps) {
   return (
-    <Card className={cn("bg-muted/30 shadow-xs", className)}>
+    <Card className={cn("min-w-0 bg-card shadow-xs", className)}>
       <CardHeader className={cn("pb-3", !overviewHref && "flex-row items-center")}>
         <h3 className="text-sm font-semibold text-muted-foreground">{title}</h3>
         {overviewHref ? (
