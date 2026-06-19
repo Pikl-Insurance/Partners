@@ -8,7 +8,6 @@ import {
   Download,
   SquareChartGantt,
   ArrowLeftRight,
-  LayoutDashboard,
   Component,
   Zap,
   LogOut,
@@ -23,7 +22,6 @@ import { ComparePage } from "@/components/compare-page"
 import { ComponentsPage } from "@/components/components-page"
 import { FilterSidebar } from "@/components/filter-sidebar"
 import { FiltersReopenTab } from "@/components/filters-reopen-tab"
-import { InsightsDashboardPage } from "@/components/insights-dashboard-page"
 import { InsightsReportPage } from "@/components/insights-report-page"
 import { LoginPage } from "@/components/login-page"
 import { SectionNav } from "@/components/section-nav"
@@ -57,12 +55,11 @@ import { type ActiveFilters, DEFAULT_FILTERS } from "@/lib/chart-data"
 const navItems = [
   { id: "booking-engine" as const, label: "Booking engine", icon: Zap },
   { id: "insights" as const, label: "Insights", icon: BarChart3 },
-  { id: "components" as const, label: "Components", icon: Component },
   { id: "admin" as const, label: "Admin", icon: Settings2 },
 ]
 
-type ActiveSection = (typeof navItems)[number]["id"]
-type InsightsView = "insights" | "compare" | "dashboard"
+type ActiveSection = (typeof navItems)[number]["id"] | "components"
+type InsightsView = "insights" | "compare"
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(true)
@@ -83,13 +80,11 @@ function App() {
     document.documentElement.classList.toggle("dark", isDark)
   }, [isDark])
 
-  const isInsightsDashboard = activeSection === "insights" && insightsView === "dashboard"
   const isInsightsReport =
     activeSection === "insights" && insightsView === "insights" && hasRun
   const showFiltersSidebar =
     activeSection === "insights" &&
     insightsView !== "compare" &&
-    insightsView !== "dashboard" &&
     (filtersSidebarOpen || !hasRun)
 
   if (!isAuthenticated) {
@@ -154,11 +149,19 @@ function App() {
                 </nav>
               </div>
 
-              <div className="relative z-30 mt-auto shrink-0 overflow-visible px-5 pb-6 pt-4">
+              <div className="relative z-30 mt-auto shrink-0 space-y-4 overflow-visible px-5 pb-6 pt-4">
+                <Button
+                  variant="outline"
+                  className="w-full justify-center gap-2 bg-card"
+                  onClick={() => setActiveSection("components")}
+                >
+                  <Component className="size-4 shrink-0" />
+                  Components
+                </Button>
                 {activeSection === "insights" && insightsView === "insights" && hasRun && <SectionNav />}
                 <Button
                   variant="outline"
-                  className={cn("w-full justify-center gap-2 bg-card", hasRun && "mt-4")}
+                  className="w-full justify-center gap-2 bg-card"
                   onClick={handleLogout}
                 >
                   <LogOut className="size-4 shrink-0" />
@@ -206,6 +209,19 @@ function App() {
               </nav>
 
               <div className="relative z-30 mt-auto flex w-full shrink-0 flex-col items-center gap-1 overflow-visible px-2 pb-4 pt-4">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={() => setActiveSection("components")}
+                      aria-label="Components"
+                      className="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground"
+                    >
+                      <Component className="size-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>Components</TooltipContent>
+                </Tooltip>
                 {activeSection === "insights" && insightsView === "insights" && hasRun && <SectionNav collapsed />}
                 <button
                   type="button"
@@ -244,9 +260,7 @@ function App() {
                           ? "Admin"
                           : insightsView === "compare"
                           ? "Compare"
-                          : insightsView === "dashboard"
-                            ? "Dashboard"
-                            : "Insights"}
+                          : "Insights"}
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
@@ -311,12 +325,10 @@ function App() {
               <FiltersReopenTab onClick={() => setFiltersSidebarOpen(true)} />
             ) : null}
             {/* Center stage */}
-            <div className={cn("min-h-0 min-w-0 overflow-hidden", isInsightsDashboard && "flex flex-col")}>
+            <div className="min-h-0 min-w-0 overflow-hidden">
               <section
                 className={cn(
-                  isInsightsDashboard
-                    ? "flex min-h-0 flex-1 flex-col px-20 py-12 xl:px-24 xl:py-14"
-                    : "h-full overflow-y-auto px-20 py-12 xl:px-24 xl:py-14",
+                  "h-full overflow-y-auto px-20 py-12 xl:px-24 xl:py-14",
                   isInsightsReport && !showFiltersSidebar && "pr-14"
                 )}
               >
@@ -338,46 +350,21 @@ function App() {
                 </div>
               ) : (
                 <>
-              <div className={cn("flex flex-wrap items-start justify-between gap-4", insightsView === "dashboard" ? "mb-8 shrink-0" : "mb-8")}>
+              <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <h1 className="text-[22px] font-semibold tracking-tight">
                     {insightsView === "compare"
                       ? "Compare partners"
-                      : insightsView === "dashboard"
-                        ? "Insights dashboard"
-                        : "Sales, cancellation & re-let metrics"}
+                      : "Sales, cancellation & re-let metrics"}
                   </h1>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {insightsView === "compare"
                       ? "Set filters for a primary and comparison side, then run to review metrics side by side."
-                      : insightsView === "dashboard"
-                        ? "At-a-glance KPIs, charts and partner performance for your selected filters."
-                        : "Real-time across 3 partners"}
+                      : "Real-time across 3 partners"}
                   </p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                  {insightsView !== "compare" && (
-                    <Button
-                      variant="outline"
-                      className="text-xs"
-                      onClick={() =>
-                        setInsightsView((view) => (view === "dashboard" ? "insights" : "dashboard"))
-                      }
-                    >
-                      {insightsView === "dashboard" ? (
-                        <>
-                          <BarChart3 className="size-3.5" />
-                          Report view
-                        </>
-                      ) : (
-                        <>
-                          <LayoutDashboard className="size-3.5" />
-                          Dashboard
-                        </>
-                      )}
-                    </Button>
-                  )}
                   {insightsView === "insights" && hasRun && filtersSidebarOpen ? (
                     <Button
                       variant="outline"
@@ -422,15 +409,6 @@ function App() {
 
               {insightsView === "compare" ? (
                 <ComparePage />
-              ) : insightsView === "dashboard" ? (
-                <InsightsDashboardPage
-                  filters={activeFilters}
-                  hasRun={hasRun}
-                  onRun={(filters) => {
-                    setActiveFilters(filters)
-                    setHasRun(true)
-                  }}
-                />
               ) : !hasRun ? (
                 <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-border bg-muted/10 py-14 text-center">
                   <div className="grid size-12 place-items-center rounded-xl bg-muted text-muted-foreground">
