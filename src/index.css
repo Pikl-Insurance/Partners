@@ -45,40 +45,49 @@
   --panel-border: rgb(0 0 0 / 0.06);
   --tooltip: #27272a;
   --tooltip-foreground: #fafafa;
+
+  /* Compare accents (unchanged in neutral light mode) */
+  --compare-primary: var(--brand-dark-blue);
+  --compare-comparison: #2563eb;
+  --compare-comparison-bar: #1d4ed8;
 }
 
 .dark {
-  --background: rgb(36 55 72 / 0.45);
-  --foreground: var(--brand-light-blue);
-  --card: #243748;
-  --card-foreground: var(--brand-light-blue);
-  --canvas: #1e2f3d;
-  --field: #243748;
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #18181b;
+  --card-foreground: #fafafa;
+  --canvas: #27272a;
+  --field: #27272a;
 
-  --primary: var(--brand-green);
-  --primary-foreground: var(--brand-dark-blue);
+  --primary: #fafafa;
+  --primary-foreground: #18181b;
 
-  --muted: #2d4454;
-  --muted-foreground: #9eb0be;
-  --accent: #2d4454;
-  --accent-foreground: var(--brand-light-blue);
-  --border: rgb(241 253 254 / 0.1);
-  --input: rgb(241 253 254 / 0.12);
-  --ring: var(--brand-pink);
-  --popover: #243748;
-  --popover-foreground: var(--brand-light-blue);
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  --accent: #27272a;
+  --accent-foreground: #fafafa;
+  --border: #3f3f46;
+  --input: #3f3f46;
+  --ring: #71717a;
+  --popover: #18181b;
+  --popover-foreground: #fafafa;
   --destructive: #f87171;
 
-  --gradient-from: #243748;
-  --gradient-mid: #2a4050;
-  --gradient-to: #243748;
-  --glow-pink: rgb(238 42 123 / 0.14);
-  --glow-green: rgb(162 255 227 / 0.08);
-  --glow-blue: rgb(36 55 72 / 0.6);
-  --panel-bg: #1a2835;
-  --panel-border: rgb(241 253 254 / 0.08);
-  --tooltip: #141f29;
-  --tooltip-foreground: #f1fdfe;
+  --gradient-from: #09090b;
+  --gradient-mid: #18181b;
+  --gradient-to: #09090b;
+  --glow-pink: transparent;
+  --glow-green: transparent;
+  --glow-blue: transparent;
+  --panel-bg: #18181b;
+  --panel-border: rgb(255 255 255 / 0.08);
+  --tooltip: #fafafa;
+  --tooltip-foreground: #18181b;
+
+  --compare-primary: #fafafa;
+  --compare-comparison: #71717a;
+  --compare-comparison-bar: #52525b;
 }
 
 @theme inline {
@@ -102,6 +111,9 @@
   --color-canvas: var(--canvas);
   --color-brand: var(--brand-pink);
   --color-field: var(--field);
+  --color-compare-primary: var(--compare-primary);
+  --color-compare-comparison: var(--compare-comparison);
+  --color-compare-comparison-bar: var(--compare-comparison-bar);
 }
 
 * {

@@ -9,6 +9,7 @@ import {
   SquareChartGantt,
   ArrowLeftRight,
   LayoutDashboard,
+  Component,
   Zap,
   LogOut,
   MoonStar,
@@ -18,6 +19,7 @@ import {
 
 import { BookingEnginePage } from "@/components/booking-engine-page"
 import { ComparePage } from "@/components/compare-page"
+import { ComponentsPage } from "@/components/components-page"
 import { FilterSidebar } from "@/components/filter-sidebar"
 import { InsightsDashboardPage } from "@/components/insights-dashboard-page"
 import { LoginPage } from "@/components/login-page"
@@ -61,6 +63,7 @@ import { type ActiveFilters, DEFAULT_FILTERS } from "@/lib/chart-data"
 const navItems = [
   { id: "booking-engine" as const, label: "Booking engine", icon: Zap },
   { id: "insights" as const, label: "Insights", icon: BarChart3 },
+  { id: "components" as const, label: "Components", icon: Component },
   { id: "admin" as const, label: "Admin", icon: Settings2 },
 ]
 
@@ -97,13 +100,6 @@ function App() {
 
   return (
     <div className="relative h-screen overflow-hidden bg-background text-foreground">
-
-      {/* ── Ambient brand glows (dark mode only) ── */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-0 hidden overflow-hidden dark:block">
-        <div className="absolute -right-40 -top-40 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle_at_center,var(--glow-pink)_0%,transparent_68%)]" />
-        <div className="absolute -bottom-40 left-[20%] h-[480px] w-[520px] rounded-full bg-[radial-gradient(circle_at_center,var(--glow-green)_0%,transparent_68%)]" />
-        <div className="absolute top-[35%] right-[38%] h-[360px] w-[360px] rounded-full bg-[radial-gradient(circle_at_center,var(--glow-blue)_0%,transparent_72%)]" />
-      </div>
 
       {/* ── Main grid ── */}
       <div
@@ -244,9 +240,11 @@ function App() {
                   <BreadcrumbPage>
                     {activeSection === "booking-engine"
                       ? "Booking engine"
-                      : activeSection === "admin"
-                        ? "Admin"
-                        : insightsView === "compare"
+                      : activeSection === "components"
+                        ? "Components"
+                        : activeSection === "admin"
+                          ? "Admin"
+                          : insightsView === "compare"
                           ? "Compare"
                           : insightsView === "dashboard"
                             ? "Dashboard"
@@ -276,7 +274,7 @@ function App() {
                   >
                     <span className="relative flex size-6 shrink-0 items-center justify-center rounded-full bg-foreground text-[10px] font-semibold text-background">
                       CG
-                      <span className="absolute -right-0.5 -bottom-0.5 size-2 rounded-full border-0 bg-muted-foreground dark:border-2 dark:border-background dark:bg-[var(--brand-green)]" />
+                      <span className="absolute -right-0.5 -bottom-0.5 size-2 rounded-full border-0 bg-muted-foreground dark:border-2 dark:border-background dark:bg-foreground" />
                     </span>
                     <span className="text-sm font-medium">Courtney</span>
                   </Button>
@@ -324,6 +322,8 @@ function App() {
               >
               {activeSection === "booking-engine" ? (
                 <BookingEnginePage />
+              ) : activeSection === "components" ? (
+                <ComponentsPage />
               ) : activeSection === "admin" ? (
                 <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-border bg-muted/10 py-14 text-center">
                   <div className="grid size-12 place-items-center rounded-xl bg-muted text-muted-foreground">

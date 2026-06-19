@@ -22,8 +22,8 @@ function ProductBadge({ product }: { product: "CAL" | "DDL" }) {
       className={cn(
         "rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase",
         product === "CAL"
-          ? "bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-200"
-          : "bg-sky-100 text-sky-800 dark:bg-sky-500/20 dark:text-sky-200"
+          ? "bg-amber-100 text-amber-800 dark:bg-muted dark:text-muted-foreground"
+          : "bg-sky-100 text-sky-800 dark:bg-muted dark:text-foreground"
       )}
     >
       {product}

@@ -215,10 +215,10 @@ export function BookingsSnapshot({ filters }: { filters: ActiveFilters }) {
                     </TableCell>
                     <TableCell className="text-muted-foreground">{row.ccy}</TableCell>
                     <TableCell className="text-right tabular-nums">{row.bookings}</TableCell>
-                    <TableCell className="text-right tabular-nums text-primary dark:text-blue-400">
+                    <TableCell className="text-right tabular-nums text-primary">
                       {row.cal}
                     </TableCell>
-                    <TableCell className="text-right tabular-nums text-amber-600 dark:text-amber-400">
+                    <TableCell className="text-right tabular-nums text-amber-600 dark:text-muted-foreground">
                       {row.ddl}
                     </TableCell>
                   </TableRow>

@@ -82,10 +82,6 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-6 py-12 text-foreground">
-      <div aria-hidden className="pointer-events-none absolute inset-0 hidden overflow-hidden dark:block">
-        <div className="absolute -right-40 -top-40 h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle_at_center,var(--glow-pink)_0%,transparent_68%)]" />
-        <div className="absolute -bottom-40 left-[20%] h-[480px] w-[520px] rounded-full bg-[radial-gradient(circle_at_center,var(--glow-green)_0%,transparent_68%)]" />
-      </div>
 
       <div className="relative z-10 w-full max-w-md">
         <div className="mb-8 flex flex-col items-center text-center">

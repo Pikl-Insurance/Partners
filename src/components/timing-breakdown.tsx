@@ -67,7 +67,7 @@ export function TimingBreakdown() {
                 </TableCell>
                 <TableCell className="text-muted-foreground">{row.ccy}</TableCell>
                 <TableCell className="text-right tabular-nums">{row.avgLead}</TableCell>
-                <TableCell className="text-right tabular-nums text-primary dark:text-blue-400">
+                <TableCell className="text-right tabular-nums text-primary">
                   {row.calAvgLead}
                 </TableCell>
               </TableRow>

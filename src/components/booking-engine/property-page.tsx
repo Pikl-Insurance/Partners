@@ -122,7 +122,7 @@ export function PropertyPage({ property, onBack }: PropertyPageProps) {
           <div className="relative min-h-48 flex-1 overflow-hidden rounded-xl border border-border bg-muted/45 sm:min-h-0 dark:bg-muted/20">
             <div
               aria-hidden
-              className="absolute inset-0 bg-[linear-gradient(to_right,rgb(36_55_72/0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgb(36_55_72/0.06)_1px,transparent_1px)] bg-size-[28px_28px] dark:bg-[linear-gradient(to_right,rgb(241_253_254/0.07)_1px,transparent_1px),linear-gradient(to_bottom,rgb(241_253_254/0.07)_1px,transparent_1px)]"
+              className="absolute inset-0 bg-[linear-gradient(to_right,rgb(0_0_0/0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgb(0_0_0/0.06)_1px,transparent_1px)] bg-size-[28px_28px] dark:bg-[linear-gradient(to_right,rgb(255_255_255/0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgb(255_255_255/0.06)_1px,transparent_1px)]"
             />
             <div className="absolute inset-0 flex items-center justify-center p-6">
               <div className="flex flex-col items-center gap-2 text-center text-muted-foreground">

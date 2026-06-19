@@ -49,7 +49,7 @@ export function CompareFilterPanel({
       <div className="px-5 pt-4">
         <div className="flex items-center gap-2">
           <span
-            className={cn("size-2 rounded-full", isPrimary ? "bg-primary" : "bg-muted-foreground dark:bg-blue-600")}
+            className={cn("size-2 rounded-full", isPrimary ? "bg-compare-primary" : "bg-compare-comparison")}
           />
           <span className="text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
             {isPrimary ? "Primary" : "Comparison"}

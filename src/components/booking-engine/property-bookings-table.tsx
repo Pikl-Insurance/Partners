@@ -20,7 +20,7 @@ function StatusBadge({ status }: { status: PropertyBooking["status"] }) {
         "inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium",
         status === "confirmed"
           ? "bg-muted text-foreground dark:bg-muted dark:text-foreground"
-          : "bg-red-100 text-red-800 dark:bg-red-500/20 dark:text-red-200"
+          : "bg-red-100 text-red-800 dark:bg-muted dark:text-muted-foreground"
       )}
     >
       {status === "confirmed" ? "Confirmed" : "Cancelled"}
