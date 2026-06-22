@@ -49,7 +49,7 @@ export function ComponentsPage() {
         <div>
           <h1 className="text-[22px] font-semibold tracking-tight">Components</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Shared UI components built with Tailwind and ShadCN.
+            A page where components will be stored, documented, and refined for now.
           </p>
         </div>
 

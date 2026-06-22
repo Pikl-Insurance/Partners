@@ -114,8 +114,8 @@ export function BookingsSnapshot({ filters }: { filters: ActiveFilters }) {
           </Tooltip>
         }
       >
-      <div className="@container min-w-0">
-        <div className="grid grid-cols-1 gap-4 @4xl:grid-cols-[minmax(0,220px)_minmax(0,1fr)]">
+      <div className="@container flex min-h-0 min-w-0 flex-1 flex-col">
+        <div className="grid grid-cols-1 items-stretch gap-4 @4xl:grid-cols-[minmax(0,220px)_minmax(0,1fr)]">
           <HeadlineDataWidget
             title="Total bookings"
             value={profile.total}

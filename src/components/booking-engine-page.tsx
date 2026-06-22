@@ -74,54 +74,59 @@ export function BookingEnginePage() {
           </Button>
         </div>
 
-        <div className="@container min-w-0 space-y-4">
+        <div className="@container min-w-0">
           <div className="grid grid-cols-1 items-stretch gap-4 @md:grid-cols-2">
-            <DualDataWidget
-              datasetA={{
-                title: "Partners",
-                value: formatCount(BOOKING_ENGINE_SUMMARY.partners),
-                clarification: "Connected to engine",
-              }}
-              datasetB={{
-                title: "Active brands",
-                value: formatCount(BOOKING_ENGINE_SUMMARY.activeBrands),
-                clarification: "Across all partners",
-              }}
-            />
-            <DualDataWidget
-              datasetA={{
-                title: "Sales",
-                value: formatCount(BOOKING_ENGINE_SUMMARY.totalBookings),
-                clarification: "Total bookings",
-              }}
-              datasetB={{
-                title: "Properties",
-                value: formatCount(BOOKING_ENGINE_SUMMARY.totalProperties),
-                clarification: "On platform",
-              }}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 items-stretch gap-4 @md:grid-cols-2">
-            <HeadlineDataWidget
-              title="Revenue"
-              value={formatCurrency(BOOKING_ENGINE_SUMMARY.totalRevenue, "GBP")}
-              label="GBP · all partners"
-              helpText="Combined revenue across all partners and brands."
-              valueClassName={FIGURE_30PX_CLASS}
-            />
-            <DualDataWidget
-              datasetA={{
-                title: "With CAL",
-                value: formatCount(BOOKING_ENGINE_SUMMARY.totalWithCal),
-                clarification: `${calPct} of bookings`,
-              }}
-              datasetB={{
-                title: "With DDL",
-                value: formatCount(BOOKING_ENGINE_SUMMARY.totalWithDdl),
-                clarification: `${ddlPct} of bookings`,
-              }}
-            />
+            <div className="flex min-h-0 flex-col gap-4">
+              <DualDataWidget
+                className="min-h-0 flex-1"
+                datasetA={{
+                  title: "Sales",
+                  value: formatCount(BOOKING_ENGINE_SUMMARY.totalBookings),
+                  clarification: "Total bookings",
+                }}
+                datasetB={{
+                  title: "Properties",
+                  value: formatCount(BOOKING_ENGINE_SUMMARY.totalProperties),
+                  clarification: "On platform",
+                }}
+              />
+              <DualDataWidget
+                className="min-h-0 flex-1"
+                datasetA={{
+                  title: "Partners",
+                  value: formatCount(BOOKING_ENGINE_SUMMARY.partners),
+                  clarification: "Connected to engine",
+                }}
+                datasetB={{
+                  title: "Active brands",
+                  value: formatCount(BOOKING_ENGINE_SUMMARY.activeBrands),
+                  clarification: "Across all partners",
+                }}
+              />
+            </div>
+            <div className="flex min-h-0 flex-col gap-4">
+              <HeadlineDataWidget
+                className="min-h-0 flex-1"
+                title="Revenue"
+                value={formatCurrency(BOOKING_ENGINE_SUMMARY.totalRevenue, "GBP")}
+                label="GBP · all partners"
+                helpText="Combined revenue across all partners and brands."
+                valueClassName={FIGURE_30PX_CLASS}
+              />
+              <DualDataWidget
+                className="min-h-0 flex-1"
+                datasetA={{
+                  title: "With CAL",
+                  value: formatCount(BOOKING_ENGINE_SUMMARY.totalWithCal),
+                  clarification: `${calPct} of bookings`,
+                }}
+                datasetB={{
+                  title: "With DDL",
+                  value: formatCount(BOOKING_ENGINE_SUMMARY.totalWithDdl),
+                  clarification: `${ddlPct} of bookings`,
+                }}
+              />
+            </div>
           </div>
         </div>
 

@@ -12,8 +12,6 @@ import {
   Zap,
   LogOut,
   MoonStar,
-  PanelRightClose,
-  PanelRightOpen,
   Settings2,
   Sun,
 } from "lucide-react"
@@ -68,7 +66,6 @@ function App() {
   const [activeSection, setActiveSection] = useState<ActiveSection>("booking-engine")
   const [insightsView, setInsightsView] = useState<InsightsView>("insights")
   const [hasRun, setHasRun] = useState(false)
-  const [filtersSidebarOpen, setFiltersSidebarOpen] = useState(true)
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>(DEFAULT_FILTERS)
 
   function handleLogout() {
@@ -81,9 +78,7 @@ function App() {
   }, [isDark])
 
   const showFiltersSidebar =
-    activeSection === "insights" &&
-    insightsView !== "compare" &&
-    (filtersSidebarOpen || !hasRun)
+    activeSection === "insights" && insightsView !== "compare"
 
   if (!isAuthenticated) {
     return <LoginPage onLogin={() => setIsAuthenticated(true)} />
@@ -359,25 +354,6 @@ function App() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                  {insightsView === "insights" && hasRun ? (
-                    <Button
-                      variant="outline"
-                      className="text-xs"
-                      onClick={() => setFiltersSidebarOpen((open) => !open)}
-                    >
-                      {filtersSidebarOpen ? (
-                        <>
-                          <PanelRightClose className="size-3.5" />
-                          Hide filters
-                        </>
-                      ) : (
-                        <>
-                          <PanelRightOpen className="size-3.5" />
-                          Show filters
-                        </>
-                      )}
-                    </Button>
-                  ) : null}
                   <Button variant="outline" className="text-xs">
                     <Calendar className="size-3.5" />
                     Schedule report
@@ -425,10 +401,7 @@ function App() {
                   </div>
                 </div>
               ) : (
-                <InsightsReportPage
-                  filters={activeFilters}
-                  wideLayout={!filtersSidebarOpen}
-                />
+                <InsightsReportPage filters={activeFilters} wideLayout={false} />
               )}
                 </>
               )}
@@ -441,7 +414,6 @@ function App() {
                   setActiveFilters(filters)
                   setHasRun(true)
                 }}
-                onClose={() => setFiltersSidebarOpen(false)}
               />
             ) : null}
           </div>

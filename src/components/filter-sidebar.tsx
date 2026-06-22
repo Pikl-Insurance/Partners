@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Ban, PanelRightClose, RefreshCw, TrendingUp } from "lucide-react"
+import { Ban, RefreshCw, TrendingUp } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -36,10 +36,9 @@ const metricOptions = [
 
 type FilterSidebarProps = {
   onRun: (filters: ActiveFilters) => void
-  onClose?: () => void
 }
 
-export function FilterSidebar({ onRun, onClose }: FilterSidebarProps) {
+export function FilterSidebar({ onRun }: FilterSidebarProps) {
   const [partner, setPartner] = useState("all-partners")
   const [brand, setBrand] = useState("all-brands")
   const [dateRange, setDateRange] = useState("year-to-month-end")
@@ -57,25 +56,11 @@ export function FilterSidebar({ onRun, onClose }: FilterSidebarProps) {
       <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-px bg-border" />
 
       <div className="flex-1 space-y-6 overflow-y-auto px-6 py-6">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <h2 className="text-sm font-semibold">Filters</h2>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Refine metrics by partner, brand, and period.
-            </p>
-          </div>
-          {onClose ? (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="size-8 shrink-0"
-              onClick={onClose}
-              aria-label="Hide filters"
-            >
-              <PanelRightClose className="size-4" />
-            </Button>
-          ) : null}
+        <div>
+          <h2 className="text-sm font-semibold">Filters</h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Refine metrics by partner, brand, and period.
+          </p>
         </div>
 
         <div className="flex flex-col gap-2">

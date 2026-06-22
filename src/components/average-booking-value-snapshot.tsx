@@ -114,45 +114,45 @@ export function AverageBookingValueSnapshot({ filters }: { filters: ActiveFilter
           </Tooltip>
         }
       >
-        <div className="@container min-w-0">
-          <div className="grid grid-cols-1 gap-4 @md:grid-cols-2 @4xl:grid-cols-3">
-          <DualDataWidget
-            primaryTitle="ABV (excl. booking fee)"
-            datasetA={{
-              title: "GBP",
-              value: profile.gbpAbv,
-              clarification: profile.gbpCal,
-            }}
-            datasetB={{
-              title: "EUR",
-              value: profile.eurAbv,
-              clarification: profile.eurCal,
-            }}
-            helpText={INSIGHTS_WIDGET_HELP_TEXT}
-          />
-          <DualDataWidget
-            primaryTitle="ABV inc. booking fee"
-            datasetA={{
-              title: "GBP",
-              value: profile.gbpAbvFee,
-              clarification: profile.gbpCalFee,
-            }}
-            datasetB={{
-              title: "EUR",
-              value: profile.eurAbvFee,
-              clarification: profile.eurCalFee,
-            }}
-            helpText={INSIGHTS_WIDGET_HELP_TEXT}
-          />
-          <div className="@md:col-span-2 @4xl:col-span-1">
-          <HeadlineDataWidget
-            title="CAL customer price"
-            value={profile.calPct}
-            label="% of ABV inc. booking fee"
-            helpText={INSIGHTS_WIDGET_HELP_TEXT}
-          />
+        <div className="@container flex min-h-0 min-w-0 flex-1 flex-col">
+          <div className="grid grid-cols-1 items-stretch gap-4 @4xl:grid-cols-[minmax(0,220px)_minmax(0,1fr)]">
+            <HeadlineDataWidget
+              title="CAL customer price"
+              value={profile.calPct}
+              label="% of ABV inc. booking fee"
+              helpText={INSIGHTS_WIDGET_HELP_TEXT}
+            />
+            <div className="grid h-full min-h-0 grid-cols-1 items-stretch gap-4 @md:grid-cols-2">
+              <DualDataWidget
+                primaryTitle="ABV (excl. booking fee)"
+                datasetA={{
+                  title: "GBP",
+                  value: profile.gbpAbv,
+                  clarification: profile.gbpCal,
+                }}
+                datasetB={{
+                  title: "EUR",
+                  value: profile.eurAbv,
+                  clarification: profile.eurCal,
+                }}
+                helpText={INSIGHTS_WIDGET_HELP_TEXT}
+              />
+              <DualDataWidget
+                primaryTitle="ABV inc. booking fee"
+                datasetA={{
+                  title: "GBP",
+                  value: profile.gbpAbvFee,
+                  clarification: profile.gbpCalFee,
+                }}
+                datasetB={{
+                  title: "EUR",
+                  value: profile.eurAbvFee,
+                  clarification: profile.eurCalFee,
+                }}
+                helpText={INSIGHTS_WIDGET_HELP_TEXT}
+              />
+            </div>
           </div>
-        </div>
         </div>
 
         {showBreakdown && (

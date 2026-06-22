@@ -8,6 +8,7 @@ export type HeadlineDataWidgetProps = {
   label: string
   helpText?: string
   valueClassName?: string
+  className?: string
 }
 
 export function HeadlineDataWidget({
@@ -16,9 +17,10 @@ export function HeadlineDataWidget({
   label,
   helpText,
   valueClassName,
+  className,
 }: HeadlineDataWidgetProps) {
   return (
-    <Card className="@container flex h-full min-w-0 flex-col bg-card shadow-xs">
+    <Card className={cn("@container flex h-full min-w-0 flex-col bg-card shadow-xs", className)}>
       <CardHeader className="flex-row items-start justify-between space-y-0 pb-0">
         <h3 className="min-w-0 pr-2 text-sm font-semibold text-muted-foreground">{title}</h3>
         <WidgetHelpButton title={title} helpText={helpText} />
