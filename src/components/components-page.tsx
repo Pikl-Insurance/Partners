@@ -15,6 +15,21 @@ import { cn } from "@/lib/utils"
 
 const fullCatalog = [...componentsCatalog, ...componentsCatalogExtra]
 
+const navSections = [
+  ...componentCategories.map((category) => ({
+    id: category.id,
+    title: category.title,
+    items: fullCatalog
+      .filter((entry) => entry.category === category.id)
+      .map((entry) => ({ id: entry.id, label: entry.name })),
+  })),
+  {
+    id: "reference",
+    title: "Reference",
+    items: [{ id: "design-tokens", label: "Design tokens" }],
+  },
+].filter((section) => section.items.length > 0)
+
 function TableOfContents({
   activeId,
   onNavigate,
@@ -23,59 +38,47 @@ function TableOfContents({
   onNavigate: (id: string) => void
 }) {
   return (
-    <nav className="space-y-6 text-sm">
-      {componentCategories.map((category) => {
-        const items = fullCatalog.filter((entry) => entry.category === category.id)
-        if (items.length === 0) return null
-
-        return (
-          <div key={category.id}>
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              {category.title}
-            </p>
-            <ul className="space-y-0.5">
-              {items.map((entry) => (
-                <li key={entry.id}>
-                  <button
-                    type="button"
-                    onClick={() => onNavigate(entry.id)}
-                    className={cn(
-                      "w-full rounded-md px-2 py-1.5 text-left text-[13px] transition-colors hover:bg-accent",
-                      activeId === entry.id
-                        ? "bg-accent font-medium text-accent-foreground"
-                        : "text-muted-foreground"
-                    )}
-                  >
-                    {entry.name}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )
-      })}
-
-      <div>
-        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-          Reference
-        </p>
-        <ul className="space-y-0.5">
-          <li>
-            <button
-              type="button"
-              onClick={() => onNavigate("design-tokens")}
-              className={cn(
-                "w-full rounded-md px-2 py-1.5 text-left text-[13px] transition-colors hover:bg-accent",
-                activeId === "design-tokens"
-                  ? "bg-accent font-medium text-accent-foreground"
-                  : "text-muted-foreground"
-              )}
-            >
-              Design tokens
-            </button>
-          </li>
-        </ul>
-      </div>
+    <nav className="space-y-0 text-sm">
+      {navSections.map((section, index) => (
+        <div
+          key={section.id}
+          className={cn(
+            "py-3",
+            index > 0 && "border-t border-border"
+          )}
+        >
+          <button
+            type="button"
+            onClick={() => onNavigate(section.id === "reference" ? "design-tokens" : section.id)}
+            className={cn(
+              "mb-2 w-full rounded-md px-2 py-1 text-left text-[11px] font-semibold uppercase tracking-wider transition-colors hover:bg-accent hover:text-foreground",
+              activeId === section.id || (section.id === "reference" && activeId === "design-tokens")
+                ? "text-foreground"
+                : "text-muted-foreground"
+            )}
+          >
+            {section.title}
+          </button>
+          <ul className="space-y-0.5">
+            {section.items.map((item) => (
+              <li key={item.id}>
+                <button
+                  type="button"
+                  onClick={() => onNavigate(item.id)}
+                  className={cn(
+                    "w-full rounded-md py-1.5 pr-2 pl-3 text-left text-[13px] transition-colors hover:bg-accent",
+                    activeId === item.id
+                      ? "bg-accent font-medium text-accent-foreground"
+                      : "text-muted-foreground"
+                  )}
+                >
+                  {item.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </nav>
   )
 }
@@ -114,7 +117,11 @@ export function ComponentsPage() {
   }
 
   useEffect(() => {
-    const sections = [...fullCatalog.map((entry) => entry.id), "design-tokens"]
+    const sections = [
+      ...componentCategories.map((category) => category.id),
+      ...fullCatalog.map((entry) => entry.id),
+      "design-tokens",
+    ]
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -134,24 +141,32 @@ export function ComponentsPage() {
     })
 
     return () => observer.disconnect()
-  }, [filteredCatalog.length])
+  }, [])
 
   return (
     <TooltipProvider>
       <div className="mx-auto max-w-6xl pb-16">
-        <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground lg:hidden">
           <Layers className="size-4" />
           <span>Keystone design system</span>
         </div>
 
         <div className="flex gap-10">
-          <aside className="hidden w-52 shrink-0 lg:block">
-            <div className="sticky top-8 space-y-4">
-              <div className="flex h-9 items-center gap-2 text-sm font-medium">
-                <BookOpen className="size-4 text-muted-foreground" />
-                <span>On this page</span>
+          <aside className="hidden w-56 shrink-0 lg:block">
+            <div className="sticky top-8 flex max-h-[calc(100vh-2rem)] flex-col gap-4">
+              <div className="shrink-0 space-y-4">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Layers className="size-4 shrink-0" />
+                  <span>Keystone design system</span>
+                </div>
+                <div className="flex h-9 items-center gap-2 text-sm font-medium">
+                  <BookOpen className="size-4 text-muted-foreground" />
+                  <span>On this page</span>
+                </div>
               </div>
-              <TableOfContents activeId={activeId} onNavigate={scrollToSection} />
+              <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-2 [-ms-overflow-style:none] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border">
+                <TableOfContents activeId={activeId} onNavigate={scrollToSection} />
+              </div>
             </div>
           </aside>
 
