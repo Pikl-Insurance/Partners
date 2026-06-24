@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { LayoutList } from "lucide-react"
 
-import { DualDataWidget } from "@/components/dual-data-widget"
 import { ReportSection } from "@/components/report-section"
 import { HeadlineDataWidget } from "@/components/widgets/headline-data-widget"
 import {
@@ -125,32 +124,16 @@ export function AverageBookingValueSnapshot({ filters }: { filters: ActiveFilter
               helpText={INSIGHTS_WIDGET_HELP_TEXT}
             />
             <div className={cn(metricCardGridClass, "h-full min-h-0 grid-cols-1 @md:grid-cols-2")}>
-              <DualDataWidget
-                primaryTitle="ABV (excl. booking fee)"
-                datasetA={{
-                  title: "Average",
-                  value: profile.gbpAbv,
-                  clarification: "GBP · all selected",
-                }}
-                datasetB={{
-                  title: "CAL ABV",
-                  value: profile.gbpCal.replace(/^CAL /, ""),
-                  clarification: "When CAL is attached",
-                }}
+              <HeadlineDataWidget
+                title="ABV (excl. booking fee)"
+                value={profile.gbpAbv}
+                label={profile.gbpCal}
                 helpText={INSIGHTS_WIDGET_HELP_TEXT}
               />
-              <DualDataWidget
-                primaryTitle="ABV inc. booking fee"
-                datasetA={{
-                  title: "Average",
-                  value: profile.gbpAbvFee,
-                  clarification: "GBP · all selected",
-                }}
-                datasetB={{
-                  title: "CAL ABV",
-                  value: profile.gbpCalFee.replace(/^CAL /, ""),
-                  clarification: "When CAL is attached",
-                }}
+              <HeadlineDataWidget
+                title="ABV inc. booking fee"
+                value={profile.gbpAbvFee}
+                label={profile.gbpCalFee}
                 helpText={INSIGHTS_WIDGET_HELP_TEXT}
               />
             </div>

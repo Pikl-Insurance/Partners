@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { LayoutList } from "lucide-react"
 
-import { DualDataWidget } from "@/components/dual-data-widget"
 import { ReportSection } from "@/components/report-section"
 import { HeadlineDataWidget } from "@/components/widgets/headline-data-widget"
 import {
@@ -118,18 +117,10 @@ export function TimingSnapshot({ filters }: { filters: ActiveFilters }) {
       >
         <div className="@container min-w-0">
           <div className={cn(metricCardGridClass, "grid-cols-1 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,240px)]")}>
-          <DualDataWidget
-            primaryTitle="Avg booking to stay"
-            datasetA={{
-              title: "All bookings",
-              value: profile.gbpDays,
-              clarification: "GBP partners",
-            }}
-            datasetB={{
-              title: "CAL bookings",
-              value: profile.gbpCal.replace(/^CAL /, ""),
-              clarification: "CAL attach only",
-            }}
+          <HeadlineDataWidget
+            title="Avg booking to stay"
+            value={profile.gbpDays}
+            label={profile.gbpCal}
             helpText={INSIGHTS_WIDGET_HELP_TEXT}
           />
           <HeadlineDataWidget
