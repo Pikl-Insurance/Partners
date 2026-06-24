@@ -97,6 +97,7 @@ export function DashboardFilterBar({ filters, onRun }: DashboardFilterBarProps) 
           </Select>
         </div>
 
+        {showBrand ? (
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="dash-brand" className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
             Brand
@@ -113,6 +114,7 @@ export function DashboardFilterBar({ filters, onRun }: DashboardFilterBarProps) 
             </SelectContent>
           </Select>
         </div>
+        ) : null}
 
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="dash-date-range" className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
