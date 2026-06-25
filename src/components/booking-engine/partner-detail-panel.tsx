@@ -8,6 +8,7 @@ import { PropertiesTable } from "@/components/booking-engine/properties-table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
+  formatBrandLabel,
   formatCompactCount,
   formatCompactCurrency,
   formatCount,
@@ -171,8 +172,7 @@ function OverviewTab({ partner }: { partner: Partner }) {
               <li key={brand.id} className="flex items-start gap-2">
                 <Tag className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-foreground">{brand.name}</p>
-                  <p className="text-xs text-muted-foreground">{brand.policyGroup}</p>
+                  <p className="text-sm font-medium text-foreground">{formatBrandLabel(brand.name)}</p>
                 </div>
               </li>
             ))}
@@ -239,7 +239,7 @@ function BrandsTab({ partner }: { partner: Partner }) {
   }
 
   return (
-    <div className="grid min-h-[420px] gap-0 overflow-hidden rounded-lg border border-border lg:grid-cols-[260px_minmax(0,1fr)]">
+    <div className="grid min-h-[420px] gap-0 overflow-hidden rounded-lg border border-border lg:grid-cols-[180px_minmax(0,1fr)]">
       <aside className="flex flex-col gap-4 border-b border-border bg-muted/20 p-4 lg:border-r lg:border-b-0">
         <div>
           <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
@@ -280,12 +280,13 @@ function BrandsTab({ partner }: { partner: Partner }) {
                     )}
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <p className="text-sm font-semibold text-foreground">{brand.name}</p>
+                      <p className="text-sm font-semibold text-foreground">
+                        {formatBrandLabel(brand.name)}
+                      </p>
                       <span className="shrink-0 rounded-md bg-background px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-muted-foreground">
                         {brandPolicyCount}
                       </span>
                     </div>
-                    <p className="text-xs text-muted-foreground">{brand.policyGroup}</p>
                   </button>
                 </li>
               )
@@ -302,8 +303,7 @@ function BrandsTab({ partner }: { partner: Partner }) {
             </p>
             {selectedBrand ? (
               <p className="mt-1 text-sm text-foreground">
-                {selectedBrand.name}
-                <span className="text-muted-foreground"> · {selectedBrand.policyGroup}</span>
+                {formatBrandLabel(selectedBrand.name)}
               </p>
             ) : null}
           </div>
@@ -446,7 +446,7 @@ export function PartnerDetailPanel({
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card">
+    <div className="flex h-full min-h-[420px] flex-col overflow-hidden rounded-xl border border-border bg-card">
       <div className="border-b border-border px-5 py-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">

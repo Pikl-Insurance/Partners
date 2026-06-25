@@ -5,22 +5,29 @@ import {
   ChevronRight,
   FileText,
   GripVertical,
+  LayoutGrid,
   LayoutPanelTop,
-  PencilLine,
+  Network,
   Plus,
+  ShoppingCart,
   Users,
   X,
   type LucideIcon,
 } from "lucide-react"
 
 import { getProductSplit } from "@/components/bookings-snapshot"
-import { ScaledPartnerPanelPreview } from "@/components/booking-engine/partner-panel-preview"
+import {
+  PasSummaryMetricCard,
+  PAS_BRANDS_CHART_STUB,
+  PAS_PARTNERS_CHART_STUB,
+  PAS_USERS_CHART_STUB,
+} from "@/components/booking-engine/pas-summary-metric-card"
 import { TargetsSnapshot } from "@/components/targets-snapshot"
 import { Button } from "@/components/ui/button"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { MetricTrendWidget } from "@/components/widgets/metric-trend-widget"
 import { ProductSplitWidget } from "@/components/widgets/product-split-widget"
-import { BOOKING_ENGINE_PARTNERS } from "@/lib/booking-engine-data"
+import { BOOKING_ENGINE_SUMMARY, getPartnerConnectionFooter, getTopPartnersBrandFooter } from "@/lib/booking-engine-data"
 import {
   type ActiveFilters,
   buildBookingTrendChart,
@@ -31,7 +38,7 @@ import { metricCardGridClass } from "@/lib/card-layout"
 import { INSIGHTS_WIDGET_HELP_TEXT } from "@/lib/insights-widget-labels"
 import { cn } from "@/lib/utils"
 
-export type BookingEngineView = "partners" | "properties" | "editor"
+export type BookingEngineView = "partners" | "properties" | "bookings"
 
 export type LandingDestination =
   | { section: "booking-engine"; view?: BookingEngineView }
@@ -433,21 +440,25 @@ function OpsActionButton({
   label,
   icon: Icon,
   onClick,
+  className,
 }: {
   label: string
   icon: LucideIcon
   onClick: () => void
+  className?: string
 }) {
   return (
-    <Button
+    <button
       type="button"
-      variant="outline"
       onClick={onClick}
-      className="flex h-auto w-full flex-col items-center justify-center gap-1 px-2 py-2.5 text-center text-xs"
+      className={cn(
+        "flex min-w-0 flex-col items-center rounded-xl border border-border bg-card p-2.5 text-center shadow-xs transition-colors hover:bg-muted/30 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+        className
+      )}
     >
-      <Icon className="size-3.5 shrink-0" />
-      {label}
-    </Button>
+      <Icon className="size-3.5 shrink-0 text-muted-foreground" strokeWidth={2} />
+      <p className="mt-1.5 text-[10px] leading-tight font-medium text-muted-foreground">{label}</p>
+    </button>
   )
 }
 
@@ -546,7 +557,6 @@ export function LandingDashboardPage({
   const productSplit = getProductSplit(booking)
   const bookingTrend = deriveBookingTrendMeta(booking.total)
   const bookingChart = buildBookingTrendChart(booking.total)
-  const snapshotPartner = BOOKING_ENGINE_PARTNERS[0]
   const [cardOrder, setCardOrder] = useState<DashboardCardId[]>(getInitialCardOrder)
   const intelligenceRef = useRef<HTMLDivElement>(null)
   const targetsRef = useRef<HTMLDivElement>(null)
@@ -630,7 +640,7 @@ export function LandingDashboardPage({
             dragHandleProps={dragHandleProps}
           >
             <div className={cn(syncOpsWithIntel && "flex min-h-0 flex-1 flex-col")}>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid shrink-0 grid-cols-3 gap-2">
                 <OpsActionButton
                   label="View partners"
                   icon={Users}
@@ -642,25 +652,52 @@ export function LandingDashboardPage({
                   onClick={() => onNavigate({ section: "booking-engine", view: "properties" })}
                 />
                 <OpsActionButton
-                  label="Editor mode"
-                  icon={PencilLine}
-                  onClick={() => onNavigate({ section: "booking-engine", view: "editor" })}
+                  label="View bookings"
+                  icon={ShoppingCart}
+                  onClick={() => onNavigate({ section: "booking-engine", view: "bookings" })}
                 />
               </div>
 
-              {snapshotPartner ? (
-                <div
-                  className={cn(
-                    "mt-4 -mx-5 overflow-hidden px-5",
-                    syncOpsWithIntel ? "-mb-4 flex min-h-0 flex-1 flex-col" : "-mb-4"
-                  )}
-                >
-                  <ScaledPartnerPanelPreview
-                    partner={snapshotPartner}
-                    className={syncOpsWithIntel ? "min-h-0 flex-1" : "h-48"}
-                  />
-                </div>
-              ) : null}
+              <div
+                className={cn(
+                  "mt-4 grid grid-cols-3 gap-2",
+                  syncOpsWithIntel && "min-h-0 flex-1 [&>*]:h-full"
+                )}
+              >
+                <PasSummaryMetricCard
+                  compact
+                  className={syncOpsWithIntel ? "h-full" : undefined}
+                  title="Connected partners"
+                  value={String(BOOKING_ENGINE_SUMMARY.partners)}
+                  icon={Network}
+                  trendLabel="+17%"
+                  chartValues={PAS_PARTNERS_CHART_STUB}
+                  chartStyle="sparkline"
+                  footer={getPartnerConnectionFooter()}
+                />
+                <PasSummaryMetricCard
+                  compact
+                  className={syncOpsWithIntel ? "h-full" : undefined}
+                  title="Active brands"
+                  value={String(BOOKING_ENGINE_SUMMARY.activeBrands)}
+                  icon={LayoutGrid}
+                  trendLabel="+8%"
+                  chartValues={PAS_BRANDS_CHART_STUB}
+                  chartStyle="sparkline"
+                  footer={getTopPartnersBrandFooter()}
+                />
+                <PasSummaryMetricCard
+                  compact
+                  className={syncOpsWithIntel ? "h-full" : undefined}
+                  title="Platform users"
+                  value={String(BOOKING_ENGINE_SUMMARY.users)}
+                  icon={Users}
+                  trendLabel="+12%"
+                  chartValues={PAS_USERS_CHART_STUB}
+                  chartStyle="sparkline"
+                  footer="24 active seats"
+                />
+              </div>
             </div>
           </DashboardPanel>
         )

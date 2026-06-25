@@ -5,6 +5,7 @@ import { PolicyRatesTable } from "@/components/booking-engine/policy-rates-table
 import { PartnerVolumeWidget } from "@/components/booking-engine/partner-volume-widget"
 import { Button } from "@/components/ui/button"
 import {
+  formatBrandLabel,
   formatCount,
   type Partner,
 } from "@/lib/booking-engine-data"
@@ -131,8 +132,7 @@ export function PartnerCard({ partner, expanded, onToggle, onViewProperty }: Par
                             : "hover:bg-muted/50"
                         )}
                       >
-                        <p className="text-sm font-medium">{brand.name}</p>
-                        <p className="text-xs text-muted-foreground">{brand.policyGroup}</p>
+                        <p className="text-sm font-medium">{formatBrandLabel(brand.name)}</p>
                       </button>
                     </li>
                   ))}

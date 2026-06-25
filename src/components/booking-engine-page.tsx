@@ -1,6 +1,23 @@
 import { useMemo, useState } from "react"
-import { Download, PencilLine, Plus, Search } from "lucide-react"
+import {
+  Banknote,
+  Download,
+  LayoutGrid,
+  Network,
+  PencilLine,
+  Plus,
+  Search,
+  ShoppingCart,
+} from "lucide-react"
 
+import {
+  PasSummaryMetricCard,
+  PAS_BOOKINGS_CHART_STUB,
+  PAS_BRANDS_CHART_STUB,
+  PAS_PARTNERS_CHART_STUB,
+  PAS_REVENUE_CHART_STUB,
+  PAS_YTD_MONTH_LABELS,
+} from "@/components/booking-engine/pas-summary-metric-card"
 import {
   PartnerDetailPanel,
   type PartnerDetailTab,
@@ -14,14 +31,14 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 import {
   BOOKING_ENGINE_PARTNERS,
   BOOKING_ENGINE_SUMMARY,
-  formatCompactCount,
-  formatCompactCurrency,
   formatCount,
+  formatCurrency,
+  getPartnerConnectionFooter,
   getPartnerTags,
+  getTopPartnersBrandFooter,
   type Partner,
 } from "@/lib/booking-engine-data"
 import { MOCK_PROPERTY } from "@/lib/property-data"
-import { cn } from "@/lib/utils"
 
 const DEFAULT_PARTNER_ID = BOOKING_ENGINE_PARTNERS[0]?.id ?? ""
 
@@ -54,11 +71,11 @@ function getInitialPasState(initialView: BookingEngineView) {
         initialTab: "properties" as PartnerDetailTab,
         editorMode: false,
       }
-    case "editor":
+    case "bookings":
       return {
         selectedPartnerId: DEFAULT_PARTNER_ID,
-        initialTab: "brands" as PartnerDetailTab,
-        editorMode: true,
+        initialTab: "bookings" as PartnerDetailTab,
+        editorMode: false,
       }
     case "partners":
     default:
@@ -72,17 +89,6 @@ function getInitialPasState(initialView: BookingEngineView) {
 
 type BookingEnginePageProps = {
   initialView?: BookingEngineView
-}
-
-function TopStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="min-w-[88px]">
-      <p className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
-        {label}
-      </p>
-      <p className="mt-1 text-lg font-semibold tabular-nums text-foreground">{value}</p>
-    </div>
-  )
 }
 
 export function BookingEnginePage({ initialView = "partners" }: BookingEnginePageProps) {
@@ -119,45 +125,61 @@ export function BookingEnginePage({ initialView = "partners" }: BookingEnginePag
 
   return (
     <TooltipProvider>
-      <div className="flex h-full min-h-0 flex-col gap-5 overflow-hidden">
-        <div className="flex shrink-0 flex-wrap items-start justify-between gap-6 border-b border-border pb-5">
-          <div className="min-w-[180px]">
-            <h1 className="text-[22px] font-semibold tracking-tight">Partners &amp; policies</h1>
-            <p className="mt-1 text-sm text-muted-foreground">YTD to June 2026</p>
+      <div className="space-y-5">
+        <div className="shrink-0 space-y-4 border-b border-border pb-5">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="min-w-[180px]">
+              <h1 className="text-[22px] font-semibold tracking-tight">Partners &amp; policies</h1>
+              <p className="mt-1 text-sm text-muted-foreground">YTD to June 2026</p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <Button variant="outline" className="h-9 gap-2 text-xs">
+                <Download className="size-3.5" />
+                Export
+              </Button>
+              <Button className="h-9 gap-2 text-xs">
+                <Plus className="size-3.5" />
+                Add partner
+              </Button>
+            </div>
           </div>
 
-          <div className="flex flex-1 flex-wrap items-start justify-center gap-x-8 gap-y-4">
-            <TopStat
-              label="Total sales"
-              value={formatCompactCount(BOOKING_ENGINE_SUMMARY.totalBookings)}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <PasSummaryMetricCard
+              title="Total bookings (sales)"
+              value={formatCount(BOOKING_ENGINE_SUMMARY.totalBookings)}
+              icon={ShoppingCart}
+              trendLabel="+12%"
+              chartValues={PAS_BOOKINGS_CHART_STUB}
+              chartLabels={PAS_YTD_MONTH_LABELS}
             />
-            <TopStat
-              label="Revenue"
-              value={formatCompactCurrency(BOOKING_ENGINE_SUMMARY.totalRevenue)}
+            <PasSummaryMetricCard
+              title="Total revenue (GBP)"
+              value={formatCurrency(BOOKING_ENGINE_SUMMARY.totalRevenue, "GBP")}
+              icon={Banknote}
+              trendLabel="+5.4%"
+              chartValues={PAS_REVENUE_CHART_STUB}
+              chartLabels={PAS_YTD_MONTH_LABELS}
             />
-            <TopStat
-              label="Properties"
-              value={formatCompactCount(BOOKING_ENGINE_SUMMARY.totalProperties)}
+            <PasSummaryMetricCard
+              title="Connected partners"
+              value={String(BOOKING_ENGINE_SUMMARY.partners)}
+              icon={Network}
+              trendLabel="+17%"
+              chartValues={PAS_PARTNERS_CHART_STUB}
+              chartStyle="sparkline"
+              footer={getPartnerConnectionFooter()}
             />
-            <TopStat
-              label="With CAL"
-              value={formatCount(BOOKING_ENGINE_SUMMARY.totalWithCal)}
+            <PasSummaryMetricCard
+              title="Active brands"
+              value={String(BOOKING_ENGINE_SUMMARY.activeBrands)}
+              icon={LayoutGrid}
+              trendLabel="+8%"
+              chartValues={PAS_BRANDS_CHART_STUB}
+              chartStyle="sparkline"
+              footer={getTopPartnersBrandFooter()}
             />
-            <TopStat
-              label="With DDL"
-              value={formatCount(BOOKING_ENGINE_SUMMARY.totalWithDdl)}
-            />
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <Button variant="outline" className="h-9 gap-2 text-xs">
-              <Download className="size-3.5" />
-              Export
-            </Button>
-            <Button className="h-9 gap-2 text-xs">
-              <Plus className="size-3.5" />
-              Add partner
-            </Button>
           </div>
         </div>
 
@@ -170,9 +192,10 @@ export function BookingEnginePage({ initialView = "partners" }: BookingEnginePag
           </div>
         ) : null}
 
-        <div className="grid min-h-0 flex-1 gap-4 overflow-hidden lg:grid-cols-[232px_minmax(0,1fr)] lg:items-stretch">
-          <aside className="flex h-full min-h-0 flex-col overflow-hidden">
-            <p className="mb-3 shrink-0 text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
+        <div className="grid gap-4 lg:grid-cols-[232px_minmax(0,1fr)] lg:items-stretch">
+          <div className="contents lg:block lg:relative lg:min-h-0">
+            <aside className="flex min-h-0 flex-col lg:absolute lg:inset-0">
+              <p className="mb-3 shrink-0 text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
               {partnerSearch.trim()
                 ? `${filteredPartners.length} of ${BOOKING_ENGINE_PARTNERS.length} partners`
                 : `${BOOKING_ENGINE_PARTNERS.length} partners`}
@@ -216,9 +239,10 @@ export function BookingEnginePage({ initialView = "partners" }: BookingEnginePag
                 </p>
               )}
             </div>
-          </aside>
+            </aside>
+          </div>
 
-          <main className={cn("flex min-h-0 min-w-0 flex-col")}>
+          <main className="flex min-h-0 min-w-0 flex-col">
             {selectedPartner ? (
               <PartnerDetailPanel
                 partner={selectedPartner}

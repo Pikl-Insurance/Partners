@@ -307,8 +307,8 @@ export const BOOKING_ENGINE_PARTNERS: Partner[] = [
     },
     currencies: ["EUR", "GBP"],
     brands: [
-      { id: "f-brand-1", name: "Brand Alpha (DK)", policyGroup: "Partner Zeta DK 2" },
-      { id: "f-brand-2", name: "Brand Alpha (EUR)", policyGroup: "Partner Zeta EUR 2" },
+      { id: "f-brand-1", name: "Brand Alpha", policyGroup: "Partner Zeta DK 2" },
+      { id: "f-brand-2", name: "Brand Beta", policyGroup: "Partner Zeta EUR 2" },
     ],
     policies: [
       {
@@ -376,6 +376,11 @@ export const BOOKING_ENGINE_PARTNERS: Partner[] = [
 export const BOOKING_ENGINE_SUMMARY = {
   partners: BOOKING_ENGINE_PARTNERS.length,
   activeBrands: BOOKING_ENGINE_PARTNERS.reduce((sum, partner) => sum + partner.brands.length, 0),
+  users: 24,
+  activePolicies: BOOKING_ENGINE_PARTNERS.reduce(
+    (sum, partner) => sum + partner.policies.length,
+    0
+  ),
   totalBookings: BOOKING_ENGINE_PARTNERS.reduce(
     (sum, partner) => sum + partner.activity.bookings,
     0
@@ -434,10 +439,42 @@ export function formatCompactCurrency(value: number, currency: "GBP" | "EUR" = "
   return formatCurrency(value, currency)
 }
 
+export function formatBrandLabel(name: string) {
+  return name.replace(/^Brand\s+/i, "")
+}
+
 export function getPartnerTags(partner: Partner) {
   const [method, currencies] = partner.dataRoute.split(" — ")
   const routeTag = currencies ? `${method} → ${currencies}` : method
   return [method, routeTag, ...partner.currencies]
+}
+
+export function getPartnerConnectionBreakdown() {
+  const counts = new Map<string, number>()
+
+  for (const partner of BOOKING_ENGINE_PARTNERS) {
+    counts.set(partner.connectionType, (counts.get(partner.connectionType) ?? 0) + 1)
+  }
+
+  return [...counts.entries()].sort((a, b) => b[1] - a[1])
+}
+
+export function getTopPartnersByBrandCount(limit = 3) {
+  return [...BOOKING_ENGINE_PARTNERS]
+    .sort((a, b) => b.brands.length - a.brands.length)
+    .slice(0, limit)
+}
+
+export function getPartnerConnectionFooter() {
+  return getPartnerConnectionBreakdown()
+    .map(([type, count]) => `${count} ${type}`)
+    .join(" · ")
+}
+
+export function getTopPartnersBrandFooter() {
+  return getTopPartnersByBrandCount(3)
+    .map((partner) => `${partner.name.replace(/^Partner /, "")} ${partner.brands.length}`)
+    .join(" · ")
 }
 
 const PARTNER_A_BOOKINGS: PartnerBooking[] = [
