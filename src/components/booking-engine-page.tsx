@@ -57,7 +57,7 @@ function getInitialPasState(initialView: BookingEngineView) {
     case "editor":
       return {
         selectedPartnerId: DEFAULT_PARTNER_ID,
-        initialTab: "rates" as PartnerDetailTab,
+        initialTab: "brands" as PartnerDetailTab,
         editorMode: true,
       }
     case "partners":
@@ -165,7 +165,7 @@ export function BookingEnginePage({ initialView = "partners" }: BookingEnginePag
           <div className="flex shrink-0 items-center gap-2 rounded-lg border border-border bg-muted/40 px-4 py-2.5 text-xs text-muted-foreground">
             <PencilLine className="size-3.5 shrink-0 text-foreground" />
             <span>
-              Editor mode — update brands, policy groups and rates in the Policy rates tab.
+              Editor mode — open the Brands tab and use Edit rates to update policy values.
             </span>
           </div>
         ) : null}

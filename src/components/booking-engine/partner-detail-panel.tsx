@@ -1,10 +1,11 @@
-import { useId, useMemo, useState, type ReactNode } from "react"
-import { Search, Tag } from "lucide-react"
+import { useEffect, useId, useMemo, useState, type ReactNode } from "react"
+import { PencilLine, Search, Tag } from "lucide-react"
 import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 
 import { PartnerBookingsTable } from "@/components/booking-engine/partner-bookings-table"
 import { PolicyRatesTable } from "@/components/booking-engine/policy-rates-table"
 import { PropertiesTable } from "@/components/booking-engine/properties-table"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
   formatCompactCount,
@@ -12,18 +13,13 @@ import {
   formatCount,
   getBookingsForPartner,
   getPartnerBookingTrend,
-  getPartnerTags,
   type Partner,
+  type PolicyRate,
 } from "@/lib/booking-engine-data"
 import { getPropertiesForPartner, type PropertyListItem } from "@/lib/properties-list-data"
 import { cn } from "@/lib/utils"
 
-export type PartnerDetailTab =
-  | "overview"
-  | "brands"
-  | "rates"
-  | "bookings"
-  | "properties"
+export type PartnerDetailTab = "overview" | "brands" | "bookings" | "properties"
 
 type PartnerDetailPanelProps = {
   partner: Partner
@@ -35,37 +31,28 @@ type PartnerDetailPanelProps = {
 const TAB_ITEMS: { id: PartnerDetailTab; label: string }[] = [
   { id: "overview", label: "Overview" },
   { id: "brands", label: "Brands" },
-  { id: "rates", label: "Policy rates" },
   { id: "bookings", label: "Bookings" },
   { id: "properties", label: "Properties" },
 ]
 
-function PartnerTag({ label }: { label: string }) {
-  return (
-    <span className="inline-flex rounded border border-border bg-muted/30 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
-      {label}
-    </span>
-  )
-}
-
 function PartnerStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="text-right">
+    <div className="min-w-[88px] rounded-lg border border-border bg-muted/25 px-4 py-3">
       <p className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
         {label}
       </p>
-      <p className="mt-0.5 text-sm font-semibold tabular-nums text-foreground">{value}</p>
+      <p className="mt-1 text-sm font-semibold tabular-nums text-foreground">{value}</p>
     </div>
   )
 }
 
 function TabSummaryMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex min-w-0 flex-col justify-center px-5 py-4">
+    <div className="flex min-w-0 flex-col justify-center px-4 py-3">
       <p className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
         {label}
       </p>
-      <p className="mt-1.5 text-2xl font-semibold tracking-tight tabular-nums text-foreground">
+      <p className="mt-1 text-sm font-semibold tabular-nums text-foreground">
         {value}
       </p>
     </div>
@@ -86,18 +73,20 @@ function TabSummaryBar({
   searchPlaceholder,
 }: {
   metrics: { label: string; value: string }[]
-  searchPlaceholder: string
+  searchPlaceholder?: string
 }) {
   return (
-    <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch">
-      <div className="grid min-w-0 flex-1 grid-cols-1 divide-y divide-border overflow-hidden rounded-lg border border-border bg-card sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+    <div className={cn("flex flex-col gap-4", searchPlaceholder && "lg:flex-row lg:items-stretch")}>
+      <div className="grid w-full min-w-0 grid-cols-1 divide-y divide-border overflow-hidden rounded-lg border border-border bg-card sm:grid-cols-3 sm:divide-x sm:divide-y-0">
         {metrics.map((metric) => (
           <TabSummaryMetric key={metric.label} label={metric.label} value={metric.value} />
         ))}
       </div>
-      <div className="flex shrink-0 items-center lg:w-64">
-        <TabSearchInput placeholder={searchPlaceholder} />
-      </div>
+      {searchPlaceholder ? (
+        <div className="flex shrink-0 items-center lg:w-64">
+          <TabSearchInput placeholder={searchPlaceholder} />
+        </div>
+      ) : null}
     </div>
   )
 }
@@ -216,10 +205,38 @@ function OverviewTab({ partner }: { partner: Partner }) {
   )
 }
 
-function RatesTab({ partner }: { partner: Partner }) {
+function BrandsTab({ partner }: { partner: Partner }) {
   const [selectedBrandId, setSelectedBrandId] = useState<string | null>(
     partner.brands[0]?.id ?? null
   )
+  const [policies, setPolicies] = useState<PolicyRate[]>(partner.policies)
+  const [isEditingRates, setIsEditingRates] = useState(false)
+
+  useEffect(() => {
+    setPolicies(partner.policies)
+    setSelectedBrandId(partner.brands[0]?.id ?? null)
+    setIsEditingRates(false)
+  }, [partner.id, partner.policies, partner.brands])
+
+  const selectedBrand = partner.brands.find((brand) => brand.id === selectedBrandId)
+  const visiblePolicies = selectedBrandId
+    ? policies.filter((policy) => policy.brandId === selectedBrandId)
+    : policies
+
+  const handlePolicyChange = (policyId: string, updates: Partial<PolicyRate>) => {
+    setPolicies((current) =>
+      current.map((policy) => (policy.id === policyId ? { ...policy, ...updates } : policy))
+    )
+  }
+
+  const handleCancelEdit = () => {
+    setPolicies(partner.policies)
+    setIsEditingRates(false)
+  }
+
+  const handleDoneEdit = () => {
+    setIsEditingRates(false)
+  }
 
   return (
     <div className="grid min-h-[420px] gap-0 overflow-hidden rounded-lg border border-border lg:grid-cols-[260px_minmax(0,1fr)]">
@@ -245,62 +262,93 @@ function RatesTab({ partner }: { partner: Partner }) {
             Brands
           </p>
           <ul className="mt-2 space-y-1.5">
-            {partner.brands.map((brand) => (
-              <li key={brand.id}>
-                <button
-                  type="button"
-                  onClick={() => setSelectedBrandId(brand.id)}
-                  className={cn(
-                    "w-full rounded-lg px-3 py-2.5 text-left transition-colors",
-                    selectedBrandId === brand.id
-                      ? "bg-muted ring-1 ring-foreground/15"
-                      : "hover:bg-muted/50"
-                  )}
-                >
-                  <p className="text-sm font-semibold text-foreground">{brand.name}</p>
-                  <p className="text-xs text-muted-foreground">{brand.policyGroup}</p>
-                </button>
-              </li>
-            ))}
+            {partner.brands.map((brand) => {
+              const brandPolicyCount = policies.filter(
+                (policy) => policy.brandId === brand.id
+              ).length
+
+              return (
+                <li key={brand.id}>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedBrandId(brand.id)}
+                    className={cn(
+                      "w-full rounded-lg px-3 py-2.5 text-left transition-colors",
+                      selectedBrandId === brand.id
+                        ? "bg-muted ring-1 ring-foreground/15"
+                        : "hover:bg-muted/50"
+                    )}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-sm font-semibold text-foreground">{brand.name}</p>
+                      <span className="shrink-0 rounded-md bg-background px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-muted-foreground">
+                        {brandPolicyCount}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{brand.policyGroup}</p>
+                  </button>
+                </li>
+              )
+            })}
           </ul>
         </div>
       </aside>
 
       <div className="min-w-0 bg-[var(--panel-bg)] p-5 dark:bg-canvas">
-        <p className="mb-4 text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
-          Policy rates
-        </p>
-        <PolicyRatesTable policies={partner.policies} selectedBrandId={selectedBrandId} />
-      </div>
-    </div>
-  )
-}
-
-function BrandsTab({ partner }: { partner: Partner }) {
-  return (
-    <div className="space-y-4">
-      {partner.brands.map((brand) => {
-        const brandPolicies = partner.policies.filter((policy) => policy.brandId === brand.id)
-        const activeCount = brandPolicies.filter((policy) => policy.status === "active").length
-        const expiredCount = brandPolicies.length - activeCount
-
-        return (
-          <section key={brand.id} className="overflow-hidden rounded-lg border border-border bg-card">
-            <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border/60 px-5 py-4">
-              <div>
-                <p className="text-base font-semibold text-foreground">{brand.name}</p>
-                <p className="mt-0.5 text-sm text-muted-foreground">Policy: {brand.policyGroup}</p>
-              </div>
-              <p className="text-sm font-medium text-foreground">
-                {activeCount} active · {expiredCount} expired
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
+              Policy rates
+            </p>
+            {selectedBrand ? (
+              <p className="mt-1 text-sm text-foreground">
+                {selectedBrand.name}
+                <span className="text-muted-foreground"> · {selectedBrand.policyGroup}</span>
               </p>
-            </div>
-            <div className="p-4">
-              <PolicyRatesTable policies={brandPolicies} selectedBrandId={brand.id} compact />
-            </div>
-          </section>
-        )
-      })}
+            ) : null}
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {isEditingRates ? (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-xs"
+                  onClick={handleCancelEdit}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="h-8 text-xs"
+                  onClick={handleDoneEdit}
+                >
+                  Done
+                </Button>
+              </>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1.5 text-xs"
+                onClick={() => setIsEditingRates(true)}
+              >
+                <PencilLine className="size-3.5" />
+                Edit rates
+              </Button>
+            )}
+          </div>
+        </div>
+        <PolicyRatesTable
+          policies={visiblePolicies}
+          selectedBrandId={selectedBrandId}
+          editable={isEditingRates}
+          onPolicyChange={handlePolicyChange}
+        />
+      </div>
     </div>
   )
 }
@@ -367,7 +415,6 @@ function PropertiesTab({
   return (
     <div className="space-y-4">
       <TabSummaryBar
-        searchPlaceholder="Search properties…"
         metrics={[
           { label: "Properties", value: formatCount(properties.length) },
           { label: "Bookings", value: formatCount(partner.activity.bookings) },
@@ -390,12 +437,10 @@ export function PartnerDetailPanel({
 }: PartnerDetailPanelProps) {
   const properties = getPropertiesForPartner(partner.id)
   const bookings = getBookingsForPartner(partner.id)
-  const tags = getPartnerTags(partner)
 
   const tabCounts: Record<PartnerDetailTab, number | null> = {
     overview: null,
     brands: partner.brands.length,
-    rates: partner.policies.length,
     bookings: bookings.length,
     properties: properties.length,
   }
@@ -404,20 +449,15 @@ export function PartnerDetailPanel({
     <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card">
       <div className="border-b border-border px-5 py-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="flex min-w-0 items-start gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-muted/40 text-[11px] font-semibold text-muted-foreground">
               {partner.initials.slice(0, 2)}
             </div>
             <div className="min-w-0">
               <h2 className="text-base font-semibold text-foreground">{partner.name}</h2>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {tags.map((tag) => (
-                  <PartnerTag key={tag} label={tag} />
-                ))}
-              </div>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-5">
+          <div className="flex flex-wrap items-stretch gap-2">
             <PartnerStat label="Bookings" value={formatCompactCount(partner.activity.bookings)} />
             <PartnerStat
               label="Revenue"
@@ -474,7 +514,6 @@ export function PartnerDetailPanel({
       <div className="min-h-0 flex-1 overflow-y-auto p-5">
         {activeTab === "overview" ? <OverviewTab partner={partner} /> : null}
         {activeTab === "brands" ? <BrandsTab partner={partner} /> : null}
-        {activeTab === "rates" ? <RatesTab partner={partner} /> : null}
         {activeTab === "bookings" ? <BookingsTab partner={partner} /> : null}
         {activeTab === "properties" ? (
           <PropertiesTab

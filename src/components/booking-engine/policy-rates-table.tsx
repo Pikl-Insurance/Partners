@@ -6,6 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Input } from "@/components/ui/input"
 import {
   formatCurrency,
   formatRate,
@@ -17,6 +18,8 @@ type PolicyRatesTableProps = {
   policies: PolicyRate[]
   selectedBrandId: string | null
   compact?: boolean
+  editable?: boolean
+  onPolicyChange?: (policyId: string, updates: Partial<PolicyRate>) => void
   /** Renders at natural height for a parent with overflow-hidden (no scroll wrappers). */
   clipped?: boolean
   /** Fixed column layout for scaled dashboard previews. */
@@ -27,9 +30,17 @@ export function PolicyRatesTable({
   policies,
   selectedBrandId,
   compact = false,
+  editable = false,
+  onPolicyChange,
   clipped = false,
   preview = false,
 }: PolicyRatesTableProps) {
+  const inputClassName = cn(
+    "h-8 font-mono text-xs tabular-nums",
+    compact ? "w-[4.5rem] px-2" : "w-24 px-2"
+  )
+
+  const liabilityInputClassName = cn(inputClassName, compact ? "w-[5.5rem]" : "w-28")
   const tableContent = (
     <>
       <TableHeader>
@@ -101,37 +112,103 @@ export function PolicyRatesTable({
                 className={cn(
                   "text-right font-mono tabular-nums text-foreground",
                   compact ? "px-3 py-2 text-xs" : "px-5 py-4 text-sm",
-                  preview && "px-2 py-1.5 text-[10px]"
+                  preview && "px-2 py-1.5 text-[10px]",
+                  editable && "px-2 py-2"
                 )}
               >
-                {formatRate(policy.netRate)}
+                {editable ? (
+                  <Input
+                    type="number"
+                    step="0.001"
+                    value={policy.netRate}
+                    onChange={(event) =>
+                      onPolicyChange?.(policy.id, {
+                        netRate: Number.parseFloat(event.target.value) || 0,
+                      })
+                    }
+                    className={cn(inputClassName, "ml-auto text-right")}
+                    aria-label={`Net rate for ${policy.name}`}
+                  />
+                ) : (
+                  formatRate(policy.netRate)
+                )}
               </TableCell>
               <TableCell
                 className={cn(
                   "text-right font-mono tabular-nums text-foreground",
                   compact ? "px-3 py-2 text-xs" : "px-5 py-4 text-sm",
-                  preview && "px-2 py-1.5 text-[10px]"
+                  preview && "px-2 py-1.5 text-[10px]",
+                  editable && "px-2 py-2"
                 )}
               >
-                {formatRate(policy.grossRate)}
+                {editable ? (
+                  <Input
+                    type="number"
+                    step="0.001"
+                    value={policy.grossRate}
+                    onChange={(event) =>
+                      onPolicyChange?.(policy.id, {
+                        grossRate: Number.parseFloat(event.target.value) || 0,
+                      })
+                    }
+                    className={cn(inputClassName, "ml-auto text-right")}
+                    aria-label={`Gross rate for ${policy.name}`}
+                  />
+                ) : (
+                  formatRate(policy.grossRate)
+                )}
               </TableCell>
               <TableCell
                 className={cn(
                   "text-right font-mono tabular-nums text-foreground",
                   compact ? "px-3 py-2 text-xs" : "px-5 py-4 text-sm",
-                  preview && "px-2 py-1.5 text-[10px]"
+                  preview && "px-2 py-1.5 text-[10px]",
+                  editable && "px-2 py-2"
                 )}
               >
-                {policy.calCommission > 0 ? `${formatRate(policy.calCommission)}%` : "—"}
+                {editable ? (
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={policy.calCommission}
+                    onChange={(event) =>
+                      onPolicyChange?.(policy.id, {
+                        calCommission: Number.parseFloat(event.target.value) || 0,
+                      })
+                    }
+                    className={cn(inputClassName, "ml-auto text-right")}
+                    aria-label={`CAL commission for ${policy.name}`}
+                  />
+                ) : policy.calCommission > 0 ? (
+                  `${formatRate(policy.calCommission)}%`
+                ) : (
+                  "—"
+                )}
               </TableCell>
               <TableCell
                 className={cn(
                   "text-right font-mono tabular-nums text-foreground",
                   compact ? "px-3 py-2 text-xs" : "px-5 py-4 text-sm",
-                  preview && "px-2 py-1.5 text-[10px]"
+                  preview && "px-2 py-1.5 text-[10px]",
+                  editable && "px-2 py-2"
                 )}
               >
-                {formatCurrency(policy.maxLiability, policy.currency)}
+                {editable ? (
+                  <Input
+                    type="number"
+                    step="100"
+                    value={policy.maxLiability}
+                    onChange={(event) =>
+                      onPolicyChange?.(policy.id, {
+                        maxLiability: Number.parseInt(event.target.value, 10) || 0,
+                      })
+                    }
+                    className={cn(liabilityInputClassName, "ml-auto text-right")}
+                    aria-label={`Max liability for ${policy.name}`}
+                  />
+                ) : (
+                  formatCurrency(policy.maxLiability, policy.currency)
+                )}
               </TableCell>
               <TableCell className={cn(compact ? "px-3 py-2 text-xs" : "px-5 py-4 text-sm", preview && "px-2 py-1.5 text-[10px]")}>
                 {policy.currency}
