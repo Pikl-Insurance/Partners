@@ -436,9 +436,10 @@ function App() {
                           <Settings2 className="size-6" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium">Admin</p>
+                          <p className="text-sm font-medium">Administration</p>
                           <p className="mt-1 text-sm text-muted-foreground">
-                            Admin tools will be available here soon.
+                            Backend tools for users, system configuration, and platform
+                            management will be available here soon.
                           </p>
                         </div>
                       </div>
