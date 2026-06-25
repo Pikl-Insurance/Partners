@@ -3,6 +3,7 @@ import {
   BarChart3,
   ChevronsLeft,
   ChevronsRight,
+  LayoutDashboard,
   SquareChartGantt,
   Palette,
   Zap,
@@ -10,9 +11,14 @@ import {
   MoonStar,
   Settings2,
   Sun,
+  type LucideIcon,
 } from "lucide-react"
 
 import { BookingEnginePage } from "@/components/booking-engine-page"
+import {
+  LandingDashboardPage,
+  type LandingDestination,
+} from "@/components/landing-dashboard-page"
 import { DesignSystemView } from "@/components/components-page"
 import { FilterSidebar } from "@/components/filter-sidebar"
 import { InsightsReportPage } from "@/components/insights-report-page"
@@ -45,24 +51,131 @@ import {
 import { cn } from "@/lib/utils"
 import { type ActiveFilters, DEFAULT_FILTERS } from "@/lib/chart-data"
 
-const navItems = [
-  { id: "booking-engine" as const, label: "Policy admin system", icon: Zap },
-  { id: "insights" as const, label: "Insights", icon: BarChart3 },
-  { id: "admin" as const, label: "Admin", icon: Settings2 },
-]
+const navGroups = [
+  {
+    heading: "Overview",
+    items: [{ id: "home" as const, label: "Home", icon: LayoutDashboard }],
+  },
+  {
+    heading: "Operations",
+    items: [{ id: "booking-engine" as const, label: "PAS", icon: Zap }],
+  },
+  {
+    heading: "Business Intelligence",
+    items: [{ id: "insights" as const, label: "Insights", icon: BarChart3 }],
+  },
+  {
+    heading: "Administration",
+    items: [{ id: "admin" as const, label: "Admin", icon: Settings2 }],
+  },
+] as const
 
-type ActiveSection = (typeof navItems)[number]["id"] | "components"
+type NavItemId = (typeof navGroups)[number]["items"][number]["id"]
+type ActiveSection = NavItemId | "components"
+
+const sectionLabels: Record<ActiveSection, string> = {
+  home: "Home",
+  "booking-engine": "PAS",
+  insights: "Insights",
+  admin: "Admin",
+  components: "Design system",
+}
+
+const navItemClassName = (isActive: boolean) =>
+  cn(
+    "flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+    isActive
+      ? "bg-accent text-accent-foreground"
+      : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+  )
+
+const collapsedNavItemClassName = (isActive: boolean) =>
+  cn(
+    "flex size-9 items-center justify-center rounded-md transition-colors",
+    isActive
+      ? "bg-accent text-accent-foreground"
+      : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+  )
+
+function NavItemButton({
+  id,
+  label,
+  icon: Icon,
+  activeSection,
+  onSelect,
+  collapsed = false,
+}: {
+  id: NavItemId
+  label: string
+  icon: LucideIcon
+  activeSection: ActiveSection
+  onSelect: (id: NavItemId) => void
+  collapsed?: boolean
+}) {
+  const isActive = activeSection === id
+
+  if (collapsed) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            onClick={() => onSelect(id)}
+            aria-current={isActive ? "page" : undefined}
+            aria-label={label}
+            className={collapsedNavItemClassName(isActive)}
+          >
+            <Icon className="size-4" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="right">{label}</TooltipContent>
+      </Tooltip>
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(id)}
+      aria-current={isActive ? "page" : undefined}
+      className={navItemClassName(isActive)}
+    >
+      <Icon className="size-4 shrink-0" />
+      {label}
+    </button>
+  )
+}
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(true)
   const [isDark, setIsDark] = useState(false)
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(true)
-  const [activeSection, setActiveSection] = useState<ActiveSection>("booking-engine")
+  const [activeSection, setActiveSection] = useState<ActiveSection>("home")
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>(DEFAULT_FILTERS)
+  const [insightsScrollTarget, setInsightsScrollTarget] = useState<string | null>(null)
 
   function handleLogout() {
     setIsAuthenticated(false)
   }
+
+  function handleLandingNavigate(destination: LandingDestination) {
+    setActiveSection(destination.section)
+    if (destination.section === "insights" && destination.anchor) {
+      setInsightsScrollTarget(destination.anchor)
+    }
+  }
+
+  useEffect(() => {
+    if (activeSection !== "insights" || !insightsScrollTarget) return
+
+    const timer = window.setTimeout(() => {
+      const el = document.getElementById(insightsScrollTarget)
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" })
+      setInsightsScrollTarget(null)
+    }, 150)
+
+    return () => window.clearTimeout(timer)
+  }, [activeSection, insightsScrollTarget])
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", isDark)
@@ -72,7 +185,14 @@ function App() {
     activeSection === "insights" || activeSection === "components"
 
   if (!isAuthenticated) {
-    return <LoginPage onLogin={() => setIsAuthenticated(true)} />
+    return (
+      <LoginPage
+        onLogin={() => {
+          setIsAuthenticated(true)
+          setActiveSection("home")
+        }}
+      />
+    )
   }
 
   return (
@@ -112,36 +232,41 @@ function App() {
                   </Tooltip>
                 </div>
 
-                <nav className="mt-3 space-y-0.5">
-                  {navItems.map(({ id, label, icon: Icon }) => (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => setActiveSection(id)}
-                      aria-current={activeSection === id ? "page" : undefined}
-                      className={cn(
-                        "flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                        activeSection === id
-                          ? "bg-accent text-accent-foreground"
-                          : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
-                      )}
-                    >
-                      <Icon className="size-4 shrink-0" />
-                      {label}
-                    </button>
+                <nav className="mt-3 space-y-5">
+                  {navGroups.map((group) => (
+                    <div key={group.heading}>
+                      <p className="mb-1.5 px-3 text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
+                        {group.heading}
+                      </p>
+                      <div className="space-y-0.5">
+                        {group.items.map((item) => (
+                          <NavItemButton
+                            key={item.id}
+                            {...item}
+                            activeSection={activeSection}
+                            onSelect={setActiveSection}
+                          />
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </nav>
               </div>
 
               <div className="relative z-30 mt-auto shrink-0 space-y-4 overflow-visible px-5 pb-6 pt-4">
-                <Button
-                  variant="outline"
-                  className="w-full justify-center gap-2 bg-card"
-                  onClick={() => setActiveSection("components")}
-                >
-                  <Palette className="size-4 shrink-0" />
-                  Design system
-                </Button>
+                <div>
+                  <p className="mb-1.5 px-3 text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
+                    Development
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-center gap-2 bg-card"
+                    onClick={() => setActiveSection("components")}
+                  >
+                    <Palette className="size-4 shrink-0" />
+                    Design system
+                  </Button>
+                </div>
                 {activeSection === "insights" && <SectionNav />}
                 <Button
                   variant="outline"
@@ -172,23 +297,25 @@ function App() {
                 </Tooltip>
               </div>
 
-              <nav className="mt-4 flex w-full flex-col items-center gap-1">
-                {navItems.map(({ id, label, icon: Icon }) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setActiveSection(id)}
-                    aria-current={activeSection === id ? "page" : undefined}
-                    title={label}
+              <nav className="mt-4 flex w-full flex-col items-center">
+                {navGroups.map((group, groupIndex) => (
+                  <div
+                    key={group.heading}
                     className={cn(
-                      "flex size-9 items-center justify-center rounded-md transition-colors",
-                      activeSection === id
-                        ? "bg-accent text-accent-foreground"
-                        : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+                      "flex w-full flex-col items-center gap-1",
+                      groupIndex > 0 && "mt-2 border-t border-border/50 pt-2"
                     )}
                   >
-                    <Icon className="size-4" />
-                  </button>
+                    {group.items.map((item) => (
+                      <NavItemButton
+                        key={item.id}
+                        {...item}
+                        activeSection={activeSection}
+                        onSelect={setActiveSection}
+                        collapsed
+                      />
+                    ))}
+                  </div>
                 ))}
               </nav>
 
@@ -235,15 +362,7 @@ function App() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>
-                    {activeSection === "booking-engine"
-                      ? "Policy admin system"
-                      : activeSection === "components"
-                        ? "Design system"
-                        : activeSection === "admin"
-                          ? "Admin"
-                          : "Insights"}
-                  </BreadcrumbPage>
+                  <BreadcrumbPage>{sectionLabels[activeSection]}</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
@@ -309,7 +428,12 @@ function App() {
               <>
                 <div className="min-h-0 min-w-0 overflow-hidden">
                   <section className="h-full overflow-y-auto px-20 py-12 xl:px-24 xl:py-14">
-                    {activeSection === "booking-engine" ? (
+                    {activeSection === "home" ? (
+                      <LandingDashboardPage
+                        filters={activeFilters}
+                        onNavigate={handleLandingNavigate}
+                      />
+                    ) : activeSection === "booking-engine" ? (
                       <BookingEnginePage />
                     ) : activeSection === "admin" ? (
                       <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-border bg-muted/10 py-14 text-center">

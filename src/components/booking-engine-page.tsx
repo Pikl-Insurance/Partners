@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Download } from "lucide-react"
+import { Download, Plus } from "lucide-react"
 
 import { PartnerCard } from "@/components/booking-engine/partner-card"
 import { PropertiesListPage } from "@/components/booking-engine/properties-list-page"
@@ -70,10 +70,16 @@ export function BookingEnginePage() {
             </p>
           </div>
 
-          <Button className="text-xs">
-            <Download className="size-3.5" />
-            Export
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" className="text-xs">
+              <Plus className="size-3.5" />
+              Add partner
+            </Button>
+            <Button className="text-xs">
+              <Download className="size-3.5" />
+              Export
+            </Button>
+          </div>
         </div>
 
         <div className="@container min-w-0">
