@@ -100,15 +100,21 @@ export function BookingEnginePage({ initialView = "partners" }: BookingEnginePag
   )
 
   if (showAddPartner) {
-    return <AddPartnerPage onBack={() => setShowAddPartner(false)} />
+    return (
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <AddPartnerPage onBack={() => setShowAddPartner(false)} />
+      </div>
+    )
   }
 
   if (selectedPropertyId) {
     return (
-      <PropertyPage
-        property={MOCK_PROPERTY}
-        onBack={() => setSelectedPropertyId(null)}
-      />
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <PropertyPage
+          property={MOCK_PROPERTY}
+          onBack={() => setSelectedPropertyId(null)}
+        />
+      </div>
     )
   }
 
@@ -190,7 +196,7 @@ export function BookingEnginePage({ initialView = "partners" }: BookingEnginePag
             </div>
           </aside>
 
-          <main className="flex min-h-0 min-w-0 flex-col">
+          <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
             {selectedPartner ? (
               <PartnerDetailPanel
                 partner={selectedPartner}

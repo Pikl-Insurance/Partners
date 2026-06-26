@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils"
 const TICK_STYLE = { fontSize: 10, fill: "var(--color-muted-foreground)" }
 
 /** Shared layout tokens for property insight cards */
-export const insightCardHeaderClass = "space-y-0 pb-0"
+export const insightCardHeaderClass = "w-full space-y-0 pb-0"
 export const insightCardBodyClass =
   "flex min-h-0 flex-1 flex-col gap-5 px-4 pb-4 pt-3"
 export const insightMetricGroupClass = "flex flex-col gap-1.5"
@@ -60,15 +60,15 @@ export function InsightWidgetHeader({
   helpText?: string
 }) {
   return (
-    <div className="flex items-start justify-between gap-3">
-      <div className="min-w-0">
+    <div className="flex w-full items-start justify-between gap-3">
+      <div className="min-w-0 flex-1">
         <h3 className="text-sm font-semibold text-foreground">{title}</h3>
         {subtitle ? <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p> : null}
+        {badges ? (
+          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">{badges}</div>
+        ) : null}
       </div>
-      <div className="flex shrink-0 items-center gap-1.5">
-        {badges}
-        <WidgetHelpButton title={title} helpText={helpText} />
-      </div>
+      <WidgetHelpButton title={title} helpText={helpText} />
     </div>
   )
 }

@@ -581,9 +581,12 @@ export function LandingDashboardPage({
     setShowCustomiseToast(true)
   }, [isCustomising])
 
+  const syncOpsWithIntel = areCardsInSameRow(cardOrder, "operations", "intelligence")
+  const syncTeamWithTargets = areCardsInSameRow(cardOrder, "targets", "team")
+
   useEffect(() => {
     const element = intelligenceRef.current
-    if (!element) {
+    if (!element || !syncOpsWithIntel) {
       setIntelligenceHeight(undefined)
       return
     }
@@ -599,7 +602,7 @@ export function LandingDashboardPage({
     const observer = new ResizeObserver(updateHeight)
     observer.observe(element)
     return () => observer.disconnect()
-  }, [cardOrder, booking.total])
+  }, [cardOrder, booking.total, syncOpsWithIntel])
 
   useEffect(() => {
     const element = targetsRef.current
@@ -620,9 +623,6 @@ export function LandingDashboardPage({
     observer.observe(element)
     return () => observer.disconnect()
   }, [cardOrder])
-
-  const syncOpsWithIntel = areCardsInSameRow(cardOrder, "operations", "intelligence")
-  const syncTeamWithTargets = areCardsInSameRow(cardOrder, "targets", "team")
 
   function renderDashboardCard(cardId: DashboardCardId, dragHandleProps?: DragHandleProps) {
     switch (cardId) {
@@ -714,52 +714,38 @@ export function LandingDashboardPage({
             onLinkClick={() => onNavigate({ section: "insights" })}
             dragHandleProps={dragHandleProps}
           >
-            <div className="@container flex min-h-0 flex-1 flex-col gap-5 py-1">
-              <div className={cn(metricCardGridClass, "min-w-0 grid-cols-2")}>
-                <MetricTrendWidget
-                  className="min-w-0"
-                  title="Total bookings"
-                  value={booking.total}
-                  trendLabel={bookingTrend.trendLabel}
-                  trend={bookingTrend.trend}
-                  comparisonLabel={bookingTrend.comparisonLabel}
-                  chartData={bookingChart}
-                  scopeLabel="All selected partners and brands"
-                  rateLabel={bookingTrend.dailyAverage}
-                  helpText={INSIGHTS_WIDGET_HELP_TEXT}
-                />
-                <ProductSplitWidget
-                  className="min-w-0"
-                  totalLabel={productSplit.totalLabel}
-                  segmentA={{
-                    label: "CAL",
-                    value: booking.calSales,
-                    sharePercent: productSplit.calSharePercent,
-                    takeUpLabel: booking.calPct,
-                    trend: productSplit.calTrend,
-                  }}
-                  segmentB={{
-                    label: "DDL",
-                    value: booking.ddlSales,
-                    sharePercent: productSplit.ddlSharePercent,
-                    takeUpLabel: booking.ddlPct,
-                    trend: productSplit.ddlTrend,
-                  }}
-                  helpText={INSIGHTS_WIDGET_HELP_TEXT}
-                />
-              </div>
-
-              <p className="mt-auto border-t border-border/50 pt-4 text-xs text-muted-foreground">
-                Explore timing, ABV, lead time and more in the{" "}
-                <button
-                  type="button"
-                  onClick={() => onNavigate({ section: "insights" })}
-                  className="font-medium text-foreground underline-offset-2 hover:underline"
-                >
-                  full insights report
-                </button>
-                .
-              </p>
+            <div className={cn(metricCardGridClass, "@container min-w-0 grid-cols-2")}>
+              <MetricTrendWidget
+                className="min-w-0"
+                title="Total bookings"
+                value={booking.total}
+                trendLabel={bookingTrend.trendLabel}
+                trend={bookingTrend.trend}
+                comparisonLabel={bookingTrend.comparisonLabel}
+                chartData={bookingChart}
+                scopeLabel="All selected partners and brands"
+                rateLabel={bookingTrend.dailyAverage}
+                helpText={INSIGHTS_WIDGET_HELP_TEXT}
+              />
+              <ProductSplitWidget
+                className="min-w-0"
+                totalLabel={productSplit.totalLabel}
+                segmentA={{
+                  label: "CAL",
+                  value: booking.calSales,
+                  sharePercent: productSplit.calSharePercent,
+                  takeUpLabel: booking.calPct,
+                  trend: productSplit.calTrend,
+                }}
+                segmentB={{
+                  label: "DDL",
+                  value: booking.ddlSales,
+                  sharePercent: productSplit.ddlSharePercent,
+                  takeUpLabel: booking.ddlPct,
+                  trend: productSplit.ddlTrend,
+                }}
+                helpText={INSIGHTS_WIDGET_HELP_TEXT}
+              />
             </div>
           </DashboardPanel>
         )
@@ -851,6 +837,7 @@ export function LandingDashboardPage({
                   : undefined
             }
             className={cn(
+              cardId === "intelligence" && syncOpsWithIntel && "self-start",
               cardId === "operations" && syncOpsWithIntel && "w-full",
               cardId === "team" && syncTeamWithTargets && "w-full",
               cardId === "team" && !syncTeamWithTargets && "self-start"

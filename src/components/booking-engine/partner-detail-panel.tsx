@@ -446,7 +446,7 @@ export function PartnerDetailPanel({
   }
 
   return (
-    <div className="flex h-full min-h-[420px] flex-col overflow-hidden rounded-xl border border-border bg-card">
+    <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card">
       <div className="border-b border-border px-5 py-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">

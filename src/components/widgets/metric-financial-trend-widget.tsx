@@ -80,8 +80,8 @@ export function MetricFinancialTrendWidget({
     return (
       <Card className={cn("@container flex h-full min-w-0 flex-col bg-card shadow-xs", className)}>
         <CardHeader className={insightCardHeaderClass}>
-          <div className="flex items-start justify-between gap-3">
-            <h3 className="min-w-0 text-sm font-semibold text-foreground">{title}</h3>
+          <div className="flex w-full items-start justify-between gap-3">
+            <h3 className="min-w-0 flex-1 text-sm font-semibold text-foreground">{title}</h3>
             <WidgetHelpButton title={title} helpText={helpText} />
           </div>
         </CardHeader>
