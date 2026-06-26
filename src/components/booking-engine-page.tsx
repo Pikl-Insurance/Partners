@@ -1,18 +1,11 @@
 import { useMemo, useState } from "react"
 import {
-  Banknote,
   Download,
-  LayoutGrid,
-  Network,
   PencilLine,
   Plus,
   Search,
-  ShoppingCart,
 } from "lucide-react"
 
-import {
-  PasSummaryMetricCard,
-} from "@/components/booking-engine/pas-summary-metric-card"
 import {
   PartnerDetailPanel,
   type PartnerDetailTab,
@@ -26,14 +19,7 @@ import { Input } from "@/components/ui/input"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import {
   BOOKING_ENGINE_PARTNERS,
-  BOOKING_ENGINE_SUMMARY,
-  formatCount,
-  formatCurrency,
-  getBrandsTrendContext,
-  getBookingsTrendContext,
   getPartnerTags,
-  getPartnerTrendContext,
-  getRevenueTrendContext,
   type Partner,
 } from "@/lib/booking-engine-data"
 import { MOCK_PROPERTY } from "@/lib/property-data"
@@ -128,8 +114,8 @@ export function BookingEnginePage({ initialView = "partners" }: BookingEnginePag
 
   return (
     <TooltipProvider>
-      <div className="space-y-5">
-        <div className="shrink-0 space-y-4 border-b border-border pb-5">
+      <div className="flex min-h-0 flex-1 flex-col gap-5">
+        <div className="shrink-0 border-b border-border pb-5">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-[180px]">
               <h1 className="text-[22px] font-semibold tracking-tight">Partners &amp; policies</h1>
@@ -150,37 +136,6 @@ export function BookingEnginePage({ initialView = "partners" }: BookingEnginePag
               </Button>
             </div>
           </div>
-
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <PasSummaryMetricCard
-              title="Total bookings (sales)"
-              value={formatCount(BOOKING_ENGINE_SUMMARY.totalBookings)}
-              icon={ShoppingCart}
-              trendLabel="+12%"
-              trendContext={getBookingsTrendContext()}
-            />
-            <PasSummaryMetricCard
-              title="Total revenue (GBP)"
-              value={formatCurrency(BOOKING_ENGINE_SUMMARY.totalRevenue, "GBP")}
-              icon={Banknote}
-              trendLabel="+5.4%"
-              trendContext={getRevenueTrendContext()}
-            />
-            <PasSummaryMetricCard
-              title="Connected partners"
-              value={String(BOOKING_ENGINE_SUMMARY.partners)}
-              icon={Network}
-              trendLabel="+17%"
-              trendContext={getPartnerTrendContext()}
-            />
-            <PasSummaryMetricCard
-              title="Active brands"
-              value={String(BOOKING_ENGINE_SUMMARY.activeBrands)}
-              icon={LayoutGrid}
-              trendLabel="+8%"
-              trendContext={getBrandsTrendContext()}
-            />
-          </div>
         </div>
 
         {editorMode ? (
@@ -192,14 +147,8 @@ export function BookingEnginePage({ initialView = "partners" }: BookingEnginePag
           </div>
         ) : null}
 
-        <div className="grid gap-4 lg:grid-cols-[232px_minmax(0,1fr)] lg:items-stretch">
-          <div className="contents lg:block lg:relative lg:min-h-0">
-            <aside className="flex min-h-0 flex-col lg:absolute lg:inset-0">
-              <p className="mb-3 shrink-0 text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
-              {partnerSearch.trim()
-                ? `${filteredPartners.length} of ${BOOKING_ENGINE_PARTNERS.length} partners`
-                : `${BOOKING_ENGINE_PARTNERS.length} partners`}
-            </p>
+        <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[232px_minmax(0,1fr)] lg:items-stretch">
+          <aside className="flex min-h-0 flex-col overflow-hidden">
             <div className="relative mb-3 shrink-0">
               <Search className="pointer-events-none absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -239,8 +188,7 @@ export function BookingEnginePage({ initialView = "partners" }: BookingEnginePag
                 </p>
               )}
             </div>
-            </aside>
-          </div>
+          </aside>
 
           <main className="flex min-h-0 min-w-0 flex-col">
             {selectedPartner ? (

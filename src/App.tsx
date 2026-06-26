@@ -456,8 +456,10 @@ function App() {
                 <div className="min-h-0 min-w-0 overflow-hidden">
                   <section
                     className={cn(
-                      "relative h-full min-h-0 overflow-y-auto px-20 xl:px-24",
-                      activeSection === "booking-engine" ? "py-8 xl:py-10" : "py-12 xl:py-14"
+                      "relative h-full min-h-0 px-20 xl:px-24",
+                      activeSection === "booking-engine"
+                        ? "flex flex-col overflow-hidden py-8 xl:py-10"
+                        : "overflow-y-auto py-12 xl:py-14"
                     )}
                   >
                     {activeSection === "home" ? (
