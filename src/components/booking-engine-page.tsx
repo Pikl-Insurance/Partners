@@ -12,11 +12,6 @@ import {
 
 import {
   PasSummaryMetricCard,
-  PAS_BOOKINGS_CHART_STUB,
-  PAS_BRANDS_CHART_STUB,
-  PAS_PARTNERS_CHART_STUB,
-  PAS_REVENUE_CHART_STUB,
-  PAS_YTD_MONTH_LABELS,
 } from "@/components/booking-engine/pas-summary-metric-card"
 import {
   PartnerDetailPanel,
@@ -163,8 +158,6 @@ export function BookingEnginePage({ initialView = "partners" }: BookingEnginePag
               icon={ShoppingCart}
               trendLabel="+12%"
               trendContext={getBookingsTrendContext()}
-              chartValues={PAS_BOOKINGS_CHART_STUB}
-              chartLabels={PAS_YTD_MONTH_LABELS}
             />
             <PasSummaryMetricCard
               title="Total revenue (GBP)"
@@ -172,8 +165,6 @@ export function BookingEnginePage({ initialView = "partners" }: BookingEnginePag
               icon={Banknote}
               trendLabel="+5.4%"
               trendContext={getRevenueTrendContext()}
-              chartValues={PAS_REVENUE_CHART_STUB}
-              chartLabels={PAS_YTD_MONTH_LABELS}
             />
             <PasSummaryMetricCard
               title="Connected partners"
@@ -181,8 +172,6 @@ export function BookingEnginePage({ initialView = "partners" }: BookingEnginePag
               icon={Network}
               trendLabel="+17%"
               trendContext={getPartnerTrendContext()}
-              chartValues={PAS_PARTNERS_CHART_STUB}
-              chartLabels={PAS_YTD_MONTH_LABELS}
             />
             <PasSummaryMetricCard
               title="Active brands"
@@ -190,8 +179,6 @@ export function BookingEnginePage({ initialView = "partners" }: BookingEnginePag
               icon={LayoutGrid}
               trendLabel="+8%"
               trendContext={getBrandsTrendContext()}
-              chartValues={PAS_BRANDS_CHART_STUB}
-              chartLabels={PAS_YTD_MONTH_LABELS}
             />
           </div>
         </div>
