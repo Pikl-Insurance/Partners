@@ -304,9 +304,6 @@ function OrganisationTargetCard({
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <h3 className="text-sm font-semibold text-foreground">{target.label}</h3>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                Current: {formatTargetValue(target)}
-              </p>
             </div>
             {meta.visual !== "arc" ? (
               <span className="shrink-0 text-xs font-semibold tabular-nums text-foreground">
@@ -321,23 +318,31 @@ function OrganisationTargetCard({
         <TargetMetricVisual target={target} percent={percent} />
       </div>
 
-      <Field className="mt-3">
-        <Label htmlFor={`org-target-${target.id}`} className="text-[11px] text-muted-foreground">
-          Target goal
-        </Label>
-        <Input
-          id={`org-target-${target.id}`}
-          type="number"
-          step={target.format === "percent" ? "0.1" : "1"}
-          min={0}
-          value={target.target}
-          onChange={(event) => onTargetChange(Number.parseFloat(event.target.value) || 0)}
-          className="h-9 text-xs tabular-nums"
-        />
-        <p className="text-[10px] text-muted-foreground">
-          Goal: {formatTargetGoal({ ...target, target: target.target })}
-        </p>
-      </Field>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <Field>
+          <Label className="text-[11px] text-muted-foreground">Actual</Label>
+          <div className="flex h-9 items-center rounded-md border border-border bg-muted/20 px-3 text-xs tabular-nums text-foreground">
+            {formatTargetValue(target)}
+          </div>
+        </Field>
+        <Field>
+          <Label htmlFor={`org-target-${target.id}`} className="text-[11px] text-muted-foreground">
+            Target goal
+          </Label>
+          <Input
+            id={`org-target-${target.id}`}
+            type="number"
+            step={target.format === "percent" ? "0.1" : "1"}
+            min={0}
+            value={target.target}
+            onChange={(event) => onTargetChange(Number.parseFloat(event.target.value) || 0)}
+            className="h-9 text-xs tabular-nums"
+          />
+          <p className="text-[10px] text-muted-foreground">
+            Goal: {formatTargetGoal({ ...target, target: target.target })}
+          </p>
+        </Field>
+      </div>
     </article>
   )
 }
@@ -1005,7 +1010,7 @@ export function ManageTargetsPage({ onBack }: ManageTargetsPageProps) {
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-6 pb-8">
+    <div className="w-full space-y-6">
       <div className="shrink-0 border-b border-border pb-5">
         <div className="flex items-center justify-between gap-4">
           <p className="text-xs font-medium text-muted-foreground">Home · Targets</p>
@@ -1076,9 +1081,9 @@ export function ManageTargetsPage({ onBack }: ManageTargetsPageProps) {
           </div>
         </TabsContent>
 
-        <TabsContent value="team" className="mt-0 space-y-4">
+        <TabsContent value="team" className="mt-0">
           <div className="grid gap-4 lg:grid-cols-[232px_minmax(0,1fr)] lg:items-start">
-            <aside className="flex flex-col">
+            <aside className="flex flex-col lg:sticky lg:top-0 lg:max-h-[calc(100dvh-14rem)] lg:overflow-hidden">
               <div className="relative mb-3 shrink-0">
                 <Search className="pointer-events-none absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -1102,7 +1107,7 @@ export function ManageTargetsPage({ onBack }: ManageTargetsPageProps) {
                 />
               </div>
 
-              <div className="space-y-2 pr-1">
+              <div className="min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain pr-1">
                 {filteredMembers.length > 0 ? (
                   filteredMembers.map((member) => {
                     const memberEntry = memberTargets.find(
@@ -1134,7 +1139,7 @@ export function ManageTargetsPage({ onBack }: ManageTargetsPageProps) {
             <section className="rounded-xl border border-border bg-card shadow-xs">
               {selectedMember && selectedMemberTargets ? (
                 <>
-                  <div className="flex shrink-0 flex-wrap items-start justify-between gap-3 border-b border-border px-4 py-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border px-4 py-4">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <h2 className="text-base font-semibold text-foreground">
@@ -1196,15 +1201,15 @@ export function ManageTargetsPage({ onBack }: ManageTargetsPageProps) {
                       </div>
                     )}
                   </div>
+
+                  <div className="flex justify-end border-t border-border px-4 py-4">
+                    <Button type="button" className="h-9 text-xs" onClick={handleSaveTeam}>
+                      Save team member target
+                    </Button>
+                  </div>
                 </>
               ) : null}
             </section>
-          </div>
-
-          <div className="flex justify-end">
-            <Button type="button" className="h-9 text-xs" onClick={handleSaveTeam}>
-              Save team member target
-            </Button>
           </div>
         </TabsContent>
 
