@@ -9,12 +9,12 @@ import { cn } from "@/lib/utils"
 const TICK_STYLE = { fontSize: 10, fill: "var(--color-muted-foreground)" }
 
 /** Shared layout tokens for property insight cards */
-export const insightCardHeaderClass = "space-y-0 pb-0"
+export const insightCardHeaderClass = "w-full space-y-0 pb-0"
 export const insightCardBodyClass =
-  "flex min-h-0 flex-1 flex-col gap-5 px-4 pb-4 pt-3"
+  "flex min-h-0 flex-1 flex-col gap-6 px-4 pb-4 pt-3"
 export const insightMetricGroupClass = "flex flex-col gap-1.5"
 export const insightVisualGroupClass = "flex flex-col gap-3"
-export const insightChartHeightClass = "h-[4.5rem] w-full min-h-0 shrink-0"
+export const insightChartHeightClass = "h-[5.25rem] w-full min-h-0 shrink-0"
 
 export function InsightCardBody({
   children,
@@ -60,15 +60,15 @@ export function InsightWidgetHeader({
   helpText?: string
 }) {
   return (
-    <div className="flex items-start justify-between gap-3">
-      <div className="min-w-0">
+    <div className="flex w-full items-start justify-between gap-3">
+      <div className="min-w-0 flex-1">
         <h3 className="text-sm font-semibold text-foreground">{title}</h3>
         {subtitle ? <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p> : null}
+        {badges ? (
+          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">{badges}</div>
+        ) : null}
       </div>
-      <div className="flex shrink-0 items-center gap-1.5">
-        {badges}
-        <WidgetHelpButton title={title} helpText={helpText} />
-      </div>
+      <WidgetHelpButton title={title} helpText={helpText} />
     </div>
   )
 }
@@ -223,6 +223,36 @@ export function InsightDistributionBars({
         })}
       </div>
     </div>
+  )
+}
+
+export function InsightHighlightGrid({
+  items,
+}: {
+  items: Array<{ label: string; value: string }>
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      {items.map((item) => (
+        <div
+          key={item.label}
+          className="rounded-lg border border-border bg-muted/20 px-3 py-2.5"
+        >
+          <p className="text-[9px] font-semibold tracking-widest text-muted-foreground uppercase">
+            {item.label}
+          </p>
+          <p className="mt-0.5 text-sm font-bold tabular-nums text-foreground">{item.value}</p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export function InsightCallout({ children }: { children: ReactNode }) {
+  return (
+    <p className="rounded-lg border border-border bg-muted/20 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
+      {children}
+    </p>
   )
 }
 

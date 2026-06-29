@@ -1,33 +1,23 @@
 import { useCallback, useEffect, useRef, useState, type HTMLAttributes, type ReactNode } from "react"
 import {
   BarChart3,
-  Building2,
   ChevronRight,
   FileText,
   GripVertical,
-  LayoutGrid,
   LayoutPanelTop,
-  Network,
+  Package,
   Plus,
-  ShoppingCart,
   Users,
   X,
   type LucideIcon,
 } from "lucide-react"
 
 import { getProductSplit } from "@/components/bookings-snapshot"
-import {
-  PasSummaryMetricCard,
-  PAS_BRANDS_CHART_STUB,
-  PAS_PARTNERS_CHART_STUB,
-  PAS_USERS_CHART_STUB,
-} from "@/components/booking-engine/pas-summary-metric-card"
 import { TargetsSnapshot } from "@/components/targets-snapshot"
 import { Button } from "@/components/ui/button"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { MetricTrendWidget } from "@/components/widgets/metric-trend-widget"
 import { ProductSplitWidget } from "@/components/widgets/product-split-widget"
-import { BOOKING_ENGINE_SUMMARY, getPartnerConnectionFooter, getTopPartnersBrandFooter } from "@/lib/booking-engine-data"
 import {
   type ActiveFilters,
   buildBookingTrendChart,
@@ -39,9 +29,10 @@ import { INSIGHTS_WIDGET_HELP_TEXT } from "@/lib/insights-widget-labels"
 import { cn } from "@/lib/utils"
 
 export type BookingEngineView = "partners" | "properties" | "bookings"
+export type BookingEngineAction = "add-partner" | "add-policy"
 
 export type LandingDestination =
-  | { section: "booking-engine"; view?: BookingEngineView }
+  | { section: "booking-engine"; view?: BookingEngineView; action?: BookingEngineAction }
   | { section: "insights"; anchor?: string }
   | { section: "admin" }
 
@@ -436,28 +427,32 @@ function formatFilterContext(filters: ActiveFilters) {
   return `${partner} · ${brand} · ${range}`
 }
 
-function OpsActionButton({
-  label,
+function QuickActionTile({
+  title,
+  description,
   icon: Icon,
   onClick,
-  className,
 }: {
-  label: string
+  title: string
+  description: string
   icon: LucideIcon
   onClick: () => void
-  className?: string
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={cn(
-        "flex min-w-0 flex-col items-center rounded-xl border border-border bg-card p-2.5 text-center shadow-xs transition-colors hover:bg-muted/30 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-        className
-      )}
+      className="flex min-w-0 flex-col gap-3 rounded-xl border border-border bg-card p-4 text-left shadow-xs transition-colors hover:bg-muted/30 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
     >
-      <Icon className="size-3.5 shrink-0 text-muted-foreground" strokeWidth={2} />
-      <p className="mt-1.5 text-[10px] leading-tight font-medium text-muted-foreground">{label}</p>
+      <span className="grid size-9 shrink-0 place-items-center rounded-full bg-muted">
+        <Icon className="size-4 text-muted-foreground" strokeWidth={2} />
+      </span>
+      <span className="min-w-0">
+        <span className="block text-sm font-semibold text-foreground">{title}</span>
+        <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">
+          {description}
+        </span>
+      </span>
     </button>
   )
 }
@@ -581,9 +576,12 @@ export function LandingDashboardPage({
     setShowCustomiseToast(true)
   }, [isCustomising])
 
+  const syncOpsWithIntel = areCardsInSameRow(cardOrder, "operations", "intelligence")
+  const syncTeamWithTargets = areCardsInSameRow(cardOrder, "targets", "team")
+
   useEffect(() => {
     const element = intelligenceRef.current
-    if (!element) {
+    if (!element || !syncOpsWithIntel) {
       setIntelligenceHeight(undefined)
       return
     }
@@ -599,7 +597,7 @@ export function LandingDashboardPage({
     const observer = new ResizeObserver(updateHeight)
     observer.observe(element)
     return () => observer.disconnect()
-  }, [cardOrder, booking.total])
+  }, [cardOrder, booking.total, syncOpsWithIntel])
 
   useEffect(() => {
     const element = targetsRef.current
@@ -621,9 +619,6 @@ export function LandingDashboardPage({
     return () => observer.disconnect()
   }, [cardOrder])
 
-  const syncOpsWithIntel = areCardsInSameRow(cardOrder, "operations", "intelligence")
-  const syncTeamWithTargets = areCardsInSameRow(cardOrder, "targets", "team")
-
   function renderDashboardCard(cardId: DashboardCardId, dragHandleProps?: DragHandleProps) {
     switch (cardId) {
       case "operations":
@@ -633,71 +628,46 @@ export function LandingDashboardPage({
             variant={syncOpsWithIntel ? "fill" : "compact"}
             customiseMode={isCustomising}
             label="Operations"
-            subtitle="Partners, policies & connectivity"
+            subtitle="Create new items or access common functions"
             headerAccentColors={["bg-green-500"]}
             linkLabel="Manage"
             onLinkClick={() => onNavigate({ section: "booking-engine" })}
             dragHandleProps={dragHandleProps}
           >
-            <div className={cn(syncOpsWithIntel && "flex min-h-0 flex-1 flex-col")}>
-              <div className="grid shrink-0 grid-cols-3 gap-2">
-                <OpsActionButton
-                  label="View partners"
-                  icon={Users}
-                  onClick={() => onNavigate({ section: "booking-engine", view: "partners" })}
-                />
-                <OpsActionButton
-                  label="View properties"
-                  icon={Building2}
-                  onClick={() => onNavigate({ section: "booking-engine", view: "properties" })}
-                />
-                <OpsActionButton
-                  label="View bookings"
-                  icon={ShoppingCart}
-                  onClick={() => onNavigate({ section: "booking-engine", view: "bookings" })}
-                />
-              </div>
-
-              <div
-                className={cn(
-                  "mt-4 grid grid-cols-3 gap-2",
-                  syncOpsWithIntel && "min-h-0 flex-1 [&>*]:h-full"
-                )}
-              >
-                <PasSummaryMetricCard
-                  compact
-                  className={syncOpsWithIntel ? "h-full" : undefined}
-                  title="Connected partners"
-                  value={String(BOOKING_ENGINE_SUMMARY.partners)}
-                  icon={Network}
-                  trendLabel="+17%"
-                  chartValues={PAS_PARTNERS_CHART_STUB}
-                  chartStyle="sparkline"
-                  footer={getPartnerConnectionFooter()}
-                />
-                <PasSummaryMetricCard
-                  compact
-                  className={syncOpsWithIntel ? "h-full" : undefined}
-                  title="Active brands"
-                  value={String(BOOKING_ENGINE_SUMMARY.activeBrands)}
-                  icon={LayoutGrid}
-                  trendLabel="+8%"
-                  chartValues={PAS_BRANDS_CHART_STUB}
-                  chartStyle="sparkline"
-                  footer={getTopPartnersBrandFooter()}
-                />
-                <PasSummaryMetricCard
-                  compact
-                  className={syncOpsWithIntel ? "h-full" : undefined}
-                  title="Platform users"
-                  value={String(BOOKING_ENGINE_SUMMARY.users)}
-                  icon={Users}
-                  trendLabel="+12%"
-                  chartValues={PAS_USERS_CHART_STUB}
-                  chartStyle="sparkline"
-                  footer="24 active seats"
-                />
-              </div>
+            <div
+              className={cn(
+                "grid grid-cols-2 gap-3",
+                syncOpsWithIntel && "min-h-0 flex-1 content-start"
+              )}
+            >
+              <QuickActionTile
+                title="New Policy"
+                description="Create a new policy"
+                icon={FileText}
+                onClick={() =>
+                  onNavigate({ section: "booking-engine", view: "partners", action: "add-policy" })
+                }
+              />
+              <QuickActionTile
+                title="New Partner"
+                description="Add a new partner"
+                icon={Users}
+                onClick={() =>
+                  onNavigate({ section: "booking-engine", view: "partners", action: "add-partner" })
+                }
+              />
+              <QuickActionTile
+                title="New Product"
+                description="Create a new product"
+                icon={Package}
+                onClick={() => onNavigate({ section: "booking-engine", view: "partners" })}
+              />
+              <QuickActionTile
+                title="New Capacity"
+                description="Add capacity provider"
+                icon={BarChart3}
+                onClick={() => onNavigate({ section: "booking-engine", view: "partners" })}
+              />
             </div>
           </DashboardPanel>
         )
@@ -714,52 +684,38 @@ export function LandingDashboardPage({
             onLinkClick={() => onNavigate({ section: "insights" })}
             dragHandleProps={dragHandleProps}
           >
-            <div className="@container flex min-h-0 flex-1 flex-col gap-5 py-1">
-              <div className={cn(metricCardGridClass, "min-w-0 grid-cols-2")}>
-                <MetricTrendWidget
-                  className="min-w-0"
-                  title="Total bookings"
-                  value={booking.total}
-                  trendLabel={bookingTrend.trendLabel}
-                  trend={bookingTrend.trend}
-                  comparisonLabel={bookingTrend.comparisonLabel}
-                  chartData={bookingChart}
-                  scopeLabel="All selected partners and brands"
-                  rateLabel={bookingTrend.dailyAverage}
-                  helpText={INSIGHTS_WIDGET_HELP_TEXT}
-                />
-                <ProductSplitWidget
-                  className="min-w-0"
-                  totalLabel={productSplit.totalLabel}
-                  segmentA={{
-                    label: "CAL",
-                    value: booking.calSales,
-                    sharePercent: productSplit.calSharePercent,
-                    takeUpLabel: booking.calPct,
-                    trend: productSplit.calTrend,
-                  }}
-                  segmentB={{
-                    label: "DDL",
-                    value: booking.ddlSales,
-                    sharePercent: productSplit.ddlSharePercent,
-                    takeUpLabel: booking.ddlPct,
-                    trend: productSplit.ddlTrend,
-                  }}
-                  helpText={INSIGHTS_WIDGET_HELP_TEXT}
-                />
-              </div>
-
-              <p className="mt-auto border-t border-border/50 pt-4 text-xs text-muted-foreground">
-                Explore timing, ABV, lead time and more in the{" "}
-                <button
-                  type="button"
-                  onClick={() => onNavigate({ section: "insights" })}
-                  className="font-medium text-foreground underline-offset-2 hover:underline"
-                >
-                  full insights report
-                </button>
-                .
-              </p>
+            <div className={cn(metricCardGridClass, "@container min-w-0 grid-cols-2")}>
+              <MetricTrendWidget
+                className="min-w-0"
+                title="Total bookings"
+                value={booking.total}
+                trendLabel={bookingTrend.trendLabel}
+                trend={bookingTrend.trend}
+                comparisonLabel={bookingTrend.comparisonLabel}
+                chartData={bookingChart}
+                scopeLabel="All selected partners and brands"
+                rateLabel={bookingTrend.dailyAverage}
+                helpText={INSIGHTS_WIDGET_HELP_TEXT}
+              />
+              <ProductSplitWidget
+                className="min-w-0"
+                totalLabel={productSplit.totalLabel}
+                segmentA={{
+                  label: "CAL",
+                  value: booking.calSales,
+                  sharePercent: productSplit.calSharePercent,
+                  takeUpLabel: booking.calPct,
+                  trend: productSplit.calTrend,
+                }}
+                segmentB={{
+                  label: "DDL",
+                  value: booking.ddlSales,
+                  sharePercent: productSplit.ddlSharePercent,
+                  takeUpLabel: booking.ddlPct,
+                  trend: productSplit.ddlTrend,
+                }}
+                helpText={INSIGHTS_WIDGET_HELP_TEXT}
+              />
             </div>
           </DashboardPanel>
         )
@@ -820,7 +776,7 @@ export function LandingDashboardPage({
 
   return (
     <TooltipProvider>
-    <div className="relative flex min-h-full flex-col gap-5">
+    <div className="relative flex min-h-full flex-col gap-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-[22px] font-semibold tracking-tight">Welcome back, Courtney</h1>
@@ -835,7 +791,7 @@ export function LandingDashboardPage({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 items-start gap-3">
+      <div className="grid grid-cols-2 items-start gap-8">
         {cardOrder.map((cardId, index) => (
           <DraggableDashboardSlot
             key={cardId}
@@ -851,6 +807,7 @@ export function LandingDashboardPage({
                   : undefined
             }
             className={cn(
+              cardId === "intelligence" && syncOpsWithIntel && "self-start",
               cardId === "operations" && syncOpsWithIntel && "w-full",
               cardId === "team" && syncTeamWithTargets && "w-full",
               cardId === "team" && !syncTeamWithTargets && "self-start"

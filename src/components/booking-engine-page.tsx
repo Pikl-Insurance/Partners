@@ -1,49 +1,42 @@
 import { useMemo, useState } from "react"
 import {
-  Banknote,
   Download,
-  LayoutGrid,
-  Network,
+  FileText,
   PencilLine,
   Plus,
   Search,
-  ShoppingCart,
 } from "lucide-react"
 
-import {
-  PasSummaryMetricCard,
-  PAS_BOOKINGS_CHART_STUB,
-  PAS_BRANDS_CHART_STUB,
-  PAS_PARTNERS_CHART_STUB,
-  PAS_REVENUE_CHART_STUB,
-  PAS_YTD_MONTH_LABELS,
-} from "@/components/booking-engine/pas-summary-metric-card"
 import {
   PartnerDetailPanel,
   type PartnerDetailTab,
 } from "@/components/booking-engine/partner-detail-panel"
 import { AddPartnerPage } from "@/components/booking-engine/add-partner-page"
+import { AddPolicyPage } from "@/components/booking-engine/add-policy-page"
 import { PartnerListItem } from "@/components/booking-engine/partner-list-item"
 import { PropertyPage } from "@/components/booking-engine/property-page"
-import type { BookingEngineView } from "@/components/landing-dashboard-page"
+import type { BookingEngineAction, BookingEngineView } from "@/components/landing-dashboard-page"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import {
-  BOOKING_ENGINE_PARTNERS,
-  BOOKING_ENGINE_SUMMARY,
-  formatCount,
-  formatCurrency,
-  getBrandsTrendContext,
-  getBookingsTrendContext,
   getPartnerTags,
-  getPartnerTrendContext,
-  getRevenueTrendContext,
+  type AddPartnerFormValues,
+  type AddPolicyFormValues,
   type Partner,
 } from "@/lib/booking-engine-data"
+import {
+  addPasPartner,
+  addPasPolicy,
+  deletePasPartner,
+  deletePasPolicy,
+  getPasPartners,
+  getPasPolicyDetails,
+  isUserAddedPartner,
+  isUserAddedPolicy,
+  updatePasPartnerBrand,
+} from "@/lib/partner-store"
 import { MOCK_PROPERTY } from "@/lib/property-data"
-
-const DEFAULT_PARTNER_ID = BOOKING_ENGINE_PARTNERS[0]?.id ?? ""
 
 function partnerMatchesSearch(partner: Partner, query: string) {
   const q = query.trim().toLowerCase()
@@ -59,6 +52,13 @@ function partnerMatchesSearch(partner: Partner, query: string) {
     ...getPartnerTags(partner),
     ...partner.brands.map((brand) => brand.name),
     ...partner.brands.map((brand) => brand.policyGroup),
+    partner.onboarding?.contactName,
+    partner.onboarding?.contactEmail,
+    partner.onboarding?.accountManager,
+    partner.onboarding?.partnerGroup,
+    partner.onboarding?.city,
+    partner.onboarding?.postcode,
+    partner.onboarding?.propertyManagementSystem,
   ]
     .join(" ")
     .toLowerCase()
@@ -66,24 +66,26 @@ function partnerMatchesSearch(partner: Partner, query: string) {
   return haystack.includes(q)
 }
 
-function getInitialPasState(initialView: BookingEngineView) {
+function getInitialPasState(initialView: BookingEngineView, partners: Partner[]) {
+  const defaultPartnerId = partners[0]?.id ?? ""
+
   switch (initialView) {
     case "properties":
       return {
-        selectedPartnerId: DEFAULT_PARTNER_ID,
+        selectedPartnerId: defaultPartnerId,
         initialTab: "properties" as PartnerDetailTab,
         editorMode: false,
       }
     case "bookings":
       return {
-        selectedPartnerId: DEFAULT_PARTNER_ID,
+        selectedPartnerId: defaultPartnerId,
         initialTab: "bookings" as PartnerDetailTab,
         editorMode: false,
       }
     case "partners":
     default:
       return {
-        selectedPartnerId: DEFAULT_PARTNER_ID,
+        selectedPartnerId: defaultPartnerId,
         initialTab: "overview" as PartnerDetailTab,
         editorMode: false,
       }
@@ -92,49 +94,121 @@ function getInitialPasState(initialView: BookingEngineView) {
 
 type BookingEnginePageProps = {
   initialView?: BookingEngineView
+  initialAction?: BookingEngineAction
 }
 
-export function BookingEnginePage({ initialView = "partners" }: BookingEnginePageProps) {
-  const initialState = getInitialPasState(initialView)
+export function BookingEnginePage({
+  initialView = "partners",
+  initialAction,
+}: BookingEnginePageProps) {
+  const [partners, setPartners] = useState<Partner[]>(() => getPasPartners())
+  const initialState = getInitialPasState(initialView, partners)
   const [selectedPartnerId, setSelectedPartnerId] = useState(initialState.selectedPartnerId)
   const [activeTab, setActiveTab] = useState<PartnerDetailTab>(initialState.initialTab)
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null)
   const [editorMode] = useState(initialState.editorMode)
   const [partnerSearch, setPartnerSearch] = useState("")
-  const [showAddPartner, setShowAddPartner] = useState(false)
+  const [showAddPartner, setShowAddPartner] = useState(initialAction === "add-partner")
+  const [showAddPolicy, setShowAddPolicy] = useState(initialAction === "add-policy")
 
   const filteredPartners = useMemo(
-    () => BOOKING_ENGINE_PARTNERS.filter((partner) => partnerMatchesSearch(partner, partnerSearch)),
-    [partnerSearch]
+    () => partners.filter((partner) => partnerMatchesSearch(partner, partnerSearch)),
+    [partners, partnerSearch]
   )
 
   const selectedPartner =
-    BOOKING_ENGINE_PARTNERS.find((partner) => partner.id === selectedPartnerId) ??
+    partners.find((partner) => partner.id === selectedPartnerId) ??
     filteredPartners[0] ??
-    BOOKING_ENGINE_PARTNERS[0]
+    partners[0]
 
   const maxPartnerBookings = useMemo(
-    () => Math.max(...BOOKING_ENGINE_PARTNERS.map((partner) => partner.activity.bookings)),
-    []
+    () => Math.max(1, ...partners.map((partner) => partner.activity.bookings)),
+    [partners]
   )
 
+  function refreshPartners() {
+    setPartners(getPasPartners())
+  }
+
+  function handleAddPartner(values: AddPartnerFormValues) {
+    const partner = addPasPartner(values)
+    refreshPartners()
+    setSelectedPartnerId(partner.id)
+    setActiveTab("overview")
+    setPartnerSearch("")
+    setShowAddPartner(false)
+  }
+
+  function handleAddPolicy(values: AddPolicyFormValues) {
+    addPasPolicy(values.partnerId, values)
+    refreshPartners()
+    setSelectedPartnerId(values.partnerId)
+    setActiveTab("brands")
+    setPartnerSearch("")
+    setShowAddPolicy(false)
+  }
+
+  function handleDeletePartner() {
+    if (!selectedPartner) return
+    if (deletePasPartner(selectedPartner.id)) {
+      const nextPartners = getPasPartners()
+      setPartners(nextPartners)
+      setSelectedPartnerId(nextPartners[0]?.id ?? "")
+    }
+  }
+
+  function handleDeletePolicy(policyId: string) {
+    if (deletePasPolicy(policyId)) {
+      refreshPartners()
+    }
+  }
+
+  function handleBrandUpdate(brandId: string, updates: { name: string; policyGroup: string }) {
+    if (!selectedPartner) return
+    if (updatePasPartnerBrand(selectedPartner.id, brandId, updates)) {
+      refreshPartners()
+    }
+  }
+
+  if (showAddPolicy) {
+    return (
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <AddPolicyPage
+          partners={partners}
+          initialPartnerId={selectedPartnerId}
+          onBack={() => setShowAddPolicy(false)}
+          onSubmit={handleAddPolicy}
+        />
+      </div>
+    )
+  }
+
   if (showAddPartner) {
-    return <AddPartnerPage onBack={() => setShowAddPartner(false)} />
+    return (
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <AddPartnerPage
+          onBack={() => setShowAddPartner(false)}
+          onSubmit={handleAddPartner}
+        />
+      </div>
+    )
   }
 
   if (selectedPropertyId) {
     return (
-      <PropertyPage
-        property={MOCK_PROPERTY}
-        onBack={() => setSelectedPropertyId(null)}
-      />
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <PropertyPage
+          property={MOCK_PROPERTY}
+          onBack={() => setSelectedPropertyId(null)}
+        />
+      </div>
     )
   }
 
   return (
     <TooltipProvider>
-      <div className="space-y-5">
-        <div className="shrink-0 space-y-4 border-b border-border pb-5">
+      <div className="flex min-h-0 flex-1 flex-col gap-5">
+        <div className="shrink-0 border-b border-border pb-5">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-[180px]">
               <h1 className="text-[22px] font-semibold tracking-tight">Partners &amp; policies</h1>
@@ -147,6 +221,14 @@ export function BookingEnginePage({ initialView = "partners" }: BookingEnginePag
                 Export
               </Button>
               <Button
+                variant="outline"
+                className="h-9 gap-2 text-xs"
+                onClick={() => setShowAddPolicy(true)}
+              >
+                <FileText className="size-3.5" />
+                Add policy
+              </Button>
+              <Button
                 className="h-9 gap-2 text-xs"
                 onClick={() => setShowAddPartner(true)}
               >
@@ -154,45 +236,6 @@ export function BookingEnginePage({ initialView = "partners" }: BookingEnginePag
                 Add partner
               </Button>
             </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <PasSummaryMetricCard
-              title="Total bookings (sales)"
-              value={formatCount(BOOKING_ENGINE_SUMMARY.totalBookings)}
-              icon={ShoppingCart}
-              trendLabel="+12%"
-              trendContext={getBookingsTrendContext()}
-              chartValues={PAS_BOOKINGS_CHART_STUB}
-              chartLabels={PAS_YTD_MONTH_LABELS}
-            />
-            <PasSummaryMetricCard
-              title="Total revenue (GBP)"
-              value={formatCurrency(BOOKING_ENGINE_SUMMARY.totalRevenue, "GBP")}
-              icon={Banknote}
-              trendLabel="+5.4%"
-              trendContext={getRevenueTrendContext()}
-              chartValues={PAS_REVENUE_CHART_STUB}
-              chartLabels={PAS_YTD_MONTH_LABELS}
-            />
-            <PasSummaryMetricCard
-              title="Connected partners"
-              value={String(BOOKING_ENGINE_SUMMARY.partners)}
-              icon={Network}
-              trendLabel="+17%"
-              trendContext={getPartnerTrendContext()}
-              chartValues={PAS_PARTNERS_CHART_STUB}
-              chartLabels={PAS_YTD_MONTH_LABELS}
-            />
-            <PasSummaryMetricCard
-              title="Active brands"
-              value={String(BOOKING_ENGINE_SUMMARY.activeBrands)}
-              icon={LayoutGrid}
-              trendLabel="+8%"
-              trendContext={getBrandsTrendContext()}
-              chartValues={PAS_BRANDS_CHART_STUB}
-              chartLabels={PAS_YTD_MONTH_LABELS}
-            />
           </div>
         </div>
 
@@ -205,14 +248,8 @@ export function BookingEnginePage({ initialView = "partners" }: BookingEnginePag
           </div>
         ) : null}
 
-        <div className="grid gap-4 lg:grid-cols-[232px_minmax(0,1fr)] lg:items-stretch">
-          <div className="contents lg:block lg:relative lg:min-h-0">
-            <aside className="flex min-h-0 flex-col lg:absolute lg:inset-0">
-              <p className="mb-3 shrink-0 text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
-              {partnerSearch.trim()
-                ? `${filteredPartners.length} of ${BOOKING_ENGINE_PARTNERS.length} partners`
-                : `${BOOKING_ENGINE_PARTNERS.length} partners`}
-            </p>
+        <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[232px_minmax(0,1fr)] lg:items-stretch">
+          <aside className="flex min-h-0 flex-col overflow-hidden">
             <div className="relative mb-3 shrink-0">
               <Search className="pointer-events-none absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -220,7 +257,7 @@ export function BookingEnginePage({ initialView = "partners" }: BookingEnginePag
                 onChange={(event) => {
                   const query = event.target.value
                   setPartnerSearch(query)
-                  const matches = BOOKING_ENGINE_PARTNERS.filter((partner) =>
+                  const matches = partners.filter((partner) =>
                     partnerMatchesSearch(partner, query)
                   )
                   if (
@@ -252,16 +289,22 @@ export function BookingEnginePage({ initialView = "partners" }: BookingEnginePag
                 </p>
               )}
             </div>
-            </aside>
-          </div>
+          </aside>
 
-          <main className="flex min-h-0 min-w-0 flex-col">
+          <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
             {selectedPartner ? (
               <PartnerDetailPanel
                 partner={selectedPartner}
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
                 onViewProperty={setSelectedPropertyId}
+                canDeletePartner={isUserAddedPartner(selectedPartner.id)}
+                canEditBrand={isUserAddedPartner(selectedPartner.id)}
+                canDeletePolicy={isUserAddedPolicy}
+                getPolicyDetails={getPasPolicyDetails}
+                onDeletePartner={handleDeletePartner}
+                onDeletePolicy={handleDeletePolicy}
+                onBrandUpdate={handleBrandUpdate}
               />
             ) : null}
           </main>
