@@ -421,7 +421,7 @@ export function BookingEnginePage({
                     setSelectedPartnerId(matches[0].id)
                   }
                 }}
-                className="h-9 pl-9 text-xs"
+                className="h-9 rounded-full pl-9 text-xs"
                 placeholder="Search partners…"
                 aria-label="Search partners"
               />

@@ -12,12 +12,13 @@ import {
   Plus,
   PoundSterling,
   Search,
+  Target,
   Trash2,
   TrendingDown,
   TrendingUp,
   type LucideIcon,
 } from "lucide-react"
-import { Area, AreaChart, ResponsiveContainer, XAxis } from "recharts"
+import { Area, AreaChart, ResponsiveContainer } from "recharts"
 
 import { Button } from "@/components/ui/button"
 import { Field } from "@/components/ui/field"
@@ -43,7 +44,6 @@ import {
   formatTargetGoal,
   formatTargetValue,
   LANDING_TARGET_PROGRESS_CHART,
-  TARGET_METRIC_TRENDS,
   type LandingTarget,
   type TargetProgressPoint,
 } from "@/lib/landing-targets-data"
@@ -62,7 +62,7 @@ type ManageTargetsPageProps = {
   onBack: () => void
 }
 
-const TICK_STYLE = { fontSize: 9, fill: "var(--color-muted-foreground)" }
+const SHOW_TARGETS_HEADER_SUMMARY = false
 
 const TARGET_TABS = [
   { id: "organisation", label: "Organisation targets" },
@@ -74,176 +74,78 @@ const TARGET_TABS = [
 const tabTriggerClass =
   "flex-1 rounded-md px-4 py-2 text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm"
 
-const ORG_TARGET_META: Record<
-  string,
-  { icon: LucideIcon; visual: "pace-area" | "arc" | "compare-bars" | "steps" }
-> = {
-  bookings: { icon: CalendarCheck, visual: "pace-area" },
-  "cal-takeup": { icon: Percent, visual: "arc" },
-  revenue: { icon: PoundSterling, visual: "compare-bars" },
-  "new-partners": { icon: Handshake, visual: "steps" },
+const ORG_TARGET_META: Record<string, { icon: LucideIcon }> = {
+  bookings: { icon: CalendarCheck },
+  "cal-takeup": { icon: Percent },
+  revenue: { icon: PoundSterling },
+  "new-partners": { icon: Handshake },
 }
 
-function describeArc(
-  cx: number,
-  cy: number,
-  radius: number,
-  startAngle: number,
-  endAngle: number
-) {
-  const startX = cx + radius * Math.cos(startAngle)
-  const startY = cy - radius * Math.sin(startAngle)
-  const endX = cx + radius * Math.cos(endAngle)
-  const endY = cy - radius * Math.sin(endAngle)
-  const largeArc = startAngle - endAngle > Math.PI ? 1 : 0
-  return `M ${startX} ${startY} A ${radius} ${radius} 0 ${largeArc} 1 ${endX} ${endY}`
-}
-
-function TargetMiniArc({ percent }: { percent: number }) {
-  const radius = 52
-  const cx = 80
-  const cy = 68
-  const clamped = Math.min(100, Math.max(0, percent))
-  const startAngle = Math.PI
-  const endAngle = 0
-  const filledAngle = startAngle - (clamped / 100) * Math.PI
-  const trackPath = describeArc(cx, cy, radius, startAngle, endAngle)
-  const fillPath = describeArc(cx, cy, radius, startAngle, filledAngle)
-
-  return (
-    <div className="relative mx-auto h-20 w-full max-w-[10.5rem]">
-      <svg viewBox="0 0 160 78" className="h-full w-full" aria-hidden>
-        <path
-          d={trackPath}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="8"
-          strokeLinecap="round"
-          className="text-muted"
-        />
-        <path
-          d={fillPath}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="8"
-          strokeLinecap="round"
-          className="text-foreground"
-        />
-      </svg>
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center">
-        <p className="text-lg font-bold tabular-nums text-foreground">{clamped}%</p>
-        <p className="text-[9px] text-muted-foreground">of goal</p>
-      </div>
-    </div>
-  )
-}
-
-function TargetPaceAreaChart({ targetId }: { targetId: string }) {
-  const gradientId = `target-pace-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`
-  const data = TARGET_METRIC_TRENDS[targetId] ?? TARGET_METRIC_TRENDS.bookings
-
-  return (
-    <div className="h-20 w-full">
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
-          <defs>
-            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--foreground)" stopOpacity={0.12} />
-              <stop offset="100%" stopColor="var(--foreground)" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <XAxis
-            dataKey="label"
-            axisLine={false}
-            tickLine={false}
-            tick={TICK_STYLE}
-            interval={0}
-            dy={2}
-          />
-          <Area
-            type="monotone"
-            dataKey="value"
-            stroke="var(--foreground)"
-            strokeWidth={1.75}
-            strokeOpacity={0.55}
-            fill={`url(#${gradientId})`}
-            dot={false}
-            activeDot={false}
-            isAnimationActive={false}
-          />
-        </AreaChart>
-      </ResponsiveContainer>
-    </div>
-  )
-}
-
-function TargetCompareBars({ actual, target }: { actual: number; target: number }) {
-  const actualPct = target > 0 ? Math.min(100, (actual / target) * 100) : 0
-
-  return (
-    <div className="flex h-20 items-end justify-center gap-8">
-      <div className="flex flex-col items-center gap-1.5">
-        <div className="flex h-14 w-9 items-end rounded-md bg-muted/50 p-0.5">
-          <div
-            className="w-full rounded-sm bg-foreground/80 transition-[height]"
-            style={{ height: `${actualPct}%` }}
-          />
-        </div>
-        <span className="text-[9px] font-medium text-muted-foreground">Actual</span>
-      </div>
-      <div className="flex flex-col items-center gap-1.5">
-        <div className="flex h-14 w-9 items-end rounded-md bg-muted/50 p-0.5">
-          <div className="h-full w-full rounded-sm bg-foreground/20" />
-        </div>
-        <span className="text-[9px] font-medium text-muted-foreground">Goal</span>
-      </div>
-    </div>
-  )
-}
-
-function TargetStepTrack({ actual, target }: { actual: number; target: number }) {
-  const steps = Math.max(1, Math.min(8, Math.ceil(target)))
-  const filled = Math.min(steps, Math.max(0, Math.round(actual)))
-
-  return (
-    <div className="flex h-20 items-center justify-center gap-2 px-2">
-      {Array.from({ length: steps }, (_, index) => (
-        <div
-          key={index}
-          className={cn(
-            "h-11 min-w-0 flex-1 max-w-14 rounded-lg border transition-colors",
-            index < filled
-              ? "border-foreground/15 bg-foreground/75 shadow-xs"
-              : "border-border bg-muted/35"
-          )}
-        />
-      ))}
-    </div>
-  )
-}
-
-function TargetMetricVisual({
-  target,
-  percent,
+function TargetCompareBar({
+  label,
+  value,
+  fillPercent,
+  variant,
 }: {
-  target: LandingTarget
-  percent: number
+  label: string
+  value: string
+  fillPercent: number
+  variant: "goal" | "actual"
 }) {
-  const meta = ORG_TARGET_META[target.id] ?? ORG_TARGET_META.bookings
+  const clamped = Math.min(100, Math.max(0, fillPercent))
 
-  if (meta.visual === "arc") {
-    return <TargetMiniArc percent={percent} />
-  }
+  return (
+    <div className="flex items-center gap-3">
+      <span className="w-10 shrink-0 text-[10px] font-semibold text-muted-foreground">{label}</span>
+      <div className="relative h-3 min-w-0 flex-1 overflow-hidden rounded-full bg-muted">
+        <div
+          className={cn(
+            "absolute inset-y-0 left-0 rounded-full transition-[width]",
+            variant === "goal" ? "bg-muted-foreground/30" : "bg-foreground"
+          )}
+          style={{ width: `${variant === "goal" ? 100 : clamped}%` }}
+        />
+      </div>
+      <span className="w-[4.5rem] shrink-0 text-right text-[10px] font-medium tabular-nums text-foreground sm:w-20">
+        {value}
+      </span>
+    </div>
+  )
+}
 
-  if (meta.visual === "compare-bars") {
-    return <TargetCompareBars actual={target.actual} target={target.target} />
-  }
+function TargetAchievementVisual({ target }: { target: LandingTarget }) {
+  const percent = getTargetAchievementPercent(target.actual, target.target)
 
-  if (meta.visual === "steps") {
-    return <TargetStepTrack actual={target.actual} target={target.target} />
-  }
-
-  return <TargetPaceAreaChart targetId={target.id} />
+  return (
+    <div className="space-y-3 py-1">
+      <div className="space-y-2.5">
+        <TargetCompareBar
+          label="Goal"
+          value={formatTargetGoal(target)}
+          fillPercent={100}
+          variant="goal"
+        />
+        <TargetCompareBar
+          label="Actual"
+          value={formatTargetValue(target)}
+          fillPercent={percent}
+          variant="actual"
+        />
+      </div>
+      <div className="flex items-center justify-between gap-3 text-[10px] font-medium text-muted-foreground">
+        <span>{percent}% of goal</span>
+        <span className="tabular-nums text-foreground">
+          {formatTargetValue(target)} / {formatTargetGoal(target)}
+        </span>
+      </div>
+      <div className="h-2 overflow-hidden rounded-full bg-muted">
+        <div
+          className="h-full rounded-full bg-foreground transition-[width]"
+          style={{ width: `${percent}%` }}
+        />
+      </div>
+    </div>
+  )
 }
 
 function getMemberAchievementPercent(assignments: MemberTargetAssignment[]) {
@@ -272,16 +174,23 @@ function TeamStatusBadge({ status }: { status: TeamMember["status"] }) {
   )
 }
 
-function TargetProgressBar({ percent }: { percent: number }) {
+function MemberTargetProgressBar({ percent }: { percent: number }) {
+  const clamped = Math.min(100, Math.max(0, percent))
+
   return (
-    <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+    <div className="h-2.5 overflow-hidden rounded-full bg-muted">
       <div
         className="h-full rounded-full bg-foreground transition-[width]"
-        style={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
+        style={{ width: `${clamped}%` }}
       />
     </div>
   )
 }
+
+const memberTargetLabelClass =
+  "text-[10px] font-semibold tracking-widest text-muted-foreground uppercase"
+
+const memberTargetLabelOffsetClass = "sm:pt-[1.125rem]"
 
 function OrganisationTargetCard({
   target,
@@ -296,35 +205,25 @@ function OrganisationTargetCard({
 
   return (
     <article className="rounded-xl border border-border bg-card p-4 shadow-xs">
-      <div className="flex items-start gap-3">
+      <div className="flex items-center gap-3">
         <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-muted/40">
           <Icon className="size-4 text-foreground" strokeWidth={2} />
         </div>
         <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h3 className="text-sm font-semibold text-foreground">{target.label}</h3>
-            </div>
-            {meta.visual !== "arc" ? (
-              <span className="shrink-0 text-xs font-semibold tabular-nums text-foreground">
-                {percent}%
-              </span>
-            ) : null}
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-sm font-semibold text-foreground">{target.label}</h3>
+            <span className="shrink-0 text-xs font-semibold tabular-nums text-foreground">
+              {percent}%
+            </span>
           </div>
         </div>
       </div>
 
-      <div className="mt-3 rounded-lg border border-border/70 bg-muted/15 px-2 py-2">
-        <TargetMetricVisual target={target} percent={percent} />
+      <div className="mt-3 rounded-lg border border-border/70 bg-muted/15 px-3 py-3">
+        <TargetAchievementVisual target={target} />
       </div>
 
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        <Field>
-          <Label className="text-[11px] text-muted-foreground">Actual</Label>
-          <div className="flex h-9 items-center rounded-md border border-border bg-muted/20 px-3 text-xs tabular-nums text-foreground">
-            {formatTargetValue(target)}
-          </div>
-        </Field>
         <Field>
           <Label htmlFor={`org-target-${target.id}`} className="text-[11px] text-muted-foreground">
             Target goal
@@ -338,9 +237,12 @@ function OrganisationTargetCard({
             onChange={(event) => onTargetChange(Number.parseFloat(event.target.value) || 0)}
             className="h-9 text-xs tabular-nums"
           />
-          <p className="text-[10px] text-muted-foreground">
-            Goal: {formatTargetGoal({ ...target, target: target.target })}
-          </p>
+        </Field>
+        <Field>
+          <Label className="text-[11px] text-muted-foreground">Actual</Label>
+          <div className="flex h-9 items-center rounded-md border border-border bg-muted/20 px-3 text-xs tabular-nums text-foreground">
+            {formatTargetValue(target)}
+          </div>
         </Field>
       </div>
     </article>
@@ -359,63 +261,80 @@ function MemberTargetEditor({
   const percent = getTargetAchievementPercent(assignment.actual, assignment.target)
 
   return (
-    <div className="rounded-lg border border-border bg-muted/15 p-3">
-      <div className="flex items-start justify-between gap-3">
-        <Field className="min-w-0 flex-1">
-          <Label className="text-[11px] text-muted-foreground">Metric</Label>
-          <Input
-            value={assignment.label}
-            onChange={(event) => onChange({ label: event.target.value })}
-            className="h-9 text-xs"
-          />
-        </Field>
+    <div className="rounded-xl border border-border bg-card py-4 pl-4 pr-6 shadow-xs sm:pr-8">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-4">
+        <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_5.5rem_5.5rem]">
+          <Field>
+            <div className="mb-1.5 flex flex-col gap-1">
+              <Target className="size-3.5 text-muted-foreground" strokeWidth={2} />
+              <Label className={memberTargetLabelClass}>Metric description</Label>
+            </div>
+            <Input
+              value={assignment.label}
+              onChange={(event) => onChange({ label: event.target.value })}
+              className="h-10 bg-muted/25 text-xs"
+            />
+          </Field>
+          <Field>
+            <Label
+              className={cn(
+                memberTargetLabelClass,
+                memberTargetLabelOffsetClass,
+                "mb-1.5 block"
+              )}
+            >
+              Actual
+            </Label>
+            <Input
+              type="number"
+              min={0}
+              value={assignment.actual}
+              onChange={(event) =>
+                onChange({ actual: Number.parseFloat(event.target.value) || 0 })
+              }
+              className="h-10 bg-muted/25 text-xs tabular-nums"
+            />
+          </Field>
+          <Field>
+            <Label
+              className={cn(
+                memberTargetLabelClass,
+                memberTargetLabelOffsetClass,
+                "mb-1.5 block"
+              )}
+            >
+              Target
+            </Label>
+            <Input
+              type="number"
+              min={0}
+              value={assignment.target}
+              onChange={(event) =>
+                onChange({ target: Number.parseFloat(event.target.value) || 0 })
+              }
+              className="h-10 bg-muted/25 text-xs tabular-nums"
+            />
+          </Field>
+        </div>
         <Button
           type="button"
-          variant="outline"
+          variant="ghost"
           size="icon"
-          className="mt-6 size-8 shrink-0 text-muted-foreground"
+          className="mb-0.5 size-9 shrink-0 justify-self-center text-muted-foreground hover:text-foreground"
           onClick={onRemove}
           aria-label={`Remove ${assignment.label}`}
         >
-          <Trash2 className="size-3.5" />
+          <Trash2 className="size-4" />
         </Button>
-      </div>
 
-      <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        <Field>
-          <Label className="text-[11px] text-muted-foreground">Actual</Label>
-          <Input
-            type="number"
-            min={0}
-            value={assignment.actual}
-            onChange={(event) =>
-              onChange({ actual: Number.parseFloat(event.target.value) || 0 })
-            }
-            className="h-9 text-xs tabular-nums"
-          />
-        </Field>
-        <Field>
-          <Label className="text-[11px] text-muted-foreground">Target</Label>
-          <Input
-            type="number"
-            min={0}
-            value={assignment.target}
-            onChange={(event) =>
-              onChange({ target: Number.parseFloat(event.target.value) || 0 })
-            }
-            className="h-9 text-xs tabular-nums"
-          />
-        </Field>
-      </div>
-
-      <div className="mt-3 flex items-center justify-between gap-3 text-[10px] text-muted-foreground">
-        <span>{percent}% achieved</span>
-        <span>
+        <p className="mt-4 text-sm font-medium text-foreground">{percent}% achieved</p>
+        <p className="mt-4 justify-self-center text-sm font-medium tabular-nums text-foreground">
           {assignment.actual} / {assignment.target}
-        </span>
-      </div>
-      <div className="mt-1.5">
-        <TargetProgressBar percent={percent} />
+        </p>
+
+        <div className="col-span-2 mt-2">
+          <MemberTargetProgressBar percent={percent} />
+        </div>
       </div>
     </div>
   )
@@ -1011,7 +930,7 @@ export function ManageTargetsPage({ onBack }: ManageTargetsPageProps) {
 
   return (
     <div className="w-full space-y-6">
-      <div className="shrink-0 border-b border-border pb-5">
+      <div className="shrink-0 pb-5">
         <div className="flex items-center justify-between gap-4">
           <p className="text-xs font-medium text-muted-foreground">Home · Targets</p>
           <Button type="button" variant="outline" className="h-9 gap-2 text-xs" onClick={onBack}>
@@ -1030,31 +949,33 @@ export function ManageTargetsPage({ onBack }: ManageTargetsPageProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <HeaderSummaryWidget
-          label="Org metrics"
-          value={orgTargets.length}
-          trendLabel={`${orgAchievement}% avg`}
-          trend={orgAchievement >= 60 ? "up" : "down"}
-          barValues={orgAchievementBars}
-        />
-        <HeaderSummaryWidget
-          label="Team members"
-          value={TEAM_MEMBERS.length}
-          trendLabel={`+${teamSizeDelta} YTD`}
-          trend="up"
-          sparklineData={TEAM_SIZE_TREND}
-        />
-        <HeaderSummaryWidget
-          label="Avg achievement"
-          value={`${teamSummary}%`}
-          trendLabel={`+${achievementTrendDelta} pts`}
-          trend={achievementTrendDelta >= 0 ? "up" : "down"}
-          sparklineData={LANDING_TARGET_PROGRESS_CHART}
-        />
-      </div>
+      {SHOW_TARGETS_HEADER_SUMMARY ? (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <HeaderSummaryWidget
+            label="Org metrics"
+            value={orgTargets.length}
+            trendLabel={`${orgAchievement}% avg`}
+            trend={orgAchievement >= 60 ? "up" : "down"}
+            barValues={orgAchievementBars}
+          />
+          <HeaderSummaryWidget
+            label="Team members"
+            value={TEAM_MEMBERS.length}
+            trendLabel={`+${teamSizeDelta} YTD`}
+            trend="up"
+            sparklineData={TEAM_SIZE_TREND}
+          />
+          <HeaderSummaryWidget
+            label="Avg achievement"
+            value={`${teamSummary}%`}
+            trendLabel={`+${achievementTrendDelta} pts`}
+            trend={achievementTrendDelta >= 0 ? "up" : "down"}
+            sparklineData={LANDING_TARGET_PROGRESS_CHART}
+          />
+        </div>
+      ) : null}
 
-      <Tabs value={activeTab} onValueChange={handleTabChange} className="gap-5">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="gap-8">
         <TabsList className="h-auto w-full justify-start rounded-lg bg-muted p-1">
           {TARGET_TABS.map((tab) => (
             <TabsTrigger key={tab.id} value={tab.id} className={tabTriggerClass}>
@@ -1082,7 +1003,7 @@ export function ManageTargetsPage({ onBack }: ManageTargetsPageProps) {
         </TabsContent>
 
         <TabsContent value="team" className="mt-0">
-          <div className="grid gap-4 lg:grid-cols-[232px_minmax(0,1fr)] lg:items-start">
+          <div className="grid gap-8 lg:grid-cols-[232px_minmax(0,1fr)] lg:items-start">
             <aside className="flex flex-col lg:sticky lg:top-0 lg:max-h-[calc(100dvh-14rem)] lg:overflow-hidden">
               <div className="relative mb-3 shrink-0">
                 <Search className="pointer-events-none absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-muted-foreground" />
@@ -1101,7 +1022,7 @@ export function ManageTargetsPage({ onBack }: ManageTargetsPageProps) {
                       setSelectedMemberId(matches[0].id)
                     }
                   }}
-                  className="h-9 pl-9 text-xs"
+                  className="h-9 rounded-full pl-9 text-xs"
                   placeholder="Search team members…"
                   aria-label="Search team members"
                 />
@@ -1136,10 +1057,10 @@ export function ManageTargetsPage({ onBack }: ManageTargetsPageProps) {
               </div>
             </aside>
 
-            <section className="rounded-xl border border-border bg-card shadow-xs">
+            <section className="rounded-xl border border-border bg-card p-8 shadow-xs">
               {selectedMember && selectedMemberTargets ? (
                 <>
-                  <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border px-4 py-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border pb-6">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <h2 className="text-base font-semibold text-foreground">
@@ -1164,7 +1085,7 @@ export function ManageTargetsPage({ onBack }: ManageTargetsPageProps) {
                     </Button>
                   </div>
 
-                  <div className="space-y-3 p-4">
+                  <div className="space-y-4 pt-6">
                     {selectedMemberTargets.assignments.length > 0 ? (
                       selectedMemberTargets.assignments.map((assignment) => (
                         <MemberTargetEditor
@@ -1202,9 +1123,9 @@ export function ManageTargetsPage({ onBack }: ManageTargetsPageProps) {
                     )}
                   </div>
 
-                  <div className="flex justify-end border-t border-border px-4 py-4">
+                  <div className="flex justify-end pt-6">
                     <Button type="button" className="h-9 text-xs" onClick={handleSaveTeam}>
-                      Save team member target
+                      Save team member targets
                     </Button>
                   </div>
                 </>
