@@ -688,13 +688,13 @@ function driverAmount(labelIncludes: string): number {
 
 const MARGIN_SHARE_PCT = Math.round((driverAmount("Margin") / REVENUE_TOTAL) * 100)
 const INCREMENTAL_SHARE_PCT = Math.round(
-  (driverAmount("Incremental") / REVENUE_TOTAL) * 100
+  (driverAmount("Inc Cancellations") / REVENUE_TOTAL) * 100
 )
 
 const STAYS_CARD_SUPPORT: Record<string, string> = {
   "Attachment (Average)": `vs ${PRODUCT_AVAILABLE_PCT}% product availability`,
   "Margin (ex. VAT) £m": `${MARGIN_SHARE_PCT}% of total partner revenue`,
-  "Incremental Cancellations & Relets Inc": `${INCREMENTAL_SHARE_PCT}% of total partner revenue`,
+  "Inc Cancellations & Relets": `${INCREMENTAL_SHARE_PCT}% of total partner revenue`,
   "Website Conversion*": "Website conversion uplift",
   Total: PARTNER_REVENUE.headlineNote,
 }
