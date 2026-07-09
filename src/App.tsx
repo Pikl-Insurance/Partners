@@ -17,6 +17,7 @@ import {
 import { FilterContextPill } from "@/components/filter-context-pill"
 import { FilterSidebar } from "@/components/filter-sidebar"
 import { AiCoworkerCard } from "@/components/ai-coworker-card"
+import { AdminPage } from "@/components/admin-page"
 import { LoginPage } from "@/components/login-page"
 import {
   DEFAULT_REPORTING_FILTERS,
@@ -25,6 +26,7 @@ import {
 } from "@/components/reporting-filter-sidebar"
 import { ReportingPage } from "@/components/reporting-page"
 import { InsightsMapPage } from "@/components/insights-map-page"
+import { SupportPage } from "@/components/support-page"
 import {
   InsightsCalPanel,
   InsightsContributionPanel,
@@ -447,26 +449,9 @@ function App() {
                   ) : activeSection === "reporting" ? (
                     <ReportingPage filters={reportingFilters} hasRun={reportingHasRun} />
                   ) : activeSection === "support" ? (
-                    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/20 px-6 py-24 text-center">
-                      <span className="grid size-10 place-items-center rounded-xl bg-muted text-muted-foreground">
-                        <LifeBuoy className="size-4" />
-                      </span>
-                      <p className="mt-4 text-sm font-semibold text-foreground">Support</p>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        Help articles, contact options, and support tickets will be available
-                        here soon.
-                      </p>
-                    </div>
+                    <SupportPage />
                   ) : activeSection === "admin" ? (
-                    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/20 px-6 py-24 text-center">
-                      <span className="grid size-10 place-items-center rounded-xl bg-muted text-muted-foreground">
-                        <SlidersHorizontal className="size-4" />
-                      </span>
-                      <p className="mt-4 text-sm font-semibold text-foreground">Admin</p>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        Account, team, and configuration settings will be available here soon.
-                      </p>
-                    </div>
+                    <AdminPage />
                   ) : activeSection === "insights" && insightsView === "map" ? (
                     <InsightsMapPage
                       filters={activeFilters}
