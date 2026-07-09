@@ -19,16 +19,16 @@ import {
 } from "@/lib/sykes-dashboard-data"
 
 const REVENUE_SPLIT = [
-  { name: "Margin (ex. VAT)", value: 900, color: "#27272a" },
-  { name: "Website conversion", value: 800, color: "#52525b" },
-  { name: "Incremental canx & relets", value: 100, color: "#a1a1aa" },
+  { name: "Margin (ex. VAT)", value: 900, color: "#006BFF" },
+  { name: "Website conversion", value: 800, color: "#3389FF" },
+  { name: "Incremental canx & relets", value: 100, color: "#99C4FF" },
 ]
 
 const CHANNEL_COLORS = {
-  website: "#27272a",
-  app: "#3f3f46",
-  offline: "#52525b",
-  ota: "#71717a",
+  website: "#006BFF",
+  app: "#3389FF",
+  offline: "#66A6FF",
+  ota: "#99C4FF",
 }
 
 function RevenueDonutCard() {
@@ -52,9 +52,6 @@ function RevenueDonutCard() {
                 <div key={driver.label} className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-sm text-foreground">{driver.label}</p>
-                    {"note" in driver && driver.note ? (
-                      <p className="text-xs text-muted-foreground">{driver.note}</p>
-                    ) : null}
                   </div>
                   <p className="shrink-0 text-sm font-bold tabular-nums">{driver.value}</p>
                 </div>
@@ -71,8 +68,8 @@ function RevenueDonutCard() {
             <PieChart>
               <defs>
                 <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#27272a" stopOpacity={0.9} />
-                  <stop offset="100%" stopColor="#18181b" stopOpacity={0.7} />
+                  <stop offset="0%" stopColor="#006BFF" stopOpacity={0.9} />
+                  <stop offset="100%" stopColor="#0054CC" stopOpacity={0.7} />
                 </linearGradient>
               </defs>
               <Pie
@@ -123,7 +120,7 @@ function AttachmentGaugeCard() {
               cy="60"
               r="48"
               fill="none"
-              stroke="#52525b"
+              stroke="#006BFF"
               strokeWidth="10"
               strokeLinecap="round"
               strokeDasharray={`${14 * 3.01} ${(100 - 14) * 3.01}`}

@@ -20,21 +20,18 @@ import {
 } from "@/components/sykes/revenue-overview-visual"
 import {
   CollapsibleDataTable,
-  NoteTooltip,
   VisualCard,
 } from "@/components/sykes/sykes-visual-primitives"
 import type { ActiveFilters } from "@/lib/chart-data"
 import {
   CONTRIBUTION_TO_PERFORMANCE_GRID,
   DAMAGE_DEPOSIT_WAIVER_GRID,
-  DASHBOARD_FOOTNOTES,
   DEPARTURES_BY_DATE_DATA,
   EVENTS_BY_DATE_DECLINING_DATA,
   EVENTS_BY_DATE_SUMMER_DATA,
   FINANCIALS_GRID,
   FLEXIBLE_CANCELLATION_GRID,
   PERFORMANCE_METRICS_GRID,
-  PROPOSITION_NOTES,
 } from "@/lib/sykes-dashboard-data"
 import { cn } from "@/lib/utils"
 
@@ -46,7 +43,6 @@ function DashboardSection({
   id,
   title,
   subtitle,
-  note,
   icon: Icon,
   children,
   className,
@@ -54,7 +50,6 @@ function DashboardSection({
   id: string
   title: string
   subtitle?: string
-  note?: string
   icon?: LucideIcon
   children: ReactNode
   className?: string
@@ -68,10 +63,7 @@ function DashboardSection({
           </div>
         ) : null}
         <div className="min-w-0 space-y-0.5">
-          <div className="flex items-center gap-1.5">
-            <h2 className="text-sm font-semibold tracking-tight text-foreground">{title}</h2>
-            {note ? <NoteTooltip note={note} /> : null}
-          </div>
+          <h2 className="text-sm font-semibold tracking-tight text-foreground">{title}</h2>
           {subtitle ? <p className="text-xs text-muted-foreground">{subtitle}</p> : null}
         </div>
       </div>
@@ -151,16 +143,6 @@ export function SykesPartnerDashboardPage({ filters }: SykesPartnerDashboardPage
         icon={Gauge}
       >
         <RevenueOverviewVisual />
-        <div className="rounded-xl border border-border bg-muted/20 px-4 py-3">
-          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Notes
-          </p>
-          <ol className="list-decimal space-y-1 pl-4 text-xs text-muted-foreground">
-            {DASHBOARD_FOOTNOTES.map((note) => (
-              <li key={note}>{note}</li>
-            ))}
-          </ol>
-        </div>
       </DashboardSection>
 
       <SectionDivider />
@@ -168,7 +150,6 @@ export function SykesPartnerDashboardPage({ filters }: SykesPartnerDashboardPage
       <DashboardSection
         id="section-total-products"
         title="Total products"
-        note={PROPOSITION_NOTES.layout}
         icon={PieChart}
       >
         <TotalProductsVisual />
@@ -179,7 +160,6 @@ export function SykesPartnerDashboardPage({ filters }: SykesPartnerDashboardPage
       <DashboardSection
         id="section-flexible-cancellation"
         title="Flexible cancellation"
-        note={PROPOSITION_NOTES.flexibleCancellation}
         icon={Shield}
       >
         <PropositionVisualSection
@@ -187,10 +167,10 @@ export function SykesPartnerDashboardPage({ filters }: SykesPartnerDashboardPage
           subtitle="Volume, attachment and margin by channel"
           accentClass="border-border bg-card"
           channelBars={[
-            { label: "Website", value: "A" },
-            { label: "App", value: "B" },
-            { label: "Offline", value: "C" },
-            { label: "OTA", value: "D" },
+            { label: "Website", value: FLEXIBLE_CANCELLATION_GRID[0].website.value },
+            { label: "App", value: FLEXIBLE_CANCELLATION_GRID[0].app.value },
+            { label: "Offline", value: FLEXIBLE_CANCELLATION_GRID[0].offline.value },
+            { label: "OTA", value: FLEXIBLE_CANCELLATION_GRID[0].ota.value },
           ]}
           rateCards={[
             { label: "FC guest price avg", value: "10%", tone: "bg-muted/40" },
@@ -214,16 +194,16 @@ export function SykesPartnerDashboardPage({ filters }: SykesPartnerDashboardPage
           subtitle="Volume, attachment and margin by channel"
           accentClass="border-border bg-card"
           channelBars={[
-            { label: "Website", value: "A" },
-            { label: "App", value: "B" },
-            { label: "Offline", value: "C" },
-            { label: "OTA", value: "D" },
+            { label: "Website", value: DAMAGE_DEPOSIT_WAIVER_GRID[0].website.value },
+            { label: "App", value: DAMAGE_DEPOSIT_WAIVER_GRID[0].app.value },
+            { label: "Offline", value: DAMAGE_DEPOSIT_WAIVER_GRID[0].offline.value },
+            { label: "OTA", value: DAMAGE_DEPOSIT_WAIVER_GRID[0].ota.value },
           ]}
           rateCards={[
             { label: "DDL guest price avg", value: "£30", tone: "bg-muted/40" },
             { label: "Insurance premium rate avg", value: "2.12%", tone: "bg-muted/40" },
-            { label: "Out of test conversion", value: "—", tone: "bg-muted/50" },
-            { label: "App / Offline / OTA", value: "N/A", tone: "bg-muted/30" },
+            { label: "Out of test conversion", value: "0.4%", tone: "bg-muted/50" },
+            { label: "Conversion benefit", value: "£180k", tone: "bg-muted/30" },
           ]}
           table={
             <CollapsibleDataTable title="View full damage deposit waiver table">
@@ -259,7 +239,6 @@ export function SykesPartnerDashboardPage({ filters }: SykesPartnerDashboardPage
       <DashboardSection
         id="section-financials"
         title="Financials"
-        note="Consider splitting financials by proposition (flexible cancellation vs damage deposit waiver)."
         icon={Wallet}
       >
         <FinancialsVisual />

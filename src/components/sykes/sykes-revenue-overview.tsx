@@ -96,9 +96,6 @@ export function SykesRevenueOverview() {
             >
               <div>
                 <p className="text-sm text-foreground">{driver.label}</p>
-                {"note" in driver && driver.note ? (
-                  <p className="mt-0.5 text-xs text-muted-foreground">{driver.note}</p>
-                ) : null}
               </div>
               <p className="text-sm font-bold tabular-nums text-foreground">{driver.value}</p>
             </div>

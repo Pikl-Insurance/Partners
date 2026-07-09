@@ -3,57 +3,57 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Brand palette — neutral */
-  --brand-primary: #27272a;
-  --brand-primary-dark: #18181b;
-  --brand-accent: #71717a;
-  --brand-surface: #f4f4f5;
+  /* Brand palette — Sykes Holiday Cottages */
+  --brand-primary: #006bff;
+  --brand-primary-dark: #0054cc;
+  --brand-accent: #3389ff;
+  --brand-surface: #eef5ff;
   --brand-pink: var(--brand-accent);
   --brand-dark-blue: var(--brand-primary-dark);
   --brand-light-blue: var(--brand-surface);
   --brand-green: var(--brand-primary);
-  --brand-grey-blue: #f7fafc;
+  --brand-grey-blue: #f5f9ff;
 
   /* Surfaces */
   --background: #ffffff;
   --foreground: #18181b;
   --card: #ffffff;
   --card-foreground: #18181b;
-  --canvas: #f4f4f5;
-  --field: #f4f4f5;
+  --canvas: #f5f9ff;
+  --field: #f5f9ff;
 
   /* Actions */
-  --primary: #27272a;
+  --primary: #006bff;
   --primary-foreground: #ffffff;
 
   /* UI chrome */
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a;
-  --accent: #f4f4f5;
-  --accent-foreground: #18181b;
-  --border: #e4e4e7;
-  --input: #e4e4e7;
-  --ring: #a1a1aa;
+  --muted: #f0f6ff;
+  --muted-foreground: #5b6b85;
+  --accent: #e8f1ff;
+  --accent-foreground: #0054cc;
+  --border: #d7e4f7;
+  --input: #d7e4f7;
+  --ring: #006bff;
   --popover: #ffffff;
   --popover-foreground: #18181b;
   --destructive: #dc2626;
 
   /* Ambient */
   --gradient-from: #ffffff;
-  --gradient-mid: #fafafa;
+  --gradient-mid: #f5f9ff;
   --gradient-to: #ffffff;
   --glow-pink: transparent;
   --glow-green: transparent;
-  --glow-blue: transparent;
-  --panel-bg: #fafafa;
-  --panel-border: rgb(0 0 0 / 0.06);
-  --tooltip: #27272a;
+  --glow-blue: rgb(0 107 255 / 0.08);
+  --panel-bg: #f8fbff;
+  --panel-border: rgb(0 107 255 / 0.08);
+  --tooltip: #0054cc;
   --tooltip-foreground: #fafafa;
 
   /* Compare accents */
   --compare-primary: var(--brand-primary);
-  --compare-comparison: #52525b;
-  --compare-comparison-bar: #3f3f46;
+  --compare-comparison: #3389ff;
+  --compare-comparison-bar: #0054cc;
 }
 
 .dark {
@@ -64,34 +64,34 @@
   --canvas: #2a2a30;
   --field: #2a2a30;
 
-  --primary: #fafafa;
-  --primary-foreground: #18181b;
+  --primary: #3389ff;
+  --primary-foreground: #ffffff;
 
-  --muted: #2a2a30;
-  --muted-foreground: #a1a1aa;
-  --accent: #323238;
-  --accent-foreground: #fafafa;
-  --border: #45454e;
-  --input: #45454e;
-  --ring: #71717a;
+  --muted: #1a2433;
+  --muted-foreground: #9db0cc;
+  --accent: #1e2f4a;
+  --accent-foreground: #9ec5ff;
+  --border: #2a3b55;
+  --input: #2a3b55;
+  --ring: #3389ff;
   --popover: #1e1e22;
   --popover-foreground: #fafafa;
   --destructive: #f87171;
 
   --gradient-from: #131316;
-  --gradient-mid: #1e1e22;
+  --gradient-mid: #161c26;
   --gradient-to: #131316;
   --glow-pink: transparent;
   --glow-green: transparent;
-  --glow-blue: transparent;
-  --panel-bg: #1e1e22;
-  --panel-border: rgb(255 255 255 / 0.09);
-  --tooltip: #fafafa;
-  --tooltip-foreground: #18181b;
+  --glow-blue: rgb(0 107 255 / 0.18);
+  --panel-bg: #1a2230;
+  --panel-border: rgb(51 137 255 / 0.16);
+  --tooltip: #3389ff;
+  --tooltip-foreground: #ffffff;
 
-  --compare-primary: #fafafa;
-  --compare-comparison: #71717a;
-  --compare-comparison-bar: #52525b;
+  --compare-primary: #3389ff;
+  --compare-comparison: #006bff;
+  --compare-comparison-bar: #0054cc;
 }
 
 @theme inline {

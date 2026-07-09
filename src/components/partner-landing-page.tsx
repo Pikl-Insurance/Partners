@@ -1,5 +1,7 @@
 import { useState } from "react"
 import {
+  ArrowDown,
+  ArrowUp,
   ArrowUpRight,
   Ban,
   BarChart3,
@@ -18,14 +20,15 @@ import {
   PiggyBank,
   Receipt,
   RefreshCcw,
+  Shield,
   Sigma,
+  TrendingUp,
   Wallet,
   type LucideIcon,
 } from "lucide-react"
 
 import { ChannelGridTable } from "@/components/sykes/channel-grid-table"
 import {
-  ChannelBarGroup,
   CollapsibleDataTable,
   MiniBarChart,
   Sparkline,
@@ -37,11 +40,12 @@ import {
   ADDITIONAL_PARTNER_REVENUE,
   FLEXIBLE_CANCELLATION_GRID,
   GROSS_BOOKINGS_TREND,
+  MARGIN_EARNED_FC_DATA,
   MARKET_COMPARISON_METRICS,
   PARTNER_REVENUE,
-  PROPOSITION_NOTES,
   TOTAL_PRODUCTS_SUMMARY,
 } from "@/lib/sykes-dashboard-data"
+import { PARTNER_BRANDING } from "@/lib/partner-branding"
 
 const MONO_LABEL =
   "text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground"
@@ -112,6 +116,10 @@ const TILE_ICONS: Array<{ match: string; icon: LucideIcon }> = [
   { match: "Rebookability Average value", icon: Coins },
   { match: "Pikl Index", icon: Gauge },
   { match: "Offer Conversion", icon: MousePointerClick },
+  { match: "Guest Price", icon: Receipt },
+  { match: "Insurance Premium", icon: Shield },
+  { match: "Out of Test Conversion", icon: TrendingUp },
+  { match: "Conversion Benefit", icon: Coins },
 ]
 
 function tileIcon(label: string): LucideIcon {
@@ -167,7 +175,7 @@ function ProgressRow({
         <div
           className={cn(
             "h-full rounded-full transition-all",
-            strong ? "bg-foreground/80" : "bg-muted-foreground/50"
+            strong ? "bg-primary" : "bg-primary/40"
           )}
           style={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
         />
@@ -212,15 +220,18 @@ function DriverTile({
 }
 
 function TrendChip({ value, tone = "up" }: { value: string; tone?: "up" | "down" }) {
+  const Arrow = tone === "up" ? ArrowUp : ArrowDown
+
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-md px-2 py-1 text-[10px] font-medium tabular-nums",
+        "inline-flex items-center gap-0.5 rounded-md px-2 py-1 text-[10px] font-medium tabular-nums",
         tone === "up"
           ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"
           : "bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400"
       )}
     >
+      <Arrow className="size-3 shrink-0" strokeWidth={2.5} />
       {value}
     </span>
   )
@@ -459,7 +470,7 @@ function PiklStaysTab() {
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-muted">
                 <div
-                  className="h-full rounded-full bg-foreground/75"
+                  className="h-full rounded-full bg-primary"
                   style={{ width: `${driver.percent}%` }}
                 />
               </div>
@@ -542,7 +553,6 @@ function PiklEffectTab() {
               value={driver.value}
               trend={driver.trend}
               footnote={driver.side}
-              tooltip={"note" in driver ? driver.note : undefined}
             />
           ))}
         </div>
@@ -635,7 +645,7 @@ function PiklMarketTab() {
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-muted">
                 <div
-                  className="h-full rounded-full bg-foreground/75"
+                  className="h-full rounded-full bg-primary"
                   style={{ width: `${item.score}%` }}
                 />
               </div>
@@ -679,7 +689,7 @@ const STAYS_CARD_SUPPORT: Record<string, string> = {
   "Attachment (Average)": `vs ${PRODUCT_AVAILABLE_PCT}% product availability`,
   "Margin (ex. VAT) £m": `${MARGIN_SHARE_PCT}% of total partner revenue`,
   "Incremental Cancellations & Relets": `${INCREMENTAL_SHARE_PCT}% of total partner revenue`,
-  "Website Conversion*": "*measured as +1% during testing",
+  "Website Conversion*": "Website conversion uplift",
   Total: PARTNER_REVENUE.headlineNote,
 }
 
@@ -723,7 +733,6 @@ function PiklEffectDriverCards({ onOpenInsights }: { onOpenInsights?: () => void
         <div
           key={driver.label}
           className={cn(PANEL, "flex flex-col gap-4 p-5")}
-          title={"note" in driver ? driver.note : undefined}
         >
           <div className="flex items-start justify-between gap-2">
             <TileIcon label={driver.label} />
@@ -776,7 +785,7 @@ function PiklMarketDriverCards({ onOpenInsights }: { onOpenInsights?: () => void
             <p className="text-[13px] leading-snug text-muted-foreground">{metric}</p>
             <p className="text-xl font-bold tracking-tight tabular-nums text-foreground">—</p>
           </div>
-          <p className="mt-auto text-xs text-muted-foreground">Partner vs Market · TBC</p>
+          <p className="mt-auto text-xs text-muted-foreground">Partner vs Market</p>
         </div>
       ))}
     </div>
@@ -877,7 +886,7 @@ function StaysSecondRow({ onOpenInsights }: { onOpenInsights?: () => void }) {
         <MiniBarChart
           data={[...STAYS_CHART_DATA]}
           valueFormatter={(v) => `£${v}k`}
-          className="h-36 text-foreground/75"
+          className="h-36 text-primary/80"
         />
       </ChartRowCard>
       <QuickActionsCard onOpenInsights={onOpenInsights} className="xl:col-span-2" />
@@ -898,7 +907,7 @@ function EffectSecondRow({ onOpenInsights }: { onOpenInsights?: () => void }) {
         <Sparkline
           data={GROSS_BOOKINGS_TREND.map((point) => ({ ...point }))}
           valueFormatter={(v) => `${v}k`}
-          className="h-36 text-foreground/75"
+          className="h-36 text-primary/80"
         />
       </ChartRowCard>
       <QuickActionsCard onOpenInsights={onOpenInsights} className="xl:col-span-2" />
@@ -915,7 +924,7 @@ function MarketSecondRow({ onOpenInsights }: { onOpenInsights?: () => void }) {
         className="xl:col-span-3"
       >
         <div className="flex h-36 items-center justify-center rounded-xl border border-dashed border-border bg-muted/20">
-          <p className="text-sm text-muted-foreground">Benchmark data TBC</p>
+          <p className="text-sm text-muted-foreground">Benchmark data coming soon</p>
         </div>
       </ChartRowCard>
       <QuickActionsCard onOpenInsights={onOpenInsights} className="xl:col-span-2" />
@@ -929,26 +938,6 @@ const INSIGHTS_PRODUCT_TABS = [
 ] as const
 
 export type InsightsProductId = (typeof INSIGHTS_PRODUCT_TABS)[number]["id"]
-
-const CAL_CHANNEL_COLORS = ["#27272a", "#3f3f46", "#52525b", "#71717a"] as const
-
-const CAL_RATE_CARDS = [
-  { label: "FC Guest Price Avg", value: "10%", hint: "Works with dynamic pricing" },
-  { label: "Insurance Premium Rate Avg", value: "6.35%", hint: "Works with dynamic pricing" },
-  { label: "Out of Test Conversion", value: "1.0%", hint: "Website only · App / Offline / OTA N/A" },
-  { label: "Conversion Benefit", value: "1% = £900k", hint: "Out of test conversion value" },
-] as const
-
-const CAL_MARGIN_ROWS = [
-  {
-    label: "FC Partner Margin",
-    hint: "Partner margin from flexible cancellation",
-  },
-  {
-    label: "Commission & Booking Fee Benefit",
-    hint: "Benefit from incremental cancellations",
-  },
-] as const
 
 /** Full-width CAL / DDL product switcher for the Insights page, styled like the Home tabs. */
 export function InsightsProductTabs({
@@ -979,87 +968,261 @@ export function InsightsProductTabs({
   )
 }
 
+const CAL_CHANNEL_COLORS = ["#006BFF", "#3389FF", "#66A6FF", "#99C4FF"] as const
+
+const CAL_RATE_CARDS = [
+  { label: "FC Guest Price Avg", value: "10%", trend: "+0.4pp", tone: "up" as const },
+  { label: "Insurance Premium Rate Avg", value: "6.35%", trend: "-0.2pp", tone: "down" as const },
+  { label: "Out of Test Conversion", value: "1.0%", trend: "+0.3pp", tone: "up" as const },
+  { label: "Conversion Benefit", value: "1% = £900k", trend: "+£50k", tone: "up" as const },
+] as const
+
+function parseDisplayValue(value: string): number {
+  const numeric = Number(value.replace(/[^0-9.]/g, "")) || 0
+  if (value.includes("k") || value.includes("K")) return numeric * 1000
+  return numeric
+}
+
+function channelShare(value: string, total: number): number {
+  if (!total) return 0
+  return Math.round((parseDisplayValue(value) / total) * 100)
+}
+
 /** CAL Flexible Cancellation analytics — channel volume, rates, margin, and full breakdown. */
 export function InsightsCalPanel() {
   const bookingsRow = FLEXIBLE_CANCELLATION_GRID[0]
-  const channelBars = [
-    { label: "Website", value: bookingsRow.website.value, percent: 85 },
-    { label: "App", value: bookingsRow.app.value, percent: 62 },
-    { label: "Offline", value: bookingsRow.offline.value, percent: 48 },
-    { label: "OTA", value: bookingsRow.ota.value, percent: 35 },
-  ].map((channel, index) => ({
-    ...channel,
-    fill: CAL_CHANNEL_COLORS[index] ?? "#71717a",
+  const attachmentRowData = FLEXIBLE_CANCELLATION_GRID[1]
+  const marginRow = FLEXIBLE_CANCELLATION_GRID[4]
+  const benefitRow = FLEXIBLE_CANCELLATION_GRID[5]
+
+  const bookingChannels = [
+    { label: "Website", value: bookingsRow.website.value, color: CAL_CHANNEL_COLORS[0] },
+    { label: "App", value: bookingsRow.app.value, color: CAL_CHANNEL_COLORS[1] },
+    { label: "Offline", value: bookingsRow.offline.value, color: CAL_CHANNEL_COLORS[2] },
+    { label: "OTA", value: bookingsRow.ota.value, color: CAL_CHANNEL_COLORS[3] },
+  ]
+  const bookingsTotal = parseDisplayValue(bookingsRow.total.value)
+  const bookingsDirect = parseDisplayValue(bookingsRow.direct.value)
+  const directShare = channelShare(bookingsRow.direct.value, bookingsTotal)
+
+  const marginChannels = [
+    { label: "Website", value: marginRow.website.value, color: CAL_CHANNEL_COLORS[0] },
+    { label: "App", value: marginRow.app.value, color: CAL_CHANNEL_COLORS[1] },
+    { label: "Offline", value: marginRow.offline.value, color: CAL_CHANNEL_COLORS[2] },
+    { label: "OTA", value: marginRow.ota.value, color: CAL_CHANNEL_COLORS[3] },
+  ]
+  const marginTotal = parseDisplayValue(marginRow.total.value)
+
+  const benefitChannels = [
+    { label: "Website", value: benefitRow.website.value, color: CAL_CHANNEL_COLORS[0] },
+    { label: "App", value: benefitRow.app.value, color: CAL_CHANNEL_COLORS[1] },
+    { label: "Offline", value: benefitRow.offline.value, color: CAL_CHANNEL_COLORS[2] },
+    { label: "OTA", value: benefitRow.ota.value, color: CAL_CHANNEL_COLORS[3] },
+  ]
+  const benefitTotal = parseDisplayValue(benefitRow.total.value)
+
+  const fcBookingsTrend = MARGIN_EARNED_FC_DATA.map((point) => ({
+    label: point.month,
+    value: point.value,
   }))
 
   return (
     <div className="space-y-6">
       <div>
-        <p className={MONO_LABEL}>Proposition</p>
+        <p className={MONO_LABEL}>Product</p>
         <h2 className="mt-1 text-lg font-semibold tracking-tight text-foreground">
           Flexible Cancellation
         </h2>
-        <p className="mt-1 text-sm text-muted-foreground">{PROPOSITION_NOTES.flexibleCancellation}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {CAL_RATE_CARDS.map((card) => (
-          <div key={card.label} className={cn(PANEL, "flex flex-col gap-2 p-5")}>
-            <p className="text-[13px] leading-snug text-muted-foreground">{card.label}</p>
-            <p className="text-xl font-bold tracking-tight tabular-nums text-foreground">
-              {card.value}
-            </p>
-            <p className="mt-auto text-xs text-muted-foreground">{card.hint}</p>
+          <div key={card.label} className={cn(PANEL, "flex flex-col gap-4 p-5")}>
+            <div className="flex items-start justify-between gap-2">
+              <TileIcon label={card.label} />
+              <TrendChip value={card.trend} tone={card.tone} />
+            </div>
+            <div className="space-y-1">
+              <p className="text-[13px] leading-snug text-muted-foreground">{card.label}</p>
+              <p className="text-xl font-bold tracking-tight tabular-nums text-foreground">
+                {card.value}
+              </p>
+            </div>
           </div>
         ))}
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1.2fr_1fr]">
-        <VisualCard
-          title="FC Bookings by channel"
-          subtitle="Website · App · Offline · OTA · Direct = A+B+C · Total = A+B+C+D"
-        >
-          <ChannelBarGroup channels={channelBars} />
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <div className="rounded-xl border border-border/70 bg-muted/30 px-4 py-3">
-              <p className="text-xs text-muted-foreground">Direct</p>
-              <p className="mt-1 text-lg font-bold tabular-nums">{bookingsRow.direct.value}</p>
+      <div className="grid gap-6 xl:grid-cols-2">
+        <div className={cn(PANEL, "flex flex-col gap-5 p-5")}>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className={MONO_LABEL}>Volume</p>
+              <h3 className="mt-1 text-sm font-semibold text-foreground">FC Bookings by channel</h3>
             </div>
-            <div className="rounded-xl border border-border/70 bg-muted/30 px-4 py-3">
+            <TrendChip value="+4.2%" tone="up" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-xl border border-border/70 bg-muted/20 px-4 py-3">
+              <p className="text-xs text-muted-foreground">Direct</p>
+              <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
+                {bookingsRow.direct.value}
+              </p>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Website + App + Offline · {directShare}% of total
+              </p>
+            </div>
+            <div className="rounded-xl border border-border/70 bg-muted/20 px-4 py-3">
               <p className="text-xs text-muted-foreground">Total</p>
-              <p className="mt-1 text-lg font-bold tabular-nums">{bookingsRow.total.value}</p>
+              <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
+                {bookingsRow.total.value}
+              </p>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Direct + OTA · 14% of 690k bookings
+              </p>
             </div>
           </div>
-        </VisualCard>
+
+          <div className="space-y-2">
+            <div className="flex h-3 overflow-hidden rounded-full bg-muted">
+              {bookingChannels.map((channel) => (
+                <div
+                  key={channel.label}
+                  className="h-full first:rounded-l-full last:rounded-r-full"
+                  style={{
+                    width: `${channelShare(channel.value, bookingsTotal)}%`,
+                    backgroundColor: channel.color,
+                  }}
+                  title={`${channel.label}: ${channel.value}`}
+                />
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-x-4 gap-y-1">
+              {bookingChannels.map((channel) => (
+                <span key={channel.label} className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                  <span
+                    className="size-2 rounded-full"
+                    style={{ backgroundColor: channel.color }}
+                  />
+                  {channel.label} {channelShare(channel.value, bookingsTotal)}%
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {bookingChannels.map((channel) => {
+              const share = channelShare(channel.value, bookingsTotal)
+              return (
+                <div key={channel.label} className="space-y-1.5">
+                  <div className="flex items-center justify-between gap-3 text-sm">
+                    <span className="text-foreground">{channel.label}</span>
+                    <span className="font-semibold tabular-nums text-foreground">
+                      {channel.value}
+                      <span className="ml-2 text-xs font-medium text-muted-foreground">{share}%</span>
+                    </span>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full"
+                      style={{ width: `${share}%`, backgroundColor: channel.color }}
+                    />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          <div className="border-t border-border/60 pt-4">
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <p className="text-xs text-muted-foreground">FC bookings made · monthly</p>
+              <p className="text-xs font-semibold tabular-nums text-foreground">
+                {bookingsDirect.toLocaleString("en-GB")} direct
+              </p>
+            </div>
+            <Sparkline
+              data={fcBookingsTrend}
+              valueFormatter={(v) => v.toLocaleString("en-GB")}
+              className="h-20 text-primary/70"
+            />
+          </div>
+        </div>
 
         <VisualCard title="Attachment & margin" subtitle="Key commercial measures by channel">
           <div className="space-y-4">
             <div className="rounded-xl border border-border/70 bg-muted/20 p-4">
               <p className="text-xs text-muted-foreground">FC Attachment</p>
-              <p className="mt-2 text-2xl font-bold tabular-nums text-foreground">%</p>
+              <p className="mt-2 text-2xl font-bold tabular-nums text-foreground">
+                {attachmentRowData.total.value}
+              </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Attachment rate across Website, App, Offline, OTA, Direct and Total
+                Direct {attachmentRowData.direct.value} · Total {attachmentRowData.total.value}
               </p>
             </div>
-            {CAL_MARGIN_ROWS.map((row) => (
-              <div
-                key={row.label}
-                className="rounded-xl border border-border/70 bg-muted/20 p-4"
-              >
-                <p className="text-xs font-medium text-foreground">{row.label}</p>
-                <p className="mt-2 text-sm text-muted-foreground">{row.hint}</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {["Website A", "App B", "Offline C", "OTA D"].map((chip) => (
-                    <span
-                      key={chip}
-                      className="rounded-md bg-muted px-2 py-1 text-[11px] font-semibold tabular-nums text-foreground"
-                    >
-                      {chip}
-                    </span>
-                  ))}
-                </div>
+            <div className="rounded-xl border border-border/70 bg-muted/20 p-4">
+              <p className="text-xs font-medium text-foreground">FC Partner Margin</p>
+              <p className="mt-1 text-lg font-bold tabular-nums text-foreground">
+                {marginRow.total.value}
+              </p>
+              <div className="mt-3 flex h-2.5 overflow-hidden rounded-full bg-muted">
+                {marginChannels.map((channel) => (
+                  <div
+                    key={channel.label}
+                    className="h-full first:rounded-l-full last:rounded-r-full"
+                    style={{
+                      width: `${channelShare(channel.value, marginTotal)}%`,
+                      backgroundColor: channel.color,
+                    }}
+                    title={`${channel.label}: ${channel.value}`}
+                  />
+                ))}
               </div>
-            ))}
+              <div className="mt-3 grid grid-cols-4 gap-2">
+                {marginChannels.map((channel) => (
+                  <div
+                    key={channel.label}
+                    className="rounded-lg border border-border/60 bg-card px-3 py-2"
+                  >
+                    <p className="text-[11px] text-muted-foreground">{channel.label}</p>
+                    <p className="mt-0.5 text-sm font-bold tabular-nums text-foreground">
+                      {channel.value}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="rounded-xl border border-border/70 bg-muted/20 p-4">
+              <p className="text-xs font-medium text-foreground">Commission & Booking Fee Benefit</p>
+              <p className="mt-1 text-lg font-bold tabular-nums text-foreground">
+                {benefitRow.total.value}
+              </p>
+              <div className="mt-3 flex h-2.5 overflow-hidden rounded-full bg-muted">
+                {benefitChannels.map((channel) => (
+                  <div
+                    key={channel.label}
+                    className="h-full first:rounded-l-full last:rounded-r-full"
+                    style={{
+                      width: `${channelShare(channel.value, benefitTotal)}%`,
+                      backgroundColor: channel.color,
+                    }}
+                    title={`${channel.label}: ${channel.value}`}
+                  />
+                ))}
+              </div>
+              <div className="mt-3 grid grid-cols-4 gap-2">
+                {benefitChannels.map((channel) => (
+                  <div
+                    key={channel.label}
+                    className="rounded-lg border border-border/60 bg-card px-3 py-2"
+                  >
+                    <p className="text-[11px] text-muted-foreground">{channel.label}</p>
+                    <p className="mt-0.5 text-sm font-bold tabular-nums text-foreground">
+                      {channel.value}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </VisualCard>
       </div>
@@ -1098,6 +1261,7 @@ export function InsightsTopCards() {
           >
             <div className="flex items-start justify-between gap-2">
               <TileIcon label={item.label} />
+              <TrendChip value={item.trend} tone={item.tone} />
             </div>
             <div className="space-y-1">
               <p className="text-[13px] leading-snug text-muted-foreground">{item.label}</p>
@@ -1128,6 +1292,13 @@ export function TabEmptyState({ tabId }: { tabId: TabId }) {
   )
 }
 
+function timeOfDayGreeting(): string {
+  const hour = new Date().getHours()
+  if (hour < 12) return "Good morning"
+  if (hour < 18) return "Good afternoon"
+  return "Good evening"
+}
+
 export function PartnerLandingPage({ onOpenInsights }: { onOpenInsights?: () => void }) {
   const [activeTab, setActiveTab] = useState<TabId>("pikl-stays")
 
@@ -1137,7 +1308,7 @@ export function PartnerLandingPage({ onOpenInsights }: { onOpenInsights?: () => 
         <div className="min-w-0">
           <span className={cn(MONO_LABEL, "block")}>Partner Dashboard</span>
           <h1 className="mt-1.5 text-[22px] font-semibold leading-tight tracking-tight text-foreground">
-            Howdy, Partner
+            {timeOfDayGreeting()}, {PARTNER_BRANDING.userDisplayName}
           </h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
             Here&apos;s how your Pikl&apos;d Stays performance is tracking.

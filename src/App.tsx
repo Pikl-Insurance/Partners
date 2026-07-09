@@ -17,6 +17,12 @@ import { FilterContextPill } from "@/components/filter-context-pill"
 import { FilterSidebar } from "@/components/filter-sidebar"
 import { LoginPage } from "@/components/login-page"
 import {
+  DEFAULT_REPORTING_FILTERS,
+  ReportingFilterSidebar,
+  type ReportingFilters,
+} from "@/components/reporting-filter-sidebar"
+import { ReportingPage } from "@/components/reporting-page"
+import {
   InsightsCalPanel,
   InsightsDdlPanel,
   InsightsProductTabs,
@@ -156,6 +162,9 @@ function App() {
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(true)
   const [activeSection, setActiveSection] = useState<ActiveSection>("dashboard")
   const [activeFilters, setActiveFilters] = useState<ActiveFilters>(DEFAULT_FILTERS)
+  const [reportingFilters, setReportingFilters] =
+    useState<ReportingFilters>(DEFAULT_REPORTING_FILTERS)
+  const [reportingHasRun, setReportingHasRun] = useState(false)
   const [insightsProduct, setInsightsProduct] = useState<InsightsProductId>("cal")
   const [insightsScrollTarget, setInsightsScrollTarget] = useState<string | null>(null)
   const mainScrollRef = useRef<HTMLElement>(null)
@@ -191,7 +200,8 @@ function App() {
     document.documentElement.classList.toggle("dark", isDark)
   }, [isDark])
 
-  const showFilterSidebar = activeSection === "insights"
+  const showFilterSidebar =
+    activeSection === "insights" || activeSection === "reporting"
 
   if (!isAuthenticated) {
     return (
@@ -405,16 +415,7 @@ function App() {
                   {activeSection === "dashboard" ? (
                     <PartnerLandingPage onOpenInsights={() => handleOpenInsights()} />
                   ) : activeSection === "reporting" ? (
-                    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/20 px-6 py-24 text-center">
-                      <span className="grid size-10 place-items-center rounded-xl bg-muted text-muted-foreground">
-                        <FileText className="size-4" />
-                      </span>
-                      <p className="mt-4 text-sm font-semibold text-foreground">Reporting</p>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        Scheduled reports, exports, and custom report builders will be available
-                        here soon.
-                      </p>
-                    </div>
+                    <ReportingPage filters={reportingFilters} hasRun={reportingHasRun} />
                   ) : activeSection === "support" ? (
                     <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/20 px-6 py-24 text-center">
                       <span className="grid size-10 place-items-center rounded-xl bg-muted text-muted-foreground">
@@ -449,7 +450,18 @@ function App() {
               </div>
 
               {showFilterSidebar ? (
-                <FilterSidebar filters={activeFilters} onRun={setActiveFilters} />
+                activeSection === "reporting" ? (
+                  <ReportingFilterSidebar
+                    filters={reportingFilters}
+                    hasRun={reportingHasRun}
+                    onRun={(next) => {
+                      setReportingFilters(next)
+                      setReportingHasRun(true)
+                    }}
+                  />
+                ) : (
+                  <FilterSidebar filters={activeFilters} onRun={setActiveFilters} />
+                )
               ) : null}
             </div>
           </div>

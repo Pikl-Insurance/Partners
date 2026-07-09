@@ -1,8 +1,6 @@
 import { cn } from "@/lib/utils"
 import { PARTNER_BRANDING } from "@/lib/partner-branding"
-
-/** Text-only wordmark. Set to false to restore the original icon + name lockup. */
-const USE_WORDMARK_LOGO = true
+import sykesLogo from "@/assets/sykes-holiday-cottages-logo.png"
 
 type PartnerLogoProps = {
   className?: string
@@ -11,72 +9,37 @@ type PartnerLogoProps = {
 }
 
 export function PartnerLogo({ className, compact = false, variant = "sidebar" }: PartnerLogoProps) {
-  if (USE_WORDMARK_LOGO) {
-    if (variant === "hero") {
-      return (
-        <div className={cn("flex flex-col items-center", className)}>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            {PARTNER_BRANDING.logoName}
-          </h1>
-        </div>
-      )
-    }
-
-    if (compact) {
-      return (
-        <div className={cn("flex min-w-0 items-center", className)}>
-          <p className="text-base font-bold tracking-tight text-foreground">
-            {PARTNER_BRANDING.logoName.charAt(0)}
-          </p>
-        </div>
-      )
-    }
-
+  if (variant === "hero") {
     return (
-      <div className={cn("flex min-w-0 items-center", className)}>
-        <p className="truncate text-base font-bold tracking-tight text-foreground">
-          {PARTNER_BRANDING.logoName}
-        </p>
+      <div className={cn("flex flex-col items-center", className)}>
+        <img
+          src={sykesLogo}
+          alt={PARTNER_BRANDING.name}
+          className="h-24 w-auto object-contain object-left"
+        />
       </div>
     )
   }
 
-  if (variant === "hero") {
+  if (compact) {
     return (
-      <div className={cn("flex flex-col items-center", className)}>
-        <div
-          aria-hidden
-          className="grid size-12 place-items-center rounded-xl bg-foreground text-background"
-        >
-          <svg viewBox="0 0 24 24" className="size-6" fill="currentColor">
-            <path d="M12 3 4 9.5V20h6v-5h4v5h6V9.5L12 3Zm0 2.8 6 4.7V18h-2v-5H10v5H6v-7.5l6-4.7Z" />
-          </svg>
-        </div>
-        <h1 className="mt-4 text-2xl font-semibold tracking-tight text-foreground">
-          {PARTNER_BRANDING.name}
-        </h1>
+      <div className={cn("flex min-w-0 items-center", className)}>
+        <img
+          src={sykesLogo}
+          alt={PARTNER_BRANDING.name}
+          className="h-10 w-10 object-cover object-left"
+        />
       </div>
     )
   }
 
   return (
-    <div className={cn("flex min-w-0 items-center gap-2.5", className)}>
-      <div
-        aria-hidden
-        className="grid size-8 shrink-0 place-items-center rounded-lg bg-foreground text-background"
-      >
-        <svg viewBox="0 0 24 24" className="size-4" fill="currentColor">
-          <path d="M12 3 4 9.5V20h6v-5h4v5h6V9.5L12 3Zm0 2.8 6 4.7V18h-2v-5H10v5H6v-7.5l6-4.7Z" />
-        </svg>
-      </div>
-      {!compact ? (
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold tracking-tight text-foreground">
-            {PARTNER_BRANDING.shortName}
-          </p>
-          <p className="truncate text-[10px] text-muted-foreground">Holiday Cottages</p>
-        </div>
-      ) : null}
+    <div className={cn("flex min-w-0 items-center", className)}>
+      <img
+        src={sykesLogo}
+        alt={PARTNER_BRANDING.name}
+        className="h-14 w-auto max-w-[300px] object-contain object-left"
+      />
     </div>
   )
 }
