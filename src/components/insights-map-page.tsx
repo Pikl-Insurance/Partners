@@ -74,11 +74,57 @@ function BritishFlag({ className }: { className?: string }) {
 }
 
 const MAP_MID_X = 400
-const CALLOUT_BOX_W = 220
-const CALLOUT_BOX_H = 148
+const CALLOUT_LINE_EDGE_INSET = 12
 
-/** Stepped callout into the white space left/right of the UK island. */
-function MapRegionCallout({
+/** Pin + stepped connector toward the white space beside the UK. */
+function MapRegionCalloutLine({
+  region,
+}: {
+  region: MapRegion
+}) {
+  const cx = region.labelX
+  const cy = region.labelY
+  const side: "left" | "right" = cx < MAP_MID_X ? "left" : "right"
+  const edgeX = side === "left" ? CALLOUT_LINE_EDGE_INSET : 800 - CALLOUT_LINE_EDGE_INSET
+  const elbowX = side === "left" ? Math.max(cx - 56, edgeX + 40) : Math.min(cx + 56, edgeX - 40)
+
+  const linePath = [
+    `M ${cx} ${cy}`,
+    `L ${elbowX} ${cy}`,
+    `L ${edgeX} ${cy}`,
+  ].join(" ")
+
+  return (
+    <g className="pointer-events-none" aria-hidden>
+      <path
+        d={linePath}
+        fill="none"
+        stroke="rgb(0 0 0 / 0.1)"
+        strokeWidth="5"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+      <path
+        d={linePath}
+        fill="none"
+        stroke="#1e293b"
+        strokeWidth="2"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+
+      {/* County anchor */}
+      <circle cx={cx} cy={cy} r="10" fill="rgb(0 107 255 / 0.14)" />
+      <circle cx={cx} cy={cy} r="6" fill="#ffffff" stroke="#006BFF" strokeWidth="2.25" />
+      <circle cx={cx} cy={cy} r="2.75" fill="#006BFF" />
+
+      {/* Edge node toward the card */}
+      <circle cx={edgeX} cy={cy} r="4" fill="#ffffff" stroke="#1e293b" strokeWidth="1.75" />
+    </g>
+  )
+}
+
+function MapRegionCalloutCard({
   region,
   metric,
   metricLabel,
@@ -91,111 +137,61 @@ function MapRegionCallout({
 }) {
   const stats = getRegionDetailStats(region, brand)
   const value = formatMapMetric(getMetricValue(region, metric), metric)
-  const cx = region.labelX
-  const cy = region.labelY
-  const side: "left" | "right" = cx < MAP_MID_X ? "left" : "right"
-
-  const boxX = side === "left" ? 18 : 800 - 18 - CALLOUT_BOX_W
-  const boxY = Math.min(Math.max(cy - CALLOUT_BOX_H / 2, 88), 1000 - CALLOUT_BOX_H - 28)
-  const boxMidY = boxY + CALLOUT_BOX_H / 2
-  const elbowX = side === "left" ? Math.max(cx - 48, boxX + CALLOUT_BOX_W + 18) : Math.min(cx + 48, boxX - 18)
-  const joinX = side === "left" ? boxX + CALLOUT_BOX_W : boxX
-
-  const linePath = [
-    `M ${cx} ${cy}`,
-    `L ${elbowX} ${cy}`,
-    `L ${elbowX} ${boxMidY}`,
-    `L ${joinX} ${boxMidY}`,
-  ].join(" ")
+  const side: "left" | "right" = region.labelX < MAP_MID_X ? "left" : "right"
+  const topPct = Math.min(72, Math.max(18, (region.labelY / 1000) * 100))
 
   const detailRows = [
     { label: "Bookings", value: stats.bookings.toLocaleString("en-GB") },
     { label: "Revenue", value: formatCompactCurrency(stats.revenue) },
+    { label: "ABV", value: formatMapMetric(stats.abv, "abv") },
     { label: "CAL take-up", value: formatMapMetric(stats.calTakeUp, "calTakeUp") },
+    { label: "With CAL", value: `${stats.withCal.toLocaleString("en-GB")} · ${stats.withCalPct.toFixed(1)}%` },
     { label: "Cancel rate", value: formatMapMetric(stats.cancellationRate, "cancellationRate") },
   ]
 
   return (
-    <g className="pointer-events-none" aria-hidden>
-      {/* Soft connector shadow */}
-      <path
-        d={linePath}
-        fill="none"
-        stroke="rgb(0 0 0 / 0.08)"
-        strokeWidth="4.5"
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
-      <path
-        d={linePath}
-        fill="none"
-        stroke="#1e293b"
-        strokeWidth="1.75"
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
+    <div
+      className={cn(
+        "pointer-events-none absolute z-20 w-[20rem] -translate-y-1/2 xl:w-[22rem]",
+        side === "left" ? "left-4" : "right-4"
+      )}
+      style={{ top: `${topPct}%` }}
+    >
+      <div className="overflow-hidden rounded-2xl border border-border/70 bg-background shadow-xl ring-1 ring-black/5">
+        <div className="relative border-b border-border/60 bg-gradient-to-r from-primary/[0.07] to-transparent px-5 py-4 pr-14">
+          <span className="absolute right-4 top-4 grid size-9 place-items-center rounded-xl bg-primary/10 text-primary">
+            <MapPin className="size-4" />
+          </span>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+            County
+          </p>
+          <p className="mt-1 text-xl font-semibold tracking-tight text-foreground">{region.name}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {region.code} · United Kingdom
+          </p>
+        </div>
 
-      {/* Anchor on county */}
-      <circle cx={cx} cy={cy} r="8" fill="rgb(0 107 255 / 0.16)" />
-      <circle cx={cx} cy={cy} r="5.25" fill="#ffffff" stroke="#006BFF" strokeWidth="2" />
-      <circle cx={cx} cy={cy} r="2.4" fill="#006BFF" />
+        <div className="space-y-4 px-5 py-4">
+          <div className="flex items-center justify-between gap-3 rounded-xl bg-primary/5 px-4 py-3.5">
+            <span className="text-sm capitalize text-muted-foreground">{metricLabel}</span>
+            <span className="text-xl font-semibold tabular-nums text-primary">{value}</span>
+          </div>
 
-      {/* Join node at card edge */}
-      <circle cx={joinX} cy={boxMidY} r="3.5" fill="#ffffff" stroke="#1e293b" strokeWidth="1.5" />
+          <div className="grid grid-cols-2 gap-x-5 gap-y-3.5">
+            {detailRows.map((row) => (
+              <div key={row.label} className="min-w-0">
+                <p className="text-xs text-muted-foreground">{row.label}</p>
+                <p className="mt-0.5 truncate text-[15px] font-semibold tabular-nums text-foreground">
+                  {row.value}
+                </p>
+              </div>
+            ))}
+          </div>
 
-      <g transform={`translate(${boxX} ${boxY})`}>
-        <rect
-          width={CALLOUT_BOX_W}
-          height={CALLOUT_BOX_H}
-          rx="14"
-          fill="#ffffff"
-          stroke="#d7e4f7"
-          strokeWidth="1.25"
-        />
-        <rect x="0" y="0" width="4" height={CALLOUT_BOX_H} rx="2" fill="#006BFF" />
-
-        <text x="16" y="22" fill="#5b6b85" fontSize="9" fontWeight="650" letterSpacing="0.14em">
-          COUNTY
-        </text>
-        <text x="16" y="42" fill="#0f172a" fontSize="15" fontWeight="700">
-          {region.name.length > 20 ? `${region.name.slice(0, 19)}…` : region.name}
-        </text>
-        <text x="16" y="58" fill="#64748b" fontSize="10.5">
-          {region.code} · United Kingdom
-        </text>
-
-        <rect x="16" y="68" width={CALLOUT_BOX_W - 32} height="24" rx="7" fill="#eef5ff" />
-        <text x="26" y="84" fill="#5b6b85" fontSize="10">
-          {metricLabel}
-        </text>
-        <text
-          x={CALLOUT_BOX_W - 26}
-          y="84"
-          fill="#006BFF"
-          fontSize="12"
-          fontWeight="700"
-          textAnchor="end"
-        >
-          {value}
-        </text>
-
-        {detailRows.map((row, index) => {
-          const col = index % 2
-          const x = col === 0 ? 16 : 118
-          const rowY = 108 + Math.floor(index / 2) * 18
-          return (
-            <g key={row.label}>
-              <text x={x} y={rowY} fill="#94a3b8" fontSize="9">
-                {row.label}
-              </text>
-              <text x={x} y={rowY + 12} fill="#0f172a" fontSize="11" fontWeight="650">
-                {row.value}
-              </text>
-            </g>
-          )
-        })}
-      </g>
-    </g>
+          <p className="text-xs text-muted-foreground">Click county to select in sidebar</p>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -573,7 +569,7 @@ export function InsightsMapPage({ filters, onBack, onFilterRegion }: InsightsMap
           ) : (
             <svg
               viewBox={MAP_VIEWBOX}
-              className="relative z-0 h-full min-h-[320px] w-full touch-manipulation px-4 py-10"
+              className="relative z-0 h-full min-h-[320px] w-full touch-manipulation px-16 py-10 xl:px-24"
               preserveAspectRatio="xMidYMid meet"
               role="img"
               aria-label="United Kingdom county performance map"
@@ -612,16 +608,18 @@ export function InsightsMapPage({ filters, onBack, onFilterRegion }: InsightsMap
                 )
               })}
 
-              {hoveredCounty && metricLabel ? (
-                <MapRegionCallout
-                  region={hoveredCounty}
-                  metric={metric}
-                  metricLabel={metricLabel}
-                  brand={filters.brand}
-                />
-              ) : null}
+              {hoveredCounty ? <MapRegionCalloutLine region={hoveredCounty} /> : null}
             </svg>
           )}
+
+          {hoveredCounty && metricLabel ? (
+            <MapRegionCalloutCard
+              region={hoveredCounty}
+              metric={metric}
+              metricLabel={metricLabel}
+              brand={filters.brand}
+            />
+          ) : null}
         </div>
 
         <aside className="relative flex min-h-0 flex-col">
