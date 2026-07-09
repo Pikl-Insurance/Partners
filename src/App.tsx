@@ -10,6 +10,7 @@ import {
   Map,
   MoonStar,
   SlidersHorizontal,
+  Sparkles,
   Sun,
   type LucideIcon,
 } from "lucide-react"
@@ -17,6 +18,7 @@ import {
 import { FilterContextPill } from "@/components/filter-context-pill"
 import { FilterSidebar } from "@/components/filter-sidebar"
 import { AiCoworkerCard } from "@/components/ai-coworker-card"
+import { AiCoworkerPage } from "@/components/ai-coworker-page"
 import { AdminPage } from "@/components/admin-page"
 import { LoginPage } from "@/components/login-page"
 import {
@@ -68,7 +70,13 @@ import { APP_MAIN_SCROLL_ID, scrollAppMainToTop, scrollToTop } from "@/lib/scrol
 import { type ActiveFilters, DEFAULT_FILTERS } from "@/lib/chart-data"
 import { PARTNER_BRANDING } from "@/lib/partner-branding"
 
-type ActiveSection = "dashboard" | "insights" | "reporting" | "admin" | "support"
+type ActiveSection =
+  | "dashboard"
+  | "insights"
+  | "reporting"
+  | "ai-coworker"
+  | "admin"
+  | "support"
 type InsightsView = "detail" | "map"
 
 /** Set to true to restore the full Insights dashboard (kept intact). */
@@ -83,6 +91,7 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
     items: [
       { id: "insights", label: "Insights", icon: BarChart3 },
       { id: "reporting", label: "Reporting", icon: FileText },
+      { id: "ai-coworker", label: "AI Coworker", icon: Sparkles },
     ],
   },
   {
@@ -100,6 +109,7 @@ const SECTION_LABELS: Record<ActiveSection, string> = {
   dashboard: "Home",
   insights: "Insights",
   reporting: "Reporting",
+  "ai-coworker": "AI Coworker",
   admin: "Admin",
   support: "Support",
 }
@@ -280,7 +290,10 @@ function App() {
 
                 <div className="relative z-30 mt-auto shrink-0 space-y-3 overflow-visible px-5 pb-6 pt-4">
                   {activeSection === "insights" && SHOW_INSIGHTS_CONTENT ? <SectionNav /> : null}
-                  <AiCoworkerCard partnerName={PARTNER_BRANDING.userDisplayName} />
+                  <AiCoworkerCard
+                    partnerName={PARTNER_BRANDING.userDisplayName}
+                    onOpen={() => setActiveSection("ai-coworker")}
+                  />
                   <Button
                     variant="outline"
                     className="w-full justify-center gap-2 bg-card"
@@ -324,7 +337,11 @@ function App() {
 
                 <div className="relative z-30 mt-auto flex w-full shrink-0 flex-col items-center gap-2 overflow-visible px-2 pb-4 pt-4">
                   {activeSection === "insights" && SHOW_INSIGHTS_CONTENT ? <SectionNav collapsed /> : null}
-                  <AiCoworkerCard collapsed partnerName={PARTNER_BRANDING.userDisplayName} />
+                  <AiCoworkerCard
+                    collapsed
+                    partnerName={PARTNER_BRANDING.userDisplayName}
+                    onOpen={() => setActiveSection("ai-coworker")}
+                  />
                   <button
                     type="button"
                     title="Log out"
@@ -416,7 +433,9 @@ function App() {
                     "relative h-full min-h-0",
                     activeSection === "insights" && insightsView === "map"
                       ? "overflow-hidden"
-                      : "overflow-y-auto px-10 py-10 xl:px-16 xl:py-14"
+                      : activeSection === "ai-coworker"
+                        ? "overflow-hidden px-6 py-5 xl:px-10 xl:py-6"
+                        : "overflow-y-auto px-10 py-10 xl:px-16 xl:py-14"
                   )}
                 >
                   {activeSection === "insights" && insightsView === "detail" ? (
@@ -448,6 +467,8 @@ function App() {
                     <PartnerLandingPage onOpenInsights={() => handleOpenInsights()} />
                   ) : activeSection === "reporting" ? (
                     <ReportingPage filters={reportingFilters} hasRun={reportingHasRun} />
+                  ) : activeSection === "ai-coworker" ? (
+                    <AiCoworkerPage partnerName={PARTNER_BRANDING.userDisplayName} />
                   ) : activeSection === "support" ? (
                     <SupportPage />
                   ) : activeSection === "admin" ? (
