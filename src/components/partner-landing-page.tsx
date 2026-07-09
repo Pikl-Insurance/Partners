@@ -104,7 +104,7 @@ const ABOVE_MARKET_COUNT = MARKET_BENCHMARKS.length - BELOW_MARKET_COUNT
 const TILE_ICONS: Array<{ match: string; icon: LucideIcon }> = [
   { match: "Attachment", icon: Package },
   { match: "Margin", icon: PiggyBank },
-  { match: "Incremental Cancellations", icon: RefreshCcw },
+  { match: "Inc Cancellations & Relets", icon: RefreshCcw },
   { match: "Website Conversion", icon: MousePointerClick },
   { match: "% of Bookings that are offered", icon: Percent },
   { match: "offered a Product", icon: Package },
@@ -114,7 +114,7 @@ const TILE_ICONS: Array<{ match: string; icon: LucideIcon }> = [
   { match: "Gross Bookings", icon: CalendarCheck },
   { match: "Lead Time", icon: Clock },
   { match: "Length of Stay", icon: CalendarRange },
-  { match: "Customer Spend", icon: Wallet },
+  { match: "Spend per Booking", icon: Wallet },
   { match: "IPB", icon: Receipt },
   { match: "Cancellation Rate", icon: Ban },
   { match: "Rebookability Rate", icon: RefreshCcw },
@@ -246,7 +246,7 @@ function TrendChip({ value, tone = "up" }: { value: string; tone?: "up" | "down"
 const REVENUE_MIX = [
   { label: "Margin", value: 900, display: "£900k", opacity: 0.9 },
   { label: "Website", value: 800, display: "£800k", opacity: 0.6 },
-  { label: "Incremental", value: 100, display: "£100k", opacity: 0.3 },
+  { label: "Inc", value: 100, display: "£100k", opacity: 0.3 },
 ] as const
 
 const OFFER_CONVERSION_PCT = Math.round((ATTACHMENT_PCT / PRODUCT_AVAILABLE_PCT) * 100)
@@ -342,7 +342,7 @@ const DRIVER_BREAKDOWN = [
     footnote: "Ex. VAT",
   },
   {
-    label: "Incremental Cancellations & Relets",
+    label: "Inc Cancellations & Relets",
     value: "£100k",
     corner: "6%",
     percent: 6,
@@ -694,7 +694,7 @@ const INCREMENTAL_SHARE_PCT = Math.round(
 const STAYS_CARD_SUPPORT: Record<string, string> = {
   "Attachment (Average)": `vs ${PRODUCT_AVAILABLE_PCT}% product availability`,
   "Margin (ex. VAT) £m": `${MARGIN_SHARE_PCT}% of total partner revenue`,
-  "Incremental Cancellations & Relets": `${INCREMENTAL_SHARE_PCT}% of total partner revenue`,
+  "Incremental Cancellations & Relets Inc": `${INCREMENTAL_SHARE_PCT}% of total partner revenue`,
   "Website Conversion*": "Website conversion uplift",
   Total: PARTNER_REVENUE.headlineNote,
 }
@@ -884,7 +884,7 @@ function QuickActionsCard({
 }
 
 const STAYS_DRIVER_BARS = [
-  { label: "Incremental", width: "28%", color: "#0054CC", value: "£100k" },
+  { label: "Inc", width: "28%", color: "#0054CC", value: "£100k" },
   { label: "Website", width: "72%", color: "#3389FF", value: "£800k" },
   { label: "Margin", width: "100%", color: "#99C4FF", value: "£900k" },
 ] as const
@@ -1280,7 +1280,7 @@ export function InsightsCalPanel() {
               </div>
             </div>
             <div className="rounded-xl border border-border/70 bg-muted/20 p-4">
-              <p className="text-xs font-medium text-foreground">Commission & Booking Fee Benefit</p>
+              <p className="text-xs font-medium text-foreground">Inc Cancellations & Relets</p>
               <p className="mt-1 text-lg font-bold tabular-nums text-foreground">
                 {benefitRow.total.value}
               </p>

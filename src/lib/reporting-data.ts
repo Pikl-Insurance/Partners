@@ -362,7 +362,7 @@ export function buildReportingCompareSections(
         buildMetric("FC attachment", left.calAttachment, right.calAttachment, "percent"),
         buildMetric("FC partner margin", left.calMargin, right.calMargin, "currency"),
         buildMetric(
-          "Incremental cancellation benefit",
+          "Inc Cancellations & Relets",
           left.calBenefit,
           right.calBenefit,
           "currency"

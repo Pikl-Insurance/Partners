@@ -22,7 +22,7 @@ export const PARTNER_REVENUE = {
   drivers: [
     { label: "Attachment (Average)", value: "14%" },
     { label: "Margin (ex. VAT) £m", value: "£900k" },
-    { label: "Incremental Cancellations & Relets", value: "£100k" },
+    { label: "Inc Cancellations & Relets", value: "£100k" },
     {
       label: "Website Conversion*",
       value: "£800k p/a",
@@ -53,7 +53,7 @@ export const ADDITIONAL_PARTNER_REVENUE = {
       side: "£100k est. value",
     },
     {
-      label: "Average Customer Spend per Booking v Non-FC",
+      label: "Avg Spend per Booking v Non-FC",
       value: "£899",
       trend: "+3",
       side: "£100k est. value",
@@ -249,8 +249,8 @@ export const FLEXIBLE_CANCELLATION_GRID: ChannelGridRow[] = [
   flatRateRow("FC Insurance Premium Rate Avg %", "6.35%"),
   // Aligns to PARTNER_REVENUE Margin (ex. VAT) £900k
   moneyRow("FC Partner Margin £", { website: 520000, app: 180000, offline: 80000, ota: 120000 }),
-  // Aligns to PARTNER_REVENUE Incremental Cancellations & Relets £100k
-  moneyRow("Commission and Booking Fee Benefit from Incremental Cancellations", {
+  // Aligns to PARTNER_REVENUE Inc Cancellations & Relets £100k
+  moneyRow("Inc Cancellations & Relets", {
     website: 55000,
     app: 20000,
     offline: 10000,
