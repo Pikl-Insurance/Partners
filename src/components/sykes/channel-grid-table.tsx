@@ -23,8 +23,8 @@ const CELL_VARIANT_CLASS: Record<ChannelCellVariant, string> = {
   volume: "bg-muted text-foreground",
   attachment: "bg-muted/70 text-muted-foreground",
   rate: "bg-muted text-foreground",
-  direct: "bg-foreground/10 text-foreground",
-  total: "border border-border bg-card text-foreground",
+  direct: "bg-primary/10 text-foreground",
+  total: "border border-primary/20 bg-card text-foreground",
   empty: "border border-dashed border-border bg-muted/40 text-muted-foreground",
 }
 

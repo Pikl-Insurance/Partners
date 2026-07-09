@@ -32,16 +32,17 @@ import {
   CollapsibleDataTable,
   MiniBarChart,
   Sparkline,
-  VisualCard,
 } from "@/components/sykes/sykes-visual-primitives"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import {
   ADDITIONAL_PARTNER_REVENUE,
+  DAMAGE_DEPOSIT_WAIVER_GRID,
   FLEXIBLE_CANCELLATION_GRID,
   GROSS_BOOKINGS_TREND,
   MARGIN_EARNED_FC_DATA,
   MARKET_COMPARISON_METRICS,
+  MARKET_COMPARISON_VALUES,
   PARTNER_REVENUE,
   TOTAL_PRODUCTS_SUMMARY,
 } from "@/lib/sykes-dashboard-data"
@@ -120,6 +121,7 @@ const TILE_ICONS: Array<{ match: string; icon: LucideIcon }> = [
   { match: "Insurance Premium", icon: Shield },
   { match: "Out of Test Conversion", icon: TrendingUp },
   { match: "Conversion Benefit", icon: Coins },
+  { match: "DDL Guest Price", icon: Receipt },
 ]
 
 function tileIcon(label: string): LucideIcon {
@@ -129,7 +131,7 @@ function tileIcon(label: string): LucideIcon {
 function TileIcon({ label }: { label: string }) {
   const Icon = tileIcon(label)
 
-  return <Icon className="size-4 shrink-0 text-muted-foreground" />
+  return <Icon className="size-4 shrink-0 text-primary" />
 }
 
 function MonoPill({ children, className }: { children: React.ReactNode; className?: string }) {
@@ -766,15 +768,15 @@ function PiklEffectDriverCards({ onOpenInsights }: { onOpenInsights?: () => void
 function PiklMarketDriverCards({ onOpenInsights }: { onOpenInsights?: () => void }) {
   return (
     <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-5">
-      {MARKET_COMPARISON_METRICS.map((metric) => (
-        <div key={metric} className={cn(PANEL, "flex flex-col gap-4 p-5")}>
+      {MARKET_COMPARISON_VALUES.map((item) => (
+        <div key={item.metric} className={cn(PANEL, "flex flex-col gap-4 p-5")}>
           <div className="flex items-start justify-between gap-2">
-            <TileIcon label={metric} />
+            <TileIcon label={item.metric} />
             {onOpenInsights ? (
               <button
                 type="button"
                 onClick={onOpenInsights}
-                aria-label={`View ${metric} in insights`}
+                aria-label={`View ${item.metric} in insights`}
                 className="-m-1.5 grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 <ArrowUpRight className="size-4" />
@@ -782,10 +784,15 @@ function PiklMarketDriverCards({ onOpenInsights }: { onOpenInsights?: () => void
             ) : null}
           </div>
           <div className="space-y-1">
-            <p className="text-[13px] leading-snug text-muted-foreground">{metric}</p>
-            <p className="text-xl font-bold tracking-tight tabular-nums text-foreground">—</p>
+            <p className="text-[13px] leading-snug text-muted-foreground">{item.metric}</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-xl font-bold tracking-tight tabular-nums text-foreground">
+                {item.value}
+              </p>
+              <TrendChip value={item.trend} tone={item.tone} />
+            </div>
           </div>
-          <p className="mt-auto text-xs text-muted-foreground">Partner vs Market</p>
+          <p className="mt-auto text-xs text-muted-foreground">{item.side}</p>
         </div>
       ))}
     </div>
@@ -870,9 +877,11 @@ function QuickActionsCard({
   )
 }
 
-const STAYS_CHART_DATA = PARTNER_REVENUE.drivers
-  .filter((d) => !("highlight" in d && d.highlight) && !d.label.startsWith("Attachment"))
-  .map((d) => ({ label: d.label.split(" ")[0], value: parseNumeric(d.value) }))
+const STAYS_DRIVER_BARS = [
+  { label: "Incremental", width: "28%", color: "#0054CC", value: "£100k" },
+  { label: "Website", width: "72%", color: "#3389FF", value: "£800k" },
+  { label: "Margin", width: "100%", color: "#99C4FF", value: "£900k" },
+] as const
 
 function StaysSecondRow({ onOpenInsights }: { onOpenInsights?: () => void }) {
   return (
@@ -883,11 +892,22 @@ function StaysSecondRow({ onOpenInsights }: { onOpenInsights?: () => void }) {
         value={PARTNER_REVENUE.headline}
         className="xl:col-span-3"
       >
-        <MiniBarChart
-          data={[...STAYS_CHART_DATA]}
-          valueFormatter={(v) => `£${v}k`}
-          className="h-36 text-primary/80"
-        />
+        <div className="flex h-36 flex-col justify-center space-y-4">
+          {STAYS_DRIVER_BARS.map((bar) => (
+            <div key={bar.label} className="space-y-1.5">
+              <div className="flex items-center justify-between gap-3">
+                <div
+                  className="h-5 rounded-md"
+                  style={{ width: bar.width, backgroundColor: bar.color }}
+                />
+                <span className="shrink-0 text-xs font-semibold tabular-nums text-foreground">
+                  {bar.value}
+                </span>
+              </div>
+              <p className="text-[11px] font-medium text-muted-foreground">{bar.label}</p>
+            </div>
+          ))}
+        </div>
       </ChartRowCard>
       <QuickActionsCard onOpenInsights={onOpenInsights} className="xl:col-span-2" />
     </div>
@@ -921,10 +941,28 @@ function MarketSecondRow({ onOpenInsights }: { onOpenInsights?: () => void }) {
       <ChartRowCard
         eyebrow="Partner vs Market"
         sub="Benchmark by metric"
+        value="92"
+        trend="-8"
         className="xl:col-span-3"
       >
-        <div className="flex h-36 items-center justify-center rounded-xl border border-dashed border-border bg-muted/20">
-          <p className="text-sm text-muted-foreground">Benchmark data coming soon</p>
+        <div className="space-y-3 pb-1">
+          {MARKET_COMPARISON_VALUES.map((item, index) => {
+            const widths = ["72%", "58%", "45%", "68%", "61%"]
+            return (
+              <div key={item.metric} className="space-y-1">
+                <div className="flex items-center justify-between gap-3 text-xs">
+                  <span className="text-muted-foreground">{item.metric}</span>
+                  <span className="font-semibold tabular-nums text-foreground">{item.value}</span>
+                </div>
+                <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full rounded-full bg-primary"
+                    style={{ width: widths[index], opacity: 1 - index * 0.12 }}
+                  />
+                </div>
+              </div>
+            )
+          })}
         </div>
       </ChartRowCard>
       <QuickActionsCard onOpenInsights={onOpenInsights} className="xl:col-span-2" />
@@ -986,6 +1024,41 @@ function parseDisplayValue(value: string): number {
 function channelShare(value: string, total: number): number {
   if (!total) return 0
   return Math.round((parseDisplayValue(value) / total) * 100)
+}
+
+function AttachmentDonut({ percent, className }: { percent: number; className?: string }) {
+  const clamped = Math.min(100, Math.max(0, percent))
+  const radius = 18
+  const circumference = 2 * Math.PI * radius
+  const dash = (clamped / 100) * circumference
+
+  return (
+    <div
+      className={cn("relative grid size-14 shrink-0 place-items-center", className)}
+      aria-hidden
+    >
+      <svg viewBox="0 0 48 48" className="size-full -rotate-90">
+        <circle
+          cx="24"
+          cy="24"
+          r={radius}
+          fill="none"
+          stroke="var(--color-muted)"
+          strokeWidth="5"
+        />
+        <circle
+          cx="24"
+          cy="24"
+          r={radius}
+          fill="none"
+          stroke="var(--color-primary)"
+          strokeWidth="5"
+          strokeLinecap="round"
+          strokeDasharray={`${dash} ${circumference - dash}`}
+        />
+      </svg>
+    </div>
+  )
 }
 
 /** CAL Flexible Cancellation analytics — channel volume, rates, margin, and full breakdown. */
@@ -1148,16 +1221,24 @@ export function InsightsCalPanel() {
           </div>
         </div>
 
-        <VisualCard title="Attachment & margin" subtitle="Key commercial measures by channel">
+        <div className={cn(PANEL, "flex flex-col gap-5 p-5")}>
+          <div>
+            <p className={MONO_LABEL}>Commercial</p>
+            <h3 className="mt-1 text-sm font-semibold text-foreground">Attachment & margin</h3>
+          </div>
+
           <div className="space-y-4">
-            <div className="rounded-xl border border-border/70 bg-muted/20 p-4">
-              <p className="text-xs text-muted-foreground">FC Attachment</p>
-              <p className="mt-2 text-2xl font-bold tabular-nums text-foreground">
-                {attachmentRowData.total.value}
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Direct {attachmentRowData.direct.value} · Total {attachmentRowData.total.value}
-              </p>
+            <div className="flex items-center justify-between gap-4 rounded-xl border border-border/70 bg-muted/20 p-4">
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground">FC Attachment</p>
+                <p className="mt-2 text-2xl font-bold tabular-nums text-foreground">
+                  {attachmentRowData.total.value}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Direct {attachmentRowData.direct.value} · Total {attachmentRowData.total.value}
+                </p>
+              </div>
+              <AttachmentDonut percent={parseDisplayValue(attachmentRowData.total.value)} />
             </div>
             <div className="rounded-xl border border-border/70 bg-muted/20 p-4">
               <p className="text-xs font-medium text-foreground">FC Partner Margin</p>
@@ -1224,7 +1305,7 @@ export function InsightsCalPanel() {
               </div>
             </div>
           </div>
-        </VisualCard>
+        </div>
       </div>
 
       <CollapsibleDataTable title="View full channel breakdown" defaultOpen>
@@ -1234,17 +1315,254 @@ export function InsightsCalPanel() {
   )
 }
 
-/** DDL placeholder until Damage Deposit Waiver analytics are wired the same way. */
+const DDL_RATE_CARDS = [
+  { label: "DDL Guest Price Avg", value: "£30", trend: "+£2", tone: "up" as const },
+  { label: "Insurance Premium Rate Avg", value: "2.12%", trend: "-0.1pp", tone: "down" as const },
+  { label: "Out of Test Conversion", value: "0.4%", trend: "+0.1pp", tone: "up" as const },
+  { label: "Conversion Benefit", value: "£180k", trend: "+£20k", tone: "up" as const },
+] as const
+
+/** DDL Damage Deposit Waiver analytics — same layout as CAL, driven by DDL grid data. */
 export function InsightsDdlPanel() {
+  const bookingsRow = DAMAGE_DEPOSIT_WAIVER_GRID[0]
+  const attachmentRowData = DAMAGE_DEPOSIT_WAIVER_GRID[1]
+  const marginRow = DAMAGE_DEPOSIT_WAIVER_GRID[4]
+  const conversionRow = DAMAGE_DEPOSIT_WAIVER_GRID[5]
+
+  const bookingChannels = [
+    { label: "Website", value: bookingsRow.website.value, color: CAL_CHANNEL_COLORS[0] },
+    { label: "App", value: bookingsRow.app.value, color: CAL_CHANNEL_COLORS[1] },
+    { label: "Offline", value: bookingsRow.offline.value, color: CAL_CHANNEL_COLORS[2] },
+    { label: "OTA", value: bookingsRow.ota.value, color: CAL_CHANNEL_COLORS[3] },
+  ]
+  const bookingsTotal = parseDisplayValue(bookingsRow.total.value)
+  const bookingsDirect = parseDisplayValue(bookingsRow.direct.value)
+  const directShare = channelShare(bookingsRow.direct.value, bookingsTotal)
+
+  const marginChannels = [
+    { label: "Website", value: marginRow.website.value, color: CAL_CHANNEL_COLORS[0] },
+    { label: "App", value: marginRow.app.value, color: CAL_CHANNEL_COLORS[1] },
+    { label: "Offline", value: marginRow.offline.value, color: CAL_CHANNEL_COLORS[2] },
+    { label: "OTA", value: marginRow.ota.value, color: CAL_CHANNEL_COLORS[3] },
+  ]
+  const marginTotal = parseDisplayValue(marginRow.total.value)
+
+  const conversionChannels = [
+    { label: "Website", value: conversionRow.website.value, color: CAL_CHANNEL_COLORS[0] },
+    { label: "App", value: conversionRow.app.value, color: CAL_CHANNEL_COLORS[1] },
+    { label: "Offline", value: conversionRow.offline.value, color: CAL_CHANNEL_COLORS[2] },
+    { label: "OTA", value: conversionRow.ota.value, color: CAL_CHANNEL_COLORS[3] },
+  ]
+
+  const ddlBookingsTrend = MARGIN_EARNED_FC_DATA.map((point) => ({
+    label: point.month,
+    value: Math.round(point.value * 0.4),
+  }))
+
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/20 px-6 py-24 text-center">
-      <span className="grid size-10 place-items-center rounded-xl bg-muted text-muted-foreground">
-        <BarChart3 className="size-4" />
-      </span>
-      <p className="mt-4 text-sm font-semibold text-foreground">Damage Deposit Waiver</p>
-      <p className="mt-1 text-sm text-muted-foreground">
-        DDL channel performance will be available here soon.
-      </p>
+    <div className="space-y-6">
+      <div>
+        <p className={MONO_LABEL}>Product</p>
+        <h2 className="mt-1 text-lg font-semibold tracking-tight text-foreground">
+          Damage Deposit Waiver
+        </h2>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {DDL_RATE_CARDS.map((card) => (
+          <div key={card.label} className={cn(PANEL, "flex flex-col gap-4 p-5")}>
+            <div className="flex items-start justify-between gap-2">
+              <TileIcon label={card.label} />
+              <TrendChip value={card.trend} tone={card.tone} />
+            </div>
+            <div className="space-y-1">
+              <p className="text-[13px] leading-snug text-muted-foreground">{card.label}</p>
+              <p className="text-xl font-bold tracking-tight tabular-nums text-foreground">
+                {card.value}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-2">
+        <div className={cn(PANEL, "flex flex-col gap-5 p-5")}>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className={MONO_LABEL}>Volume</p>
+              <h3 className="mt-1 text-sm font-semibold text-foreground">DDL Bookings by channel</h3>
+            </div>
+            <TrendChip value="+3.1%" tone="up" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-xl border border-border/70 bg-muted/20 px-4 py-3">
+              <p className="text-xs text-muted-foreground">Direct</p>
+              <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
+                {bookingsRow.direct.value}
+              </p>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Website + App + Offline · {directShare}% of total
+              </p>
+            </div>
+            <div className="rounded-xl border border-border/70 bg-muted/20 px-4 py-3">
+              <p className="text-xs text-muted-foreground">Total</p>
+              <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
+                {bookingsRow.total.value}
+              </p>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Direct + OTA · 6.8% attachment overall
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex h-3 overflow-hidden rounded-full bg-muted">
+              {bookingChannels.map((channel) => (
+                <div
+                  key={channel.label}
+                  className="h-full first:rounded-l-full last:rounded-r-full"
+                  style={{
+                    width: `${channelShare(channel.value, bookingsTotal)}%`,
+                    backgroundColor: channel.color,
+                  }}
+                  title={`${channel.label}: ${channel.value}`}
+                />
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-x-4 gap-y-1">
+              {bookingChannels.map((channel) => (
+                <span
+                  key={channel.label}
+                  className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground"
+                >
+                  <span
+                    className="size-2 rounded-full"
+                    style={{ backgroundColor: channel.color }}
+                  />
+                  {channel.label} {channelShare(channel.value, bookingsTotal)}%
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {bookingChannels.map((channel) => {
+              const share = channelShare(channel.value, bookingsTotal)
+              return (
+                <div key={channel.label} className="space-y-1.5">
+                  <div className="flex items-center justify-between gap-3 text-sm">
+                    <span className="text-foreground">{channel.label}</span>
+                    <span className="font-semibold tabular-nums text-foreground">
+                      {channel.value}
+                      <span className="ml-2 text-xs font-medium text-muted-foreground">
+                        {share}%
+                      </span>
+                    </span>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full"
+                      style={{ width: `${share}%`, backgroundColor: channel.color }}
+                    />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          <div className="border-t border-border/60 pt-4">
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <p className="text-xs text-muted-foreground">DDL bookings made · monthly</p>
+              <p className="text-xs font-semibold tabular-nums text-foreground">
+                {bookingsDirect.toLocaleString("en-GB")} direct
+              </p>
+            </div>
+            <Sparkline
+              data={ddlBookingsTrend}
+              valueFormatter={(v) => v.toLocaleString("en-GB")}
+              className="h-20 text-primary/70"
+            />
+          </div>
+        </div>
+
+        <div className={cn(PANEL, "flex flex-col gap-5 p-5")}>
+          <div>
+            <p className={MONO_LABEL}>Commercial</p>
+            <h3 className="mt-1 text-sm font-semibold text-foreground">Attachment & margin</h3>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between gap-4 rounded-xl border border-border/70 bg-muted/20 p-4">
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground">DDL Attachment</p>
+                <p className="mt-2 text-2xl font-bold tabular-nums text-foreground">
+                  {attachmentRowData.total.value}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Direct {attachmentRowData.direct.value} · Total {attachmentRowData.total.value}
+                </p>
+              </div>
+              <AttachmentDonut percent={parseDisplayValue(attachmentRowData.total.value)} />
+            </div>
+            <div className="rounded-xl border border-border/70 bg-muted/20 p-4">
+              <p className="text-xs font-medium text-foreground">DDL Partner Margin</p>
+              <p className="mt-1 text-lg font-bold tabular-nums text-foreground">
+                {marginRow.total.value}
+              </p>
+              <div className="mt-3 flex h-2.5 overflow-hidden rounded-full bg-muted">
+                {marginChannels.map((channel) => (
+                  <div
+                    key={channel.label}
+                    className="h-full first:rounded-l-full last:rounded-r-full"
+                    style={{
+                      width: `${channelShare(channel.value, marginTotal)}%`,
+                      backgroundColor: channel.color,
+                    }}
+                    title={`${channel.label}: ${channel.value}`}
+                  />
+                ))}
+              </div>
+              <div className="mt-3 grid grid-cols-4 gap-2">
+                {marginChannels.map((channel) => (
+                  <div
+                    key={channel.label}
+                    className="rounded-lg border border-border/60 bg-card px-3 py-2"
+                  >
+                    <p className="text-[11px] text-muted-foreground">{channel.label}</p>
+                    <p className="mt-0.5 text-sm font-bold tabular-nums text-foreground">
+                      {channel.value}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="rounded-xl border border-border/70 bg-muted/20 p-4">
+              <p className="text-xs font-medium text-foreground">Out of Test Conversion Benefit</p>
+              <p className="mt-1 text-lg font-bold tabular-nums text-foreground">
+                {conversionRow.total.value}
+              </p>
+              <div className="mt-3 grid grid-cols-4 gap-2">
+                {conversionChannels.map((channel) => (
+                  <div
+                    key={channel.label}
+                    className="rounded-lg border border-border/60 bg-card px-3 py-2"
+                  >
+                    <p className="text-[11px] text-muted-foreground">{channel.label}</p>
+                    <p className="mt-0.5 text-sm font-bold tabular-nums text-foreground">
+                      {channel.value}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <CollapsibleDataTable title="View full channel breakdown" defaultOpen>
+        <ChannelGridTable rows={DAMAGE_DEPOSIT_WAIVER_GRID} className="border-0 shadow-none" />
+      </CollapsibleDataTable>
     </div>
   )
 }
@@ -1310,8 +1628,8 @@ export function PartnerLandingPage({ onOpenInsights }: { onOpenInsights?: () => 
           <h1 className="mt-1.5 text-[22px] font-semibold leading-tight tracking-tight text-foreground">
             {timeOfDayGreeting()}, {PARTNER_BRANDING.userDisplayName}
           </h1>
-          <p className="mt-1.5 text-sm text-muted-foreground">
-            Here&apos;s how your Pikl&apos;d Stays performance is tracking.
+          <p className="mt-1.5 max-w-xl text-sm text-muted-foreground">
+            Review stays performance, product effect, and market benchmarks.
           </p>
         </div>
 

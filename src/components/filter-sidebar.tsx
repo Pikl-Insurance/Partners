@@ -93,9 +93,9 @@ export function FilterSidebar({ filters, hasRun = true, onRun }: FilterSidebarPr
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all-brands">All brands</SelectItem>
-                <SelectItem value="brand-a">Alpha</SelectItem>
-                <SelectItem value="brand-b">Beta</SelectItem>
-                <SelectItem value="brand-c">Gamma</SelectItem>
+                <SelectItem value="brand-a">Manor Cottages</SelectItem>
+                <SelectItem value="brand-b">Lake Lovers</SelectItem>
+                <SelectItem value="brand-c">Dream Cottages</SelectItem>
               </SelectContent>
             </Select>
           </Field>
@@ -161,8 +161,9 @@ export function FilterSidebar({ filters, hasRun = true, onRun }: FilterSidebarPr
                   variant="outline"
                   className={cn(
                     "w-full justify-start gap-2",
-                    isActive &&
-                      "border-foreground/40 bg-muted text-foreground hover:bg-muted hover:text-foreground"
+                    isActive
+                      ? "border-foreground/40 bg-background text-foreground hover:bg-background hover:text-foreground"
+                      : "border-border bg-muted text-foreground hover:bg-muted hover:text-foreground"
                   )}
                   onClick={() => setMetric(value)}
                 >

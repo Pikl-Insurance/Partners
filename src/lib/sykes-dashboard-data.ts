@@ -32,7 +32,7 @@ export const PARTNER_REVENUE = {
 } as const
 
 export const ADDITIONAL_PARTNER_REVENUE = {
-  headline: "£x",
+  headline: "£1.2m",
   drivers: [
     {
       label: "Gross Bookings",
@@ -82,6 +82,15 @@ export const MARKET_COMPARISON_METRICS = [
   "Rebookability Average value",
   "Average Lead Time",
   "Average Length of Stay",
+] as const
+
+/** Partner vs market mock figures — same measures, filled values. */
+export const MARKET_COMPARISON_VALUES = [
+  { metric: "Cancellation Rate", value: "8.3%", trend: "-0.6pp", tone: "up" as const, side: "Market 8.9%" },
+  { metric: "Rebookability Rate", value: "58%", trend: "+2.1pp", tone: "up" as const, side: "Market 55%" },
+  { metric: "Rebookability Average value", value: "£830", trend: "+£40", tone: "up" as const, side: "Market £790" },
+  { metric: "Average Lead Time", value: "125 days", trend: "+15", tone: "up" as const, side: "Market 110 days" },
+  { metric: "Average Length of Stay", value: "6.1 days", trend: "+0.5", tone: "up" as const, side: "Market 5.6 days" },
 ] as const
 
 export const TOTAL_PRODUCTS_SUMMARY = [
@@ -193,21 +202,21 @@ function attachmentRow(
     app: { value: formatPercent(channels.app), variant: "attachment" },
     offline: { value: formatPercent(channels.offline), variant: "attachment" },
     ota: { value: formatPercent(channels.ota), variant: "attachment" },
-    direct: { value: formatPercent(direct), variant: "attachment" },
-    total: { value: formatPercent(total), variant: "attachment" },
+    direct: { value: formatPercent(direct), variant: "direct" },
+    total: { value: formatPercent(total), variant: "total" },
   }
 }
 
 function flatRateRow(label: string, value: string): ChannelGridRow {
-  const cell = (): ChannelGridCell => ({ value, variant: "rate" })
+  const channelCell = (): ChannelGridCell => ({ value, variant: "rate" })
   return {
     label,
-    website: cell(),
-    app: cell(),
-    offline: cell(),
-    ota: cell(),
-    direct: cell(),
-    total: cell(),
+    website: channelCell(),
+    app: channelCell(),
+    offline: channelCell(),
+    ota: channelCell(),
+    direct: { value, variant: "direct" },
+    total: { value, variant: "total" },
   }
 }
 
@@ -275,12 +284,13 @@ export const DAMAGE_DEPOSIT_WAIVER_GRID: ChannelGridRow[] = [
   },
 ]
 
+/**
+ * Contribution to performance — channel grid matching the partner wireframe.
+ * Direct = Website+App+Offline; Total = Direct+OTA. FC rows are Flexible Cancellation.
+ */
 export const CONTRIBUTION_TO_PERFORMANCE_GRID: ChannelGridRow[] = [
   volumeRow("Cancellation Volume", { website: 4200, app: 1600, offline: 800, ota: 1400 }),
   attachmentRow("Cancellation Avg %", { website: 8.7, app: 8.3, offline: 8.3, ota: 7.2 }, 8.6, 8.3),
-]
-
-export const PERFORMANCE_METRICS_GRID: ChannelGridRow[] = [
   volumeRow("Cancellation Volume FC", { website: 2900, app: 1100, offline: 550, ota: 950 }),
   attachmentRow("Cancellation % Avg FC", { website: 6.0, app: 5.7, offline: 5.7, ota: 4.9 }, 5.9, 5.7),
   volumeRow("Relet Volume", { website: 1740, app: 660, offline: 330, ota: 570 }),
@@ -372,6 +382,10 @@ export const PERFORMANCE_METRICS_GRID: ChannelGridRow[] = [
     formatDays
   ),
 ]
+
+/** Alias kept for the full Sykes dashboard — same rows as contribution (FC + behaviour). */
+export const PERFORMANCE_METRICS_GRID: ChannelGridRow[] =
+  CONTRIBUTION_TO_PERFORMANCE_GRID.slice(2)
 
 export const FINANCIALS_GRID: ChannelGridRow[] = [
   moneyRow("Insurance Premium Paid £", { website: 310000, app: 110000, offline: 50000, ota: 80000 }),

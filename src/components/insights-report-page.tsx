@@ -24,7 +24,7 @@ export function InsightsReportPage({ filters, wideLayout }: InsightsReportPagePr
 
   if (wideLayout) {
     return (
-      <div className="grid grid-cols-1 items-stretch gap-x-8 gap-y-6 xl:grid-cols-2">
+      <div className="grid grid-cols-1 items-start gap-x-8 gap-y-6 xl:grid-cols-2">
         <div id="section-bookings" className={cn(sectionClass, "flex min-w-0 flex-col")}>
           <BookingsSnapshot filters={filters} />
         </div>

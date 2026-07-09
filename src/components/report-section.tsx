@@ -10,6 +10,8 @@ type ReportSectionProps = {
   filters?: ActiveFilters
   headingClassName?: string
   headerActions?: ReactNode
+  /** Stretch to fill a grid cell — only use in equal-height carousel / report grids. */
+  fillHeight?: boolean
   children: ReactNode
 }
 
@@ -19,12 +21,16 @@ export function ReportSection({
   filters,
   headingClassName,
   headerActions,
+  fillHeight = false,
   children,
 }: ReportSectionProps) {
   const snapshotRef = useRef<HTMLElement>(null)
 
   return (
-    <section ref={snapshotRef} className="flex h-full min-w-0 flex-col">
+    <section
+      ref={snapshotRef}
+      className={cn("flex min-w-0 flex-col", fillHeight && "h-full")}
+    >
       <div
         className={cn(
           "flex items-center justify-between gap-3",
@@ -41,7 +47,7 @@ export function ReportSection({
           />
         </div>
       </div>
-      <div className="flex flex-1 flex-col">{children}</div>
+      <div className={cn(fillHeight && "flex min-h-0 flex-1 flex-col")}>{children}</div>
     </section>
   )
 }

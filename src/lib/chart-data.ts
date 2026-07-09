@@ -28,9 +28,9 @@ export function formatFilterContext(filters: ActiveFilters) {
         ? "All partners"
         : filters.partner.replace("partner-", "Partner ").replace(/\b\w/g, (c) => c.toUpperCase())
   const brandLabels: Record<string, string> = {
-    "brand-a": "Alpha",
-    "brand-b": "Beta",
-    "brand-c": "Gamma",
+    "brand-a": "Manor Cottages",
+    "brand-b": "Lake Lovers",
+    "brand-c": "Dream Cottages",
   }
   const brand =
     filters.brand === "all-brands"

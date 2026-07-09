@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { ArrowLeftRight, Check, Play } from "lucide-react"
+import { ArrowLeftRight, Play } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Field } from "@/components/ui/field"
@@ -40,9 +40,9 @@ const periodOptions = [
 ] as const
 
 const brandOptions = [
-  { label: "Alpha", value: "brand-a" },
-  { label: "Beta", value: "brand-b" },
-  { label: "Gamma", value: "brand-c" },
+  { label: "Manor Cottages", value: "brand-a" },
+  { label: "Lake Lovers", value: "brand-b" },
+  { label: "Dream Cottages", value: "brand-c" },
 ] as const
 
 type ReportingFilterSidebarProps = {
@@ -82,30 +82,21 @@ export function ReportingFilterSidebar({
           </p>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <h2 className="text-sm font-semibold">Period</h2>
-          <div className="grid grid-cols-2 gap-2">
-            {periodOptions.map(({ label, value }) => {
-              const isActive = period === value
-              return (
-                <Button
-                  key={value}
-                  type="button"
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start gap-2",
-                    isActive &&
-                      "border-foreground/40 bg-muted text-foreground hover:bg-muted hover:text-foreground"
-                  )}
-                  onClick={() => setPeriod(value)}
-                >
-                  <span className="flex-1 text-left">{label}</span>
-                  {isActive ? <Check className="size-3.5 shrink-0" /> : null}
-                </Button>
-              )
-            })}
-          </div>
-        </div>
+        <Field>
+          <Label htmlFor="report-period">Period</Label>
+          <Select value={period} onValueChange={(value) => setPeriod(value as ReportingPeriod)}>
+            <SelectTrigger id="report-period">
+              <SelectValue placeholder="Select period" />
+            </SelectTrigger>
+            <SelectContent>
+              {periodOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
 
         <Separator />
 
@@ -126,25 +117,22 @@ export function ReportingFilterSidebar({
             </button>
           </div>
 
-          <Field>
-            <Label htmlFor="report-brand-a">Brand A</Label>
-            <Select value={brandA} onValueChange={setBrandA}>
-              <SelectTrigger id="report-brand-a">
-                <SelectValue placeholder="Select brand" />
-              </SelectTrigger>
-              <SelectContent>
-                {brandOptions.map((brand) => (
-                  <SelectItem
-                    key={brand.value}
-                    value={brand.value}
-                    disabled={compareEnabled && brand.value === brandB}
-                  >
-                    {brand.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
+          <Select value={brandA} onValueChange={setBrandA}>
+            <SelectTrigger id="report-brand-a" aria-label="First brand">
+              <SelectValue placeholder="Select brand" />
+            </SelectTrigger>
+            <SelectContent>
+              {brandOptions.map((brand) => (
+                <SelectItem
+                  key={brand.value}
+                  value={brand.value}
+                  disabled={compareEnabled && brand.value === brandB}
+                >
+                  {brand.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
           {compareEnabled ? (
             <>
@@ -161,36 +149,85 @@ export function ReportingFilterSidebar({
                 </Button>
               </div>
 
-              <Field>
-                <Label htmlFor="report-brand-b">Brand B</Label>
-                <Select value={brandB} onValueChange={setBrandB}>
-                  <SelectTrigger id="report-brand-b">
-                    <SelectValue placeholder="Select brand" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {brandOptions.map((brand) => (
-                      <SelectItem
-                        key={brand.value}
-                        value={brand.value}
-                        disabled={brand.value === brandA}
-                      >
-                        {brand.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </Field>
+              <Select value={brandB} onValueChange={setBrandB}>
+                <SelectTrigger id="report-brand-b" aria-label="Second brand">
+                  <SelectValue placeholder="Select brand" />
+                </SelectTrigger>
+                <SelectContent>
+                  {brandOptions.map((brand) => (
+                    <SelectItem
+                      key={brand.value}
+                      value={brand.value}
+                      disabled={brand.value === brandA}
+                    >
+                      {brand.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </>
           ) : null}
         </div>
       </div>
 
-      <div className="shrink-0 border-t border-border px-6 pb-6 pt-4">
+      <div className="shrink-0 space-y-4 border-t border-border px-6 pb-6 pt-4">
+        <ReportFormWireframe />
         <Button className="w-full" onClick={handleRun} aria-label="Run report">
           <Play className="size-3.5" />
           {hasRun ? "Run report again" : "Run report"}
         </Button>
       </div>
     </aside>
+  )
+}
+
+/** Decorative wireframe form preview for the filter bar footer. */
+function ReportFormWireframe() {
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none select-none overflow-hidden rounded-xl border border-dashed border-border/80 bg-muted/20 p-3"
+    >
+      <div className="mb-2.5 flex items-center justify-between gap-2">
+        <div className="h-1.5 w-16 rounded-full bg-primary/25" />
+        <div className="h-4 w-8 rounded bg-primary/15" />
+      </div>
+
+      <div className="space-y-2 rounded-lg border border-border/70 bg-background/80 p-2.5 shadow-xs">
+        <div className="flex items-center gap-2 border-b border-border/50 pb-2">
+          <div className="size-4 rounded-full border-2 border-primary/40" />
+          <div className="min-w-0 flex-1 space-y-1">
+            <div className="h-1.5 w-14 rounded-full bg-foreground/20" />
+            <div className="h-1 w-20 rounded-full bg-foreground/10" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-1.5">
+          <div className="h-6 rounded-md border border-border/70 bg-muted/40" />
+          <div className="h-6 rounded-md border border-border/70 bg-muted/40" />
+        </div>
+
+        <div className="space-y-1.5 pt-0.5">
+          {[72, 56, 64, 48].map((width, index) => (
+            <div key={index} className="space-y-1">
+              <div
+                className="h-1 rounded-full bg-foreground/15"
+                style={{ width: `${width}%` }}
+              />
+              <div className="flex gap-1.5">
+                <div className="h-4 flex-1 rounded border border-dashed border-border/80 bg-muted/30" />
+                <div className="h-4 flex-1 rounded border border-dashed border-border/80 bg-muted/20" />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-1 rounded-md border border-dashed border-primary/25 bg-primary/5 px-2 py-2">
+          <div className="h-1 w-12 rounded-full bg-primary/30" />
+          <div className="mt-1.5 h-1 w-full rounded-full bg-primary/15" />
+          <div className="mt-1 h-1 w-2/3 rounded-full bg-primary/10" />
+        </div>
+      </div>
+    </div>
   )
 }
