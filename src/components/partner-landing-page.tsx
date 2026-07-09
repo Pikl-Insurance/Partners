@@ -1699,25 +1699,27 @@ export function InsightsContributionPanel({ filters }: { filters: ActiveFilters 
 /** Top card row for the Insights page — same style as the Home tab cards. */
 export function InsightsTopCards() {
   return (
-    <div className="@container overflow-x-auto pb-1">
-      <div className="flex w-max gap-6">
-        {TOTAL_PRODUCTS_SUMMARY.map((item) => (
-          <div
-            key={item.label}
-            className={cn(PANEL, "flex w-[calc((100cqi-6rem)/4.25)] shrink-0 flex-col gap-4 p-5")}
-          >
-            <div className="flex items-start justify-between gap-2">
-              <TileIcon label={item.label} />
-              <TrendChip value={item.trend} tone={item.tone} />
+    <div className="rounded-2xl bg-[#f0f5fe] p-4 dark:bg-muted">
+      <div className="@container overflow-x-auto">
+        <div className="flex w-max gap-6">
+          {TOTAL_PRODUCTS_SUMMARY.map((item) => (
+            <div
+              key={item.label}
+              className={cn(PANEL, "flex w-[calc((100cqi-6rem)/4.25)] shrink-0 flex-col gap-4 p-5")}
+            >
+              <div className="flex items-start justify-between gap-2">
+                <TileIcon label={item.label} />
+                <TrendChip value={item.trend} tone={item.tone} />
+              </div>
+              <div className="space-y-1">
+                <p className="text-[13px] leading-snug text-muted-foreground">{item.label}</p>
+                <p className="text-xl font-bold tracking-tight tabular-nums text-foreground">
+                  {item.value}
+                </p>
+              </div>
             </div>
-            <div className="space-y-1">
-              <p className="text-[13px] leading-snug text-muted-foreground">{item.label}</p>
-              <p className="text-xl font-bold tracking-tight tabular-nums text-foreground">
-                {item.value}
-              </p>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   )

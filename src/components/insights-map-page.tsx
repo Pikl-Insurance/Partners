@@ -157,39 +157,39 @@ function MapRegionCalloutCard({
       )}
       style={{ top: `${topPct}%` }}
     >
-      <div className="overflow-hidden rounded-2xl border border-border/70 bg-background shadow-xl ring-1 ring-black/5">
-        <div className="relative border-b border-border/60 bg-gradient-to-r from-primary/[0.07] to-transparent px-5 py-4 pr-14">
-          <span className="absolute right-4 top-4 grid size-9 place-items-center rounded-xl bg-primary/10 text-primary">
-            <MapPin className="size-4" />
+      <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-xs">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 space-y-1">
+            <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+              County
+            </p>
+            <p className="text-lg font-semibold tracking-tight text-foreground">{region.name}</p>
+            <p className="text-xs text-muted-foreground">
+              {region.code} · United Kingdom
+            </p>
+          </div>
+          <MapPin className="mt-0.5 size-4 shrink-0 text-primary" />
+        </div>
+
+        <div className="mt-4 flex items-baseline justify-between gap-3 border-t border-border/50 pt-4">
+          <span className="text-sm capitalize text-muted-foreground">{metricLabel}</span>
+          <span className="text-xl font-bold tabular-nums tracking-tight text-foreground">
+            {value}
           </span>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-            County
-          </p>
-          <p className="mt-1 text-xl font-semibold tracking-tight text-foreground">{region.name}</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {region.code} · United Kingdom
-          </p>
         </div>
 
-        <div className="space-y-4 px-5 py-4">
-          <div className="flex items-center justify-between gap-3 rounded-xl bg-primary/5 px-4 py-3.5">
-            <span className="text-sm capitalize text-muted-foreground">{metricLabel}</span>
-            <span className="text-xl font-semibold tabular-nums text-primary">{value}</span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-x-5 gap-y-3.5">
-            {detailRows.map((row) => (
-              <div key={row.label} className="min-w-0">
-                <p className="text-xs text-muted-foreground">{row.label}</p>
-                <p className="mt-0.5 truncate text-[15px] font-semibold tabular-nums text-foreground">
-                  {row.value}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <p className="text-xs text-muted-foreground">Click county to select in sidebar</p>
+        <div className="mt-4 grid grid-cols-2 gap-x-5 gap-y-3">
+          {detailRows.map((row) => (
+            <div key={row.label} className="min-w-0">
+              <p className="text-xs text-muted-foreground">{row.label}</p>
+              <p className="mt-0.5 truncate text-sm font-semibold tabular-nums text-foreground">
+                {row.value}
+              </p>
+            </div>
+          ))}
         </div>
+
+        <p className="mt-4 text-xs text-muted-foreground">Click county to select in sidebar</p>
       </div>
     </div>
   )
