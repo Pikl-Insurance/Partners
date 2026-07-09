@@ -54,7 +54,7 @@ export function MarginEarnedChartTable() {
             <Bar
               dataKey="value"
               name="FC Bookings Made"
-              fill="var(--brand-primary)"
+              fill="#27272a"
               radius={[2, 2, 0, 0]}
             />
           </BarChart>

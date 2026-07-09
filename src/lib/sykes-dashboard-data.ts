@@ -70,6 +70,15 @@ export const ADDITIONAL_PARTNER_REVENUE = {
   ],
 } as const
 
+export const GROSS_BOOKINGS_TREND = [
+  { label: "Jan", value: 520 },
+  { label: "Feb", value: 545 },
+  { label: "Mar", value: 580 },
+  { label: "Apr", value: 610 },
+  { label: "May", value: 640 },
+  { label: "Jun", value: 690 },
+] as const
+
 export const MARKET_COMPARISON_METRICS = [
   "Cancellation Rate",
   "Rebookability Rate",
@@ -371,9 +380,9 @@ export const EVENTS_BY_DATE_DECLINING_DATA: MonthlyTripleSeries[] = [
 export const DEPARTURES_BY_DATE_DATA = EVENTS_BY_DATE_SUMMER_DATA
 
 export const TRIPLE_SERIES_COLORS = {
-  bookings: "#1e3a5f",
-  cancellations: "#e87722",
-  relets: "#1a5c3e",
+  bookings: "#3f3f46",
+  cancellations: "#71717a",
+  relets: "#a1a1aa",
 } as const
 
 export const TRIPLE_SERIES_LABELS = {

@@ -19,12 +19,12 @@ const CHANNEL_COLUMNS = [
 ] as const
 
 const CELL_VARIANT_CLASS: Record<ChannelCellVariant, string> = {
-  channel: "bg-rose-100 text-rose-950",
-  volume: "bg-emerald-100 text-emerald-950",
-  attachment: "bg-orange-100 text-orange-950",
-  rate: "bg-rose-100 text-rose-950",
-  direct: "bg-emerald-100 text-emerald-950",
-  total: "border border-border bg-zinc-100 text-zinc-800",
+  channel: "bg-muted text-foreground",
+  volume: "bg-muted text-foreground",
+  attachment: "bg-muted/70 text-muted-foreground",
+  rate: "bg-muted text-foreground",
+  direct: "bg-foreground/10 text-foreground",
+  total: "border border-border bg-card text-foreground",
   empty: "border border-dashed border-border bg-muted/40 text-muted-foreground",
 }
 

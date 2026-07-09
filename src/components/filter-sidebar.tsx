@@ -72,10 +72,10 @@ export function FilterSidebar({ filters, hasRun = true, onRun }: FilterSidebarPr
   }
 
   return (
-    <aside className="relative min-h-0 overflow-y-auto">
+    <aside className="relative flex min-h-0 flex-col">
       <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-px bg-border" />
 
-      <div className="space-y-6 px-6 py-6">
+      <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-6 py-6">
         <div>
           <h2 className="text-sm font-semibold">Filters</h2>
           <p className="mt-1 text-xs text-muted-foreground">
@@ -166,29 +166,30 @@ export function FilterSidebar({ filters, hasRun = true, onRun }: FilterSidebarPr
           </div>
         </div>
 
-        <div className="border-t border-border pt-4">
-          <Button
-            className="w-full"
-            onClick={handleRun}
-            aria-label={
-              hasRun
-                ? "Update report with selected filters"
-                : "Generate report from selected filters"
-            }
-          >
-            {hasRun ? (
-              <>
-                <RefreshCw className="size-3.5" />
-                Update report
-              </>
-            ) : (
-              <>
-                <Play className="size-3.5" />
-                Generate report
-              </>
-            )}
-          </Button>
-        </div>
+      </div>
+
+      <div className="shrink-0 border-t border-border px-6 pb-6 pt-4">
+        <Button
+          className="w-full"
+          onClick={handleRun}
+          aria-label={
+            hasRun
+              ? "Update report with selected filters"
+              : "Generate report from selected filters"
+          }
+        >
+          {hasRun ? (
+            <>
+              <RefreshCw className="size-3.5" />
+              Update report
+            </>
+          ) : (
+            <>
+              <Play className="size-3.5" />
+              Generate report
+            </>
+          )}
+        </Button>
       </div>
     </aside>
   )

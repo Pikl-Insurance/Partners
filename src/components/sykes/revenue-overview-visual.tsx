@@ -13,21 +13,22 @@ import { MetricTrendWidget } from "@/components/widgets/metric-trend-widget"
 import { cn } from "@/lib/utils"
 import {
   ADDITIONAL_PARTNER_REVENUE,
+  GROSS_BOOKINGS_TREND,
   MARKET_COMPARISON_METRICS,
   PARTNER_REVENUE,
 } from "@/lib/sykes-dashboard-data"
 
 const REVENUE_SPLIT = [
-  { name: "Margin (ex. VAT)", value: 900, color: "#006b6b" },
-  { name: "Website conversion", value: 800, color: "#e87722" },
-  { name: "Incremental canx & relets", value: 100, color: "#7c3aed" },
+  { name: "Margin (ex. VAT)", value: 900, color: "#27272a" },
+  { name: "Website conversion", value: 800, color: "#52525b" },
+  { name: "Incremental canx & relets", value: 100, color: "#a1a1aa" },
 ]
 
 const CHANNEL_COLORS = {
-  website: "#006b6b",
-  app: "#2563eb",
-  offline: "#e87722",
-  ota: "#7c3aed",
+  website: "#27272a",
+  app: "#3f3f46",
+  offline: "#52525b",
+  ota: "#71717a",
 }
 
 function RevenueDonutCard() {
@@ -37,7 +38,7 @@ function RevenueDonutCard() {
     <VisualCard
       title="Pikl'd Stays: Partner Revenue"
       subtitle={PARTNER_REVENUE.headlineNote}
-      className="border-rose-100 bg-gradient-to-br from-rose-50/80 to-card xl:col-span-2"
+      className="border-border bg-card xl:col-span-2"
     >
       <div className="grid gap-6 lg:grid-cols-[1fr_220px] lg:items-center">
         <div>
@@ -59,7 +60,7 @@ function RevenueDonutCard() {
                 </div>
               ))}
           </div>
-          <div className="mt-4 flex items-center justify-between rounded-lg border border-rose-200 bg-rose-100/50 px-3 py-2">
+          <div className="mt-4 flex items-center justify-between rounded-lg border border-border bg-muted/40 px-3 py-2">
             <span className="text-sm font-semibold">Total</span>
             <span className="text-sm font-bold tabular-nums">£1,800k</span>
           </div>
@@ -70,8 +71,8 @@ function RevenueDonutCard() {
             <PieChart>
               <defs>
                 <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#006b6b" stopOpacity={0.9} />
-                  <stop offset="100%" stopColor="#004d4d" stopOpacity={0.7} />
+                  <stop offset="0%" stopColor="#27272a" stopOpacity={0.9} />
+                  <stop offset="100%" stopColor="#18181b" stopOpacity={0.7} />
                 </linearGradient>
               </defs>
               <Pie
@@ -111,7 +112,7 @@ function AttachmentGaugeCard() {
     <VisualCard
       title="Product attachment"
       subtitle="Average across all bookings"
-      className="border-violet-100 bg-gradient-to-br from-violet-50/70 to-card"
+      className="border-border bg-card"
     >
       <div className="flex flex-col items-center py-2">
         <div className="relative grid size-32 place-items-center">
@@ -122,7 +123,7 @@ function AttachmentGaugeCard() {
               cy="60"
               r="48"
               fill="none"
-              stroke="#7c3aed"
+              stroke="#52525b"
               strokeWidth="10"
               strokeLinecap="round"
               strokeDasharray={`${14 * 3.01} ${(100 - 14) * 3.01}`}
@@ -143,10 +144,9 @@ function AttachmentGaugeCard() {
 
 function additionalDriverHint(
   driver: (typeof ADDITIONAL_PARTNER_REVENUE.drivers)[number]
-) {
-  if ("side" in driver) return driver.side
-  if ("note" in driver) return driver.note
-  return undefined
+): string | undefined {
+  const extended = driver as { side?: string; note?: string }
+  return extended.side ?? extended.note
 }
 
 export function RevenueOverviewVisual() {
@@ -165,14 +165,14 @@ export function RevenueOverviewVisual() {
             value={driver.value}
             hint={additionalDriverHint(driver)}
             trend={driver.trend ? { value: driver.trend, direction: "up" } : undefined}
-            className="bg-gradient-to-br from-sky-50/60 to-card"
+            className="bg-card"
           />
         ))}
         <KpiTile
           label="Additional partner revenue"
           value={ADDITIONAL_PARTNER_REVENUE.headline}
           hint="Pikl'd Stays effect — estimated uplift"
-          className="border-sky-200 bg-gradient-to-br from-sky-50/80 to-card md:col-span-2 xl:col-span-1"
+          className="border-border bg-card md:col-span-2 xl:col-span-1"
         />
       </div>
 
@@ -186,21 +186,14 @@ export function RevenueOverviewVisual() {
           comparisonLabel="vs prior period"
           scopeLabel="65% product availability"
           rateLabel="Bookings with product offered"
-          chartData={[
-            { label: "Jan", value: 520 },
-            { label: "Feb", value: 545 },
-            { label: "Mar", value: 580 },
-            { label: "Apr", value: 610 },
-            { label: "May", value: 640 },
-            { label: "Jun", value: 690 },
-          ]}
+          chartData={[...GROSS_BOOKINGS_TREND]}
           className="h-auto"
         />
 
         <VisualCard
           title="Pikl Index: Market comparison"
           subtitle="Partner vs market benchmarks"
-          className="border-emerald-100 bg-gradient-to-br from-emerald-50/60 to-card"
+          className="border-border bg-card"
         >
           <div className="space-y-4">
             {MARKET_COMPARISON_METRICS.map((metric, index) => (
@@ -256,14 +249,14 @@ export function TotalProductsVisual() {
             <p className="mt-1 text-xs text-muted-foreground">Offered a product</p>
           </div>
           <span className="hidden text-muted-foreground lg:block">→</span>
-          <div className="rounded-xl border border-[var(--brand-primary)]/30 bg-[var(--brand-primary)]/5 p-4 text-center">
-            <p className="text-2xl font-bold tabular-nums text-[var(--brand-primary)]">800k</p>
+          <div className="rounded-xl border border-border bg-muted/30 p-4 text-center">
+            <p className="text-2xl font-bold tabular-nums text-foreground">800k</p>
             <p className="mt-1 text-xs text-muted-foreground">Margin earned</p>
           </div>
         </div>
         <div className="mt-5 h-3 overflow-hidden rounded-full bg-muted">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-accent)]"
+            className="h-full rounded-full bg-foreground/70"
             style={{ width: `${offeredPercent}%` }}
           />
         </div>

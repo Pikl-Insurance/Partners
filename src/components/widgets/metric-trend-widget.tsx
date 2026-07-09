@@ -1,4 +1,4 @@
-import { Calendar, TrendingDown, TrendingUp, Users } from "lucide-react"
+import { Calendar, TrendingDown, TrendingUp, Users, type LucideIcon } from "lucide-react"
 import { useId } from "react"
 import { Area, AreaChart, ResponsiveContainer, XAxis } from "recharts"
 
@@ -24,6 +24,7 @@ export type MetricTrendPoint = {
 
 export type MetricTrendWidgetProps = {
   title: string
+  icon?: LucideIcon
   value: string
   trendLabel: string
   trend?: MetricTrendDirection
@@ -34,6 +35,8 @@ export type MetricTrendWidgetProps = {
   helpText?: string
   className?: string
   insightLayout?: boolean
+  showFooter?: boolean
+  compact?: boolean
 }
 
 const TICK_STYLE = { fontSize: 11, fill: "var(--color-muted-foreground)" }
@@ -57,6 +60,7 @@ function TrendBadge({
 
 export function MetricTrendWidget({
   title,
+  icon: Icon,
   value,
   trendLabel,
   trend = "up",
@@ -67,27 +71,42 @@ export function MetricTrendWidget({
   helpText,
   className,
   insightLayout = false,
+  showFooter = true,
+  compact = false,
 }: MetricTrendWidgetProps) {
   const gradientId = `metric-trend-fill-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`
 
   if (insightLayout) {
     return (
-      <Card className={cn("@container flex h-full min-w-0 flex-col bg-card shadow-xs", className)}>
-        <CardHeader className={insightCardHeaderClass}>
+      <Card
+        className={cn(
+          "@container flex min-w-0 flex-col bg-card shadow-xs",
+          compact ? "h-full rounded-2xl border border-border/70" : "h-full",
+          className
+        )}
+      >
+        <CardHeader className={cn(insightCardHeaderClass, compact && "px-5 pt-5")}>
           <div className="flex w-full items-start justify-between gap-3">
-            <h3 className="min-w-0 flex-1 text-sm font-semibold text-foreground">{title}</h3>
-            <WidgetHelpButton title={title} helpText={helpText} />
+            <div className="flex min-w-0 items-center gap-2.5">
+              {Icon ? (
+                <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-muted text-foreground">
+                  <Icon className="size-4" />
+                </span>
+              ) : null}
+              <h3 className="min-w-0 flex-1 text-sm font-semibold text-foreground">{title}</h3>
+            </div>
+            {compact ? null : <WidgetHelpButton title={title} helpText={helpText} />}
           </div>
         </CardHeader>
 
-        <CardContent className="flex min-h-0 flex-1 flex-col p-0">
-          <InsightCardBody>
+        <CardContent className={cn("flex flex-col p-0", compact ? "flex-1" : "min-h-0 flex-1")}>
+          <InsightCardBody className={compact ? "flex flex-1 flex-col gap-3 px-5 pb-5 pt-0" : undefined}>
             <InsightMetricGroup>
               <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
                 <p
                   className={cn(
                     "font-bold tracking-tight tabular-nums text-foreground",
-                    FIGURE_24PX_CLASS
+                    compact ? "text-[26px]" : FIGURE_24PX_CLASS
                   )}
                 >
                   {value}
@@ -97,8 +116,8 @@ export function MetricTrendWidget({
               <p className="text-xs text-muted-foreground">{comparisonLabel}</p>
             </InsightMetricGroup>
 
-            <InsightVisualGroup>
-              <div className={insightChartHeightClass}>
+            <InsightVisualGroup className={compact ? "mt-auto gap-0 pt-2" : undefined}>
+              <div className={compact ? "h-16 w-full" : insightChartHeightClass}>
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={chartData} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
                     <defs>
@@ -131,20 +150,22 @@ export function MetricTrendWidget({
               </div>
             </InsightVisualGroup>
 
-            <InsightFooter
-              left={
-                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                  <Users className="size-3.5 shrink-0" strokeWidth={2} />
-                  <span className="truncate">{scopeLabel}</span>
-                </div>
-              }
-              right={
-                <div className="flex items-center gap-1.5 text-[10px] tabular-nums text-muted-foreground">
-                  <Calendar className="size-3.5 shrink-0" strokeWidth={2} />
-                  {rateLabel}
-                </div>
-              }
-            />
+            {showFooter ? (
+              <InsightFooter
+                left={
+                  <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                    <Users className="size-3.5 shrink-0" strokeWidth={2} />
+                    <span className="truncate">{scopeLabel}</span>
+                  </div>
+                }
+                right={
+                  <div className="flex items-center gap-1.5 text-[10px] tabular-nums text-muted-foreground">
+                    <Calendar className="size-3.5 shrink-0" strokeWidth={2} />
+                    {rateLabel}
+                  </div>
+                }
+              />
+            ) : null}
           </InsightCardBody>
         </CardContent>
       </Card>
@@ -154,7 +175,14 @@ export function MetricTrendWidget({
   return (
     <Card className={cn("@container flex h-full min-w-0 flex-col bg-card shadow-xs", className)}>
       <CardHeader className="flex-row items-start justify-between space-y-0 px-4 pb-2 pt-4">
-        <h3 className="min-w-0 pr-2 text-sm font-semibold text-muted-foreground">{title}</h3>
+        <div className="flex min-w-0 items-center gap-2.5 pr-2">
+          {Icon ? (
+            <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-muted text-foreground">
+              <Icon className="size-4" />
+            </span>
+          ) : null}
+          <h3 className="min-w-0 text-sm font-semibold text-muted-foreground">{title}</h3>
+        </div>
         <WidgetHelpButton title={title} helpText={helpText} />
       </CardHeader>
 
